@@ -52,6 +52,17 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 .btn.full{width:100%}
 .btn.sm{padding:4px 8px;font-size:10px}
 #chain-status{margin-top:6px;font-size:10px;color:var(--text3);min-height:16px;word-break:break-all}
+/* live trace */
+#trace-btn.recording{background:rgba(239,68,68,.18);border-color:var(--red);color:var(--red)}
+#trace-btn.recording:hover{background:rgba(239,68,68,.3)}
+#trace-stats{background:var(--bg2);border:1px solid var(--border);border-radius:5px;padding:8px 10px;margin-top:6px;font-size:10px}
+#trace-stats .ts-row{display:flex;justify-content:space-between;margin-bottom:3px;color:var(--text2)}
+#trace-stats .ts-val{font-weight:600;color:var(--accent)}
+@keyframes pulse-ring{0%{transform:scale(.6);opacity:.8}100%{transform:scale(2.4);opacity:0}}
+@keyframes pulse-dot{0%,100%{transform:scale(1)}50%{transform:scale(1.2)}}
+.gps-pulse-wrap{position:relative;width:18px;height:18px}
+.gps-pulse-dot{width:12px;height:12px;background:var(--accent);border:2px solid #fff;border-radius:50%;position:absolute;top:3px;left:3px;animation:pulse-dot 1.5s ease-in-out infinite;box-shadow:0 0 6px var(--accent)}
+.gps-pulse-ring{width:18px;height:18px;border:2px solid var(--accent);border-radius:50%;position:absolute;top:0;left:0;animation:pulse-ring 1.5s ease-out infinite}
 #gps-status{font-size:10px;color:var(--text3);margin-bottom:5px;min-height:14px}
 #mapbox-wrap{margin-top:6px}
 #mapbox-token{width:100%;background:var(--bg2);border:1px solid var(--border2);color:var(--text);border-radius:4px;padding:5px 7px;font-size:10px}
@@ -237,6 +248,21 @@ input.form-in:focus,select.form-sel:focus{outline:1px solid var(--accent);border
           <button class="btn" id="chain-btn" onclick="toggleChain()" style="width:100%">⛓ Auto-Chain: OFF</button>
           <div id="chain-status"></div>
         </div>
+        <!-- Live Trace -->
+        <div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border)">
+          <div class="sec-label">Live Route Trace</div>
+          <button class="btn full" id="trace-btn" onclick="toggleLiveTrace()">🔴 Start Live Trace</button>
+          <div id="trace-stats" style="display:none">
+            <div class="ts-row"><span>Distance</span><span class="ts-val" id="ts-dist">0 m</span></div>
+            <div class="ts-row"><span>Duration</span><span class="ts-val" id="ts-time">0:00</span></div>
+            <div class="ts-row"><span>Points</span><span class="ts-val" id="ts-pts">0</span></div>
+            <div class="ts-row"><span>Accuracy</span><span class="ts-val" id="ts-acc">—</span></div>
+            <div style="margin-top:6px;display:flex;gap:4px">
+              <button class="btn sm primary" onclick="dropTraceInfra()" style="flex:1">📌 Mark Here</button>
+              <button class="btn sm danger" onclick="stopLiveTrace(true)" style="flex:1">⏹ Stop &amp; Edit</button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
     <div class="sb-section">
@@ -332,6 +358,29 @@ input.form-in:focus,select.form-sel:focus{outline:1px solid var(--accent);border
   <div class="form-actions">
     <button class="btn" onclick="cancelLabel()">Cancel</button>
     <button class="btn primary" onclick="confirmLabel()">Place</button>
+  </div>
+</div>
+</div>
+
+<!-- Quick Infra Modal (mid-trace marker placement) -->
+<div class="modal-overlay" id="trace-infra-modal">
+<div class="modal" style="width:340px">
+  <h2>📌 Mark Point Along Trace</h2>
+  <div class="form-row">
+    <label>Infrastructure Type</label>
+    <div class="tool-grid" id="trace-infra-grid" style="margin-bottom:8px"></div>
+  </div>
+  <div class="form-row">
+    <label>Label</label>
+    <input class="form-in" id="trace-infra-label" placeholder="e.g. SC-001"/>
+  </div>
+  <div class="form-row">
+    <label>Notes</label>
+    <input class="form-in" id="trace-infra-notes" placeholder="Optional"/>
+  </div>
+  <div class="form-actions">
+    <button class="btn" onclick="document.getElementById('trace-infra-modal').classList.remove('open')">Cancel</button>
+    <button class="btn primary" onclick="confirmTraceInfra()">Place Marker</button>
   </div>
 </div>
 </div>
@@ -1265,6 +1314,220 @@ function printSurvey(id){
   <div class="footer">Technician: ___________________________ &nbsp; Signature: ___________________________</div>
   </body></html>`);
   w.document.close(); w.print();
+}
+
+// ══════════════════════════════════════════════════
+//  LIVE GPS TRACE
+// ══════════════════════════════════════════════════
+const T = {
+  active: false,
+  watchId: null,
+  pts: [],            // L.LatLng array
+  rawPts: [],         // {lat,lng,acc,ts}
+  polyline: null,
+  posMarker: null,    // pulsing dot
+  accCircle: null,    // accuracy ring
+  startTime: null,
+  timerInterval: null,
+  totalDist: 0,
+  lastPt: null,
+  selectedInfraType: 'closure', // default for mid-trace markers
+};
+
+const TRACE_MIN_DIST = 3;    // metres — ignore jitter below this
+const TRACE_MAX_ACC  = 50;   // metres — skip poor-accuracy fixes
+const TRACE_ROUTE_COLOR = '#00D9FF';
+
+function toggleLiveTrace(){
+  T.active ? stopLiveTrace(true) : startLiveTrace();
+}
+
+function startLiveTrace(){
+  if(!navigator.geolocation){ toast('Geolocation not supported on this device'); return; }
+  T.active = true;
+  T.pts = []; T.rawPts = []; T.totalDist = 0; T.lastPt = null;
+  T.startTime = Date.now();
+
+  // Style the button
+  const btn = document.getElementById('trace-btn');
+  btn.textContent = '⏹ Stop Tracing…';
+  btn.className = 'btn full recording';
+  document.getElementById('trace-stats').style.display = '';
+
+  // Create live polyline
+  T.polyline = L.polyline([], {
+    color: TRACE_ROUTE_COLOR, weight: 4,
+    dashArray: '6,4', opacity: .9,
+  }).addTo(MAP);
+
+  // Start timer
+  T.timerInterval = setInterval(updateTraceTimer, 1000);
+
+  // Start watching
+  T.watchId = navigator.geolocation.watchPosition(
+    onTracePosition,
+    err => { toast('GPS error: ' + err.message); stopLiveTrace(false); },
+    { enableHighAccuracy: true, maximumAge: 1000, timeout: 10000 }
+  );
+  toast('Live trace started — walk the route');
+}
+
+function onTracePosition(pos){
+  const { latitude: lat, longitude: lng, accuracy: acc } = pos.coords;
+
+  // Update accuracy/status display
+  document.getElementById('ts-acc').textContent = `±${Math.round(acc)}m`;
+  document.getElementById('gps-status').textContent = `Tracing ±${Math.round(acc)}m`;
+
+  // Skip poor fixes
+  if(acc > TRACE_MAX_ACC) return;
+
+  const ll = L.latLng(lat, lng);
+
+  // Skip jitter (too close to last recorded point)
+  if(T.lastPt){
+    const d = MAP.distance(T.lastPt, ll);
+    if(d < TRACE_MIN_DIST) return;
+    T.totalDist += d;
+  }
+
+  T.pts.push(ll);
+  T.rawPts.push({ lat, lng, acc, ts: Date.now() });
+  T.lastPt = ll;
+
+  // Extend polyline
+  T.polyline.setLatLngs(T.pts);
+
+  // Update pulsing position marker
+  updatePosMarker(ll, acc);
+
+  // Pan to keep user in view
+  if(!MAP.getBounds().contains(ll)) MAP.panTo(ll);
+
+  // Update stats
+  document.getElementById('ts-dist').textContent =
+    T.totalDist >= 1000 ? `${(T.totalDist/1000).toFixed(2)} km` : `${Math.round(T.totalDist)} m`;
+  document.getElementById('ts-pts').textContent = T.pts.length;
+}
+
+function updatePosMarker(ll, acc){
+  // Accuracy circle
+  if(T.accCircle) MAP.removeLayer(T.accCircle);
+  T.accCircle = L.circle(ll, { radius: acc, color: TRACE_ROUTE_COLOR,
+    fillColor: TRACE_ROUTE_COLOR, fillOpacity: .06, weight: 1, opacity: .4 }).addTo(MAP);
+
+  // Pulsing dot icon
+  if(T.posMarker) MAP.removeLayer(T.posMarker);
+  T.posMarker = L.marker(ll, {
+    icon: L.divIcon({
+      className: '',
+      html: `<div class="gps-pulse-wrap"><div class="gps-pulse-ring"></div><div class="gps-pulse-dot"></div></div>`,
+      iconSize: [18,18], iconAnchor: [9,9],
+    }),
+    zIndexOffset: 1000,
+    interactive: false,
+  }).addTo(MAP);
+}
+
+function updateTraceTimer(){
+  const elapsed = Math.floor((Date.now() - T.startTime) / 1000);
+  const m = Math.floor(elapsed / 60);
+  const s = elapsed % 60;
+  document.getElementById('ts-time').textContent = `${m}:${String(s).padStart(2,'0')}`;
+}
+
+function stopLiveTrace(openModal){
+  if(!T.active) return;
+  T.active = false;
+
+  // Stop watching
+  if(T.watchId !== null){ navigator.geolocation.clearWatch(T.watchId); T.watchId = null; }
+  clearInterval(T.timerInterval);
+
+  // Reset button
+  const btn = document.getElementById('trace-btn');
+  btn.textContent = '🔴 Start Live Trace';
+  btn.className = 'btn full';
+  document.getElementById('trace-stats').style.display = 'none';
+  document.getElementById('gps-status').textContent = 'Ready';
+
+  // Clean up live markers
+  if(T.posMarker){ MAP.removeLayer(T.posMarker); T.posMarker = null; }
+  if(T.accCircle){ MAP.removeLayer(T.accCircle); T.accCircle = null; }
+
+  if(!T.pts.length){ toast('No trace points recorded'); return; }
+
+  if(T.polyline){ MAP.removeLayer(T.polyline); T.polyline = null; }
+
+  if(!openModal){
+    toast(`Trace discarded (${T.pts.length} pts)`);
+    return;
+  }
+
+  // Hand the traced points to the route modal as a pending route
+  const dist = T.totalDist || calcRouteDist(T.pts);
+  S.pendingRoute = {
+    pts: T.pts,
+    fromEl: snapToElem(T.pts[0]),
+    toEl:   snapToElem(T.pts[T.pts.length - 1]),
+  };
+  // Pre-fill a sensible label
+  const rcnt = S.routes.length + 1;
+  openRouteModal();
+  document.getElementById('rm-label').value = `TRACE-${String(rcnt).padStart(3,'0')}`;
+  document.getElementById('rm-notes').value =
+    `Recorded ${new Date(T.startTime).toLocaleTimeString()} · ${Math.round(dist)}m · ${T.pts.length} pts`;
+  toast(`Trace stopped — ${Math.round(dist)}m, ${T.pts.length} points`);
+}
+
+// ── Mid-trace infrastructure placement ──
+let _traceInfraLL = null;
+
+function dropTraceInfra(){
+  if(!T.lastPt){ toast('No GPS fix yet'); return; }
+  _traceInfraLL = T.lastPt;
+
+  // Build quick-pick grid
+  const grid = document.getElementById('trace-infra-grid');
+  // Only show field-relevant types
+  const fieldTypes = ['closure','manhole','rack','cabinet','odp','patchpanel','customer'];
+  grid.innerHTML = fieldTypes.map(id => {
+    const cfg = INFRA[id];
+    return `<button class="tool-btn${T.selectedInfraType===id?' active':''}"
+      onclick="selectTraceInfraType('${id}')" id="tig-${id}">
+      <span style="color:${cfg.color}">●</span> ${cfg.abbr}<br>
+      <span style="font-size:9px;color:var(--text3)">${cfg.label}</span>
+    </button>`;
+  }).join('');
+
+  // Auto-label
+  const cfg = INFRA[T.selectedInfraType];
+  const count = S.elements.filter(e=>e.type===T.selectedInfraType).length + 1;
+  document.getElementById('trace-infra-label').value =
+    `${cfg.abbr}-${String(count).padStart(3,'0')}`;
+  document.getElementById('trace-infra-notes').value = '';
+
+  document.getElementById('trace-infra-modal').classList.add('open');
+}
+
+function selectTraceInfraType(id){
+  T.selectedInfraType = id;
+  document.querySelectorAll('[id^="tig-"]').forEach(b => b.classList.remove('active'));
+  document.getElementById('tig-'+id)?.classList.add('active');
+  const cfg = INFRA[id];
+  const count = S.elements.filter(e=>e.type===id).length + 1;
+  document.getElementById('trace-infra-label').value =
+    `${cfg.abbr}-${String(count).padStart(3,'0')}`;
+}
+
+function confirmTraceInfra(){
+  const type  = T.selectedInfraType;
+  const label = document.getElementById('trace-infra-label').value.trim();
+  const notes = document.getElementById('trace-infra-notes').value.trim();
+  document.getElementById('trace-infra-modal').classList.remove('open');
+  if(!_traceInfraLL) return;
+  placeElem(type, _traceInfraLL, label, 0, notes);
+  toast(`${INFRA[type].label} "${label}" marked`);
 }
 
 // ══════════════════════════════════════════════════
