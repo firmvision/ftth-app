@@ -10,7 +10,7 @@ const TILE_HOSTS = [
 ];
 
 const APP_SHELL = [
-  "/","index.html","manifest.json",
+  "./","./index.html","./manifest.json",
   "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js",
   "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
 ];
