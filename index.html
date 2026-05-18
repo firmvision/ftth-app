@@ -1020,66 +1020,178 @@ function fitAll(){
   if(pts.length)MAP.fitBounds(L.latLngBounds(pts),{padding:[40,40]});
 }
 
-// ── LOCATE ME (map button) ──
+// ── LOCATE ME — multi-sample weighted-average engine ──
+//
+// Software accuracy ceiling for a smartphone GPS (single-frequency L1):
+//   • Raw single reading : 8–20 m typical
+//   • After averaging    : 2–5 m in open sky  ← what this achieves
+//   • Hardware floor     : ~1 m  (irreducible: atmosphere, multipath, tiny antenna)
+//   • 0.5 m / sub-metre  : requires RTK GPS hardware with base corrections
+//
+// Algorithm:
+//   1. watchPosition with maximumAge:0 (always fresh, never cached)
+//   2. Reject any fix worse than LOCATE_REJECT_ACC (80 m)
+//   3. Weight each accepted fix by  w = 1 / acc²  (better fix → much higher weight)
+//   4. Accumulate weighted sums → running weighted-mean lat/lng
+//   5. Stop when: reported accuracy ≤ LOCATE_TARGET_ACC  OR  ≥ LOCATE_MAX_SAMPLES collected
+//   6. Hard 25 s timeout — report best available if any samples were collected
+//
+const LOCATE_TARGET_ACC  = 5;   // m — stop collecting once a single fix reaches this
+const LOCATE_MAX_SAMPLES = 30;  // max samples before finalising
+const LOCATE_REJECT_ACC  = 80;  // m — discard fixes worse than this (HDOP too high)
+const LOCATE_TIMEOUT_MS  = 25000; // ms — hard deadline
+
 let _locateMarker=null, _locateCircle=null, _locating=false;
+let _locateWatch=null, _locateSamples=[], _locateTimeoutId=null;
+
 function locateUser(){
   if(!navigator.geolocation){toast('Geolocation not supported on this device');return;}
-  const btn=document.getElementById('locate-btn');
-  // If already showing a location, toggle off
-  if(_locateMarker&&!_locating){
-    MAP.removeLayer(_locateMarker); _locateMarker=null;
-    if(_locateCircle){MAP.removeLayer(_locateCircle);_locateCircle=null;}
-    btn.classList.remove('located');
+  const mapBtn   = document.getElementById('locate-btn');
+  const dockBtn  = document.getElementById('dock-locate-btn');
+
+  // Already located (not acquiring) → clear and toggle off
+  if(_locateMarker && !_locating){
+    _locateClear();
+    mapBtn?.classList.remove('located');
+    dockBtn?.classList.remove('dock-active');
     toast('Location cleared');
     return;
   }
-  if(_locating) return; // already requesting
-  _locating=true;
-  btn.classList.add('locating');
-  toast('Finding your location…');
-  navigator.geolocation.getCurrentPosition(
-    pos=>{
-      _locating=false;
-      btn.classList.remove('locating');
-      btn.classList.add('located');
-      const lat=pos.coords.latitude, lng=pos.coords.longitude, acc=pos.coords.accuracy;
-      const ll=L.latLng(lat,lng);
-      // Remove old markers
-      if(_locateMarker){MAP.removeLayer(_locateMarker);_locateMarker=null;}
-      if(_locateCircle){MAP.removeLayer(_locateCircle);_locateCircle=null;}
-      // Accuracy circle
-      if(acc<500){
-        _locateCircle=L.circle(ll,{radius:acc,color:'#00D9FF',fillColor:'#00D9FF',fillOpacity:0.07,weight:1,interactive:false}).addTo(MAP);
+  if(_locating) return;
+
+  _locating = true;
+  _locateSamples = [];
+  mapBtn?.classList.add('locating');
+  dockBtn?.classList.add('dock-active');
+  toast('📡 Acquiring GPS — hold still for best accuracy…');
+
+  // watchPosition: keeps the GPS radio on and delivers improving fixes over time
+  _locateWatch = navigator.geolocation.watchPosition(
+    pos => {
+      const { latitude:lat, longitude:lng, accuracy:acc } = pos.coords;
+
+      // Skip if fix is too poor to be useful
+      if(acc > LOCATE_REJECT_ACC) return;
+
+      // Accumulate weighted sample  (w = 1/acc²)
+      const w = 1 / (acc * acc);
+      _locateSamples.push({ lat, lng, acc, w });
+
+      // Compute best estimate so far
+      const best = _locateWeightedMean(_locateSamples);
+
+      // Update the live marker while collecting
+      _locateDrawMarker(best.lat, best.lng, best.acc, _locateSamples.length, /*final=*/false);
+
+      // Stop conditions
+      if(acc <= LOCATE_TARGET_ACC || _locateSamples.length >= LOCATE_MAX_SAMPLES){
+        _locateFinalise(best);
       }
-      // Pulsing "you are here" dot
-      _locateMarker=L.marker(ll,{
-        icon:L.divIcon({
-          className:'',
-          html:`<div style="position:relative;width:18px;height:18px">
-            <div style="position:absolute;inset:0;border:2px solid #00D9FF;border-radius:50%;animation:pulse-ring 1.5s ease-out infinite"></div>
-            <div style="position:absolute;top:3px;left:3px;width:12px;height:12px;background:#00D9FF;border:2px solid #fff;border-radius:50%;animation:pulse-dot 1.5s ease-in-out infinite;box-shadow:0 0 8px #00D9FF88"></div>
-          </div>`,
-          iconSize:[18,18],iconAnchor:[9,9]
-        }),
-        zIndexOffset:2000,
-        interactive:true
-      }).addTo(MAP);
-      _locateMarker.bindPopup(`<b>📍 You are here</b><br>Accuracy: ±${Math.round(acc)} m<br>${lat.toFixed(5)}, ${lng.toFixed(5)}`);
-      // Fly to location smoothly
-      MAP.flyTo(ll,Math.max(MAP.getZoom(),16),{animate:true,duration:1.2});
-      toast(`Located ✓  Accuracy ±${Math.round(acc)} m`);
-      // Also fill the GPS field tool inputs
-      document.getElementById('gps-lat').value=lat.toFixed(6);
-      document.getElementById('gps-lng').value=lng.toFixed(6);
     },
-    err=>{
-      _locating=false;
-      btn.classList.remove('locating');
-      const msgs={1:'Location permission denied — enable in Settings',2:'Location signal unavailable',3:'Location request timed out'};
-      toast(msgs[err.code]||'Could not get location');
+    err => {
+      _locateClear(/*keepMarker=*/false);
+      mapBtn?.classList.remove('locating');
+      dockBtn?.classList.remove('dock-active');
+      const msgs = {1:'Location permission denied — enable in Settings → Privacy',
+                    2:'Location signal unavailable — try open sky',
+                    3:'GPS timed out — try open sky'};
+      toast(msgs[err.code] || 'Could not get location');
     },
-    {enableHighAccuracy:true,timeout:15000,maximumAge:10000}
+    { enableHighAccuracy:true, timeout:LOCATE_TIMEOUT_MS, maximumAge:0 }
   );
+
+  // Hard deadline: finalise with whatever we have
+  _locateTimeoutId = setTimeout(()=>{
+    if(!_locating) return;
+    if(_locateSamples.length > 0){
+      _locateFinalise(_locateWeightedMean(_locateSamples));
+    } else {
+      _locateClear(false);
+      mapBtn?.classList.remove('locating');
+      dockBtn?.classList.remove('dock-active');
+      toast('GPS timeout — no fix. Move to open sky and retry.');
+    }
+  }, LOCATE_TIMEOUT_MS + 2000);
+}
+
+// Weighted mean of collected samples (weight = 1/acc²)
+function _locateWeightedMean(samples){
+  let wSum=0, latSum=0, lngSum=0, accWSum=0;
+  samples.forEach(s=>{ wSum+=s.w; latSum+=s.lat*s.w; lngSum+=s.lng*s.w; accWSum+=s.acc*s.w; });
+  return { lat:latSum/wSum, lng:lngSum/wSum, acc:accWSum/wSum };
+}
+
+// Draw / update the "you are here" marker and accuracy circle
+function _locateDrawMarker(lat, lng, acc, n, final){
+  const ll = L.latLng(lat, lng);
+  if(_locateCircle){ MAP.removeLayer(_locateCircle); _locateCircle=null; }
+  if(_locateMarker){ MAP.removeLayer(_locateMarker); _locateMarker=null; }
+
+  const colour  = final ? '#22C55E' : '#00D9FF';
+  const ringAnim = final ? '' : 'animation:pulse-ring 1.5s ease-out infinite';
+  const dotAnim  = final ? '' : 'animation:pulse-dot 1.5s ease-in-out infinite';
+
+  _locateCircle = L.circle(ll,{
+    radius:acc, color:colour, fillColor:colour,
+    fillOpacity:0.07, weight:1.5, interactive:false
+  }).addTo(MAP);
+
+  _locateMarker = L.marker(ll,{
+    icon:L.divIcon({
+      className:'',
+      html:`<div style="position:relative;width:18px;height:18px">
+        <div style="position:absolute;inset:0;border:2px solid ${colour};border-radius:50%;${ringAnim}"></div>
+        <div style="position:absolute;top:3px;left:3px;width:12px;height:12px;background:${colour};border:2px solid #fff;border-radius:50%;${dotAnim};box-shadow:0 0 8px ${colour}99"></div>
+      </div>`,
+      iconSize:[18,18], iconAnchor:[9,9]
+    }),
+    zIndexOffset:2000, interactive:true
+  }).addTo(MAP);
+
+  const label = final ? '📍 You are here' : `📡 Acquiring… (${n} sample${n>1?'s':''})`;
+  _locateMarker.bindPopup(
+    `<b>${label}</b><br>Accuracy: ±${acc.toFixed(1)} m<br>${lat.toFixed(6)}, ${lng.toFixed(6)}`
+  );
+
+  // Pan map on first sample only; don't jitter on every update
+  if(n === 1 || final){
+    MAP.flyTo(ll, Math.max(MAP.getZoom(), final?17:16), {animate:true, duration:final?1.2:0.8});
+  }
+}
+
+// Stop the watch, display final result, update buttons
+function _locateFinalise(best){
+  if(!_locating) return;
+  _locating = false;
+  if(_locateWatch != null){ navigator.geolocation.clearWatch(_locateWatch); _locateWatch=null; }
+  clearTimeout(_locateTimeoutId);
+
+  const mapBtn  = document.getElementById('locate-btn');
+  const dockBtn = document.getElementById('dock-locate-btn');
+  mapBtn?.classList.remove('locating');
+  mapBtn?.classList.add('located');
+  // keep dock button highlighted to signal "located"
+  dockBtn?.classList.add('dock-active');
+
+  const n = _locateSamples.length;
+  _locateDrawMarker(best.lat, best.lng, best.acc, n, /*final=*/true);
+
+  // Fill GPS field tool
+  document.getElementById('gps-lat').value = best.lat.toFixed(6);
+  document.getElementById('gps-lng').value = best.lng.toFixed(6);
+
+  toast(`✓ Located  ±${best.acc.toFixed(1)} m  (${n} sample${n>1?'s':''} averaged)`);
+}
+
+// Reset all locate state
+function _locateClear(keepMarker=false){
+  if(_locateWatch!=null){ navigator.geolocation.clearWatch(_locateWatch); _locateWatch=null; }
+  clearTimeout(_locateTimeoutId);
+  _locating=false; _locateSamples=[];
+  if(!keepMarker){
+    if(_locateMarker){ MAP.removeLayer(_locateMarker); _locateMarker=null; }
+    if(_locateCircle){ MAP.removeLayer(_locateCircle); _locateCircle=null; }
+  }
 }
 
 // ── GPS ──
@@ -1569,8 +1681,8 @@ const T = {
   selectedInfraType: 'closure', // default for mid-trace markers
 };
 
-const TRACE_MIN_DIST = 3;    // metres — ignore jitter below this
-const TRACE_MAX_ACC  = 50;   // metres — skip poor-accuracy fixes
+const TRACE_MIN_DIST = 2;    // metres — ignore jitter below this
+const TRACE_MAX_ACC  = 20;   // metres — skip poor-accuracy fixes (tightened from 50)
 const TRACE_ROUTE_COLOR = '#00D9FF';
 
 function toggleLiveTrace(){
