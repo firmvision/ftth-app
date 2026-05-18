@@ -1,0 +1,17 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="80" fill="#04090F"/>
+  <path d="M 100 420 L 100 250 L 256 180 L 412 250 L 412 380"
+        fill="none" stroke="#00D9FF" stroke-width="6" stroke-linecap="round"/>
+  <path d="M 100 250 L 160 320 L 160 420" fill="none" stroke="#10B981" stroke-width="4"/>
+  <path d="M 412 250 L 352 320 L 352 420" fill="none" stroke="#10B981" stroke-width="4"/>
+  <rect x="220" y="148" width="72" height="64" rx="10" fill="#F59E0B22" stroke="#F59E0B" stroke-width="3"/>
+  <text x="256" y="184" text-anchor="middle" fill="#F59E0B" font-family="monospace" font-size="20" font-weight="bold">CO</text>
+  <circle cx="100" cy="250" r="20" fill="#A855F722" stroke="#A855F7" stroke-width="2.5"/>
+  <text x="100" y="256" text-anchor="middle" fill="#A855F7" font-family="monospace" font-size="10">ODP</text>
+  <circle cx="412" cy="250" r="20" fill="#A855F722" stroke="#A855F7" stroke-width="2.5"/>
+  <text x="412" y="256" text-anchor="middle" fill="#A855F7" font-family="monospace" font-size="10">ODP</text>
+  <rect x="88"  y="408" width="24" height="24" rx="4" fill="#10B98122" stroke="#10B981" stroke-width="2"/>
+  <rect x="148" y="408" width="24" height="24" rx="4" fill="#10B98122" stroke="#10B981" stroke-width="2"/>
+  <rect x="340" y="408" width="24" height="24" rx="4" fill="#10B98122" stroke="#10B981" stroke-width="2"/>
+  <rect x="400" y="408" width="24" height="24" rx="4" fill="#10B98122" stroke="#10B981" stroke-width="2"/>
+</svg>

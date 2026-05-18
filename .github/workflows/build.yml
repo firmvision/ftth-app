@@ -1,0 +1,39 @@
+﻿name: Build All Platforms
+on:
+  push:
+    branches: [main, master]
+    tags: ["v*"]
+
+jobs:
+  build-desktop:
+    name: Desktop (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: "20" }
+      - run: npm ci
+      - run: npm run build:linux
+        if: matrix.os == 'ubuntu-latest'
+        env: { GH_TOKEN: "${{ secrets.GITHUB_TOKEN }}" }
+      - run: npm run build:win
+        if: matrix.os == 'windows-latest'
+        env: { GH_TOKEN: "${{ secrets.GITHUB_TOKEN }}" }
+      - run: npm run build:mac
+        if: matrix.os == 'macos-latest'
+        env: { GH_TOKEN: "${{ secrets.GITHUB_TOKEN }}", CSC_IDENTITY_AUTO_DISCOVERY: "false" }
+      - uses: actions/upload-artifact@v4
+        with:
+          name: desktop-${{ matrix.os }}
+          path: dist/desktop/*
+
+  build-docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/build-push-action@v5
+        with: { context: ".", push: false, tags: "ftth-planner:latest" }

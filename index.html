@@ -1,0 +1,1199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"/>
+<title>FTTH GIS Route Planner</title>
+<link rel="manifest" href="manifest.json"/>
+<meta name="theme-color" content="#00D9FF"/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#04090F;--bg1:#080F1A;--bg2:#0D1825;--bg3:#121F2E;
+  --border:#1A2D42;--border2:#243D56;
+  --accent:#00D9FF;--accent2:#0099BB;
+  --text:#C8D8E8;--text2:#7A9BB5;--text3:#4A6A85;
+  --green:#22C55E;--red:#EF4444;--orange:#F97316;--yellow:#EAB308;
+  --amber:#F59E0B;--purple:#A855F7;--pink:#EC4899;--teal:#14B8A6;
+  --lime:#84CC16;--rose:#F43F5E;--violet:#8B5CF6;--slate:#64748B;
+}
+html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;font-size:13px}
+#app{display:flex;height:100vh;width:100vw}
+#sidebar{width:260px;min-width:220px;background:var(--bg1);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;z-index:10}
+#map-wrap{flex:1;position:relative}
+#map{width:100%;height:100%}
+#panel{width:320px;min-width:260px;background:var(--bg1);border-left:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;z-index:10}
+#sidebar-header{padding:12px 14px 10px;border-bottom:1px solid var(--border);flex-shrink:0}
+#sidebar-header h1{font-size:13px;font-weight:700;color:var(--accent);letter-spacing:.5px;text-transform:uppercase}
+#sidebar-header p{font-size:10px;color:var(--text3);margin-top:2px}
+.sb-section{border-bottom:1px solid var(--border);flex-shrink:0}
+.sb-section-title{padding:7px 14px;font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;background:var(--bg2)}
+.sb-content{padding:10px 12px}
+.tool-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px}
+.tool-btn{padding:7px 6px;border:1px solid var(--border2);background:var(--bg2);color:var(--text);border-radius:5px;cursor:pointer;font-size:11px;text-align:center;transition:.15s;user-select:none;line-height:1.3}
+.tool-btn:hover{background:var(--bg3);border-color:var(--accent2)}
+.tool-btn.active{background:rgba(0,217,255,.12);border-color:var(--accent);color:var(--accent)}
+.tool-btn.wide{grid-column:1/-1}
+.route-grid{display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-top:6px}
+.rb{padding:5px 4px;border:1px solid var(--border2);background:var(--bg2);color:var(--text);border-radius:4px;cursor:pointer;font-size:10px;text-align:center;transition:.15s}
+.rb:hover{background:var(--bg3)}
+.rb.active{background:rgba(0,217,255,.1);border-color:var(--accent);color:var(--accent)}
+#tile-select{width:100%;background:var(--bg2);color:var(--text);border:1px solid var(--border2);border-radius:4px;padding:5px 7px;font-size:12px;cursor:pointer}
+.gps-row{display:flex;gap:5px;margin-bottom:5px}
+.gps-input{flex:1;background:var(--bg2);border:1px solid var(--border2);color:var(--text);border-radius:4px;padding:5px 7px;font-size:11px}
+.btn{padding:6px 10px;border-radius:4px;border:1px solid var(--border2);background:var(--bg2);color:var(--text);cursor:pointer;font-size:11px;transition:.15s;text-align:center}
+.btn:hover{background:var(--bg3);border-color:var(--accent2)}
+.btn.primary{background:rgba(0,217,255,.15);border-color:var(--accent);color:var(--accent)}
+.btn.primary:hover{background:rgba(0,217,255,.25)}
+.btn.danger{background:rgba(239,68,68,.1);border-color:var(--red);color:var(--red)}
+.btn.full{width:100%}
+.btn.sm{padding:4px 8px;font-size:10px}
+#chain-status{margin-top:6px;font-size:10px;color:var(--text3);min-height:16px;word-break:break-all}
+#gps-status{font-size:10px;color:var(--text3);margin-bottom:5px;min-height:14px}
+#mapbox-wrap{margin-top:6px}
+#mapbox-token{width:100%;background:var(--bg2);border:1px solid var(--border2);color:var(--text);border-radius:4px;padding:5px 7px;font-size:10px}
+#sidebar-body{flex:1;overflow-y:auto}
+#sidebar-body::-webkit-scrollbar{width:4px}
+#sidebar-body::-webkit-scrollbar-track{background:var(--bg1)}
+#sidebar-body::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+#map-btns{position:absolute;top:10px;left:10px;z-index:900;display:flex;flex-direction:column;gap:4px}
+#map-btns .map-btn{width:32px;height:32px;background:var(--bg1);border:1px solid var(--border2);color:var(--text);border-radius:5px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;transition:.15s}
+#map-btns .map-btn:hover{background:var(--bg2);border-color:var(--accent2)}
+#status-bar{position:absolute;bottom:6px;left:50%;transform:translateX(-50%);background:rgba(8,15,26,.85);border:1px solid var(--border2);border-radius:20px;padding:4px 14px;font-size:11px;color:var(--text2);white-space:nowrap;z-index:900;pointer-events:none;backdrop-filter:blur(4px)}
+#coords-bar{position:absolute;bottom:6px;right:8px;background:rgba(8,15,26,.7);border:1px solid var(--border);border-radius:4px;padding:3px 8px;font-size:10px;color:var(--text3);z-index:900;pointer-events:none}
+#panel-tabs{display:flex;border-bottom:1px solid var(--border);flex-shrink:0;overflow-x:auto}
+#panel-tabs::-webkit-scrollbar{height:2px}
+.ptab{padding:9px 10px;font-size:10px;font-weight:600;color:var(--text3);cursor:pointer;white-space:nowrap;border-bottom:2px solid transparent;transition:.15s;text-transform:uppercase;letter-spacing:.5px}
+.ptab:hover{color:var(--text)}
+.ptab.active{color:var(--accent);border-bottom-color:var(--accent)}
+#panel-body{flex:1;overflow-y:auto;padding:12px}
+#panel-body::-webkit-scrollbar{width:4px}
+#panel-body::-webkit-scrollbar-track{background:var(--bg1)}
+#panel-body::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+.ph{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.ph h3{font-size:12px;font-weight:600;color:var(--text);text-transform:uppercase;letter-spacing:.5px}
+.elem-group-title{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin:10px 0 5px;font-weight:600}
+.elem-item{display:flex;align-items:center;gap:7px;padding:6px 8px;border-radius:5px;border:1px solid transparent;cursor:pointer;margin-bottom:3px;transition:.12s}
+.elem-item:hover{background:var(--bg2);border-color:var(--border)}
+.elem-item.selected{background:rgba(0,217,255,.08);border-color:var(--accent2)}
+.elem-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.elem-label{flex:1;font-size:11px;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.elem-del{color:var(--text3);font-size:14px;line-height:1;padding:0 2px;border:none;background:none;cursor:pointer;opacity:.5;transition:.12s}
+.elem-del:hover{color:var(--red);opacity:1}
+.route-item{background:var(--bg2);border:1px solid var(--border);border-radius:5px;padding:8px 10px;margin-bottom:6px}
+.route-item-head{display:flex;align-items:center;gap:7px;margin-bottom:4px}
+.route-color-bar{width:3px;height:22px;border-radius:2px;flex-shrink:0}
+.route-label{font-size:12px;font-weight:600;flex:1;color:var(--text)}
+.route-meta{font-size:10px;color:var(--text3);display:flex;flex-wrap:wrap;gap:6px}
+.route-meta span{background:var(--bg3);border-radius:3px;padding:1px 5px}
+.data-table{width:100%;border-collapse:collapse;font-size:11px}
+.data-table th{text-align:left;color:var(--text3);font-weight:600;padding:5px 6px;border-bottom:1px solid var(--border);font-size:10px;text-transform:uppercase}
+.data-table td{padding:5px 6px;border-bottom:1px solid var(--border);color:var(--text);vertical-align:top}
+.data-table tr:last-child td{border-bottom:none}
+.bom-section{margin-bottom:14px}
+.bom-section h4{font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;padding-bottom:4px;border-bottom:1px solid var(--border)}
+.lb-row{display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--border)}
+.lb-label{flex:1;font-size:11px;color:var(--text)}
+.lb-val{font-size:11px;font-weight:600;color:var(--text2);min-width:55px;text-align:right}
+.lb-loss{color:var(--red)}
+.lb-gain{color:var(--green)}
+.badge{display:inline-block;padding:2px 8px;border-radius:3px;font-size:10px;font-weight:700;text-transform:uppercase}
+.badge.pass{background:rgba(34,197,94,.15);color:var(--green);border:1px solid var(--green)}
+.badge.fail{background:rgba(239,68,68,.15);color:var(--red);border:1px solid var(--red)}
+.badge.warn{background:rgba(234,179,8,.15);color:var(--yellow);border:1px solid var(--yellow)}
+select.form-sel{background:var(--bg2);color:var(--text);border:1px solid var(--border2);border-radius:4px;padding:5px 7px;font-size:11px;width:100%;cursor:pointer}
+input.form-in{background:var(--bg2);color:var(--text);border:1px solid var(--border2);border-radius:4px;padding:5px 7px;font-size:11px;width:100%}
+input.form-in:focus,select.form-sel:focus{outline:1px solid var(--accent);border-color:var(--accent)}
+.survey-field{margin-bottom:8px}
+.survey-label{font-size:10px;color:var(--text3);margin-bottom:3px}
+.survey-val{font-size:11px;color:var(--text);background:var(--bg2);border:1px solid var(--border);border-radius:4px;padding:5px 7px}
+.survey-check{display:flex;align-items:flex-start;gap:7px;padding:5px 0;border-bottom:1px solid var(--border);cursor:pointer}
+.survey-check input[type=checkbox]{accent-color:var(--accent);margin-top:1px;cursor:pointer}
+.survey-check-label{font-size:11px;color:var(--text);line-height:1.4}
+.survey-check.done .survey-check-label{color:var(--green);text-decoration:line-through}
+.cmp-table{width:100%;border-collapse:collapse;font-size:11px}
+.cmp-table th{padding:5px 8px;text-align:center;color:var(--text3);font-size:10px;border-bottom:1px solid var(--border)}
+.cmp-table td{padding:5px 8px;text-align:center;border-bottom:1px solid var(--border);color:var(--text)}
+.cmp-table td:first-child{text-align:left;color:var(--text2)}
+.cmp-table .winner{color:var(--green);font-weight:600}
+.sub-tabs{display:flex;gap:3px;margin-bottom:10px;flex-wrap:wrap}
+.stab{padding:4px 10px;font-size:10px;border-radius:4px;border:1px solid var(--border2);background:var(--bg2);color:var(--text3);cursor:pointer;transition:.12s;font-weight:600;text-transform:uppercase}
+.stab:hover{color:var(--text)}
+.stab.active{background:rgba(0,217,255,.1);border-color:var(--accent);color:var(--accent)}
+.dwdm-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:4px}
+.dwdm-ch{padding:5px 3px;border:1px solid var(--border2);border-radius:4px;text-align:center;font-size:9px;background:var(--bg2);color:var(--text3)}
+.dwdm-ch.used{background:rgba(0,217,255,.12);border-color:var(--accent);color:var(--accent)}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:2000;align-items:center;justify-content:center;backdrop-filter:blur(3px)}
+.modal-overlay.open{display:flex}
+.modal{background:var(--bg1);border:1px solid var(--border2);border-radius:10px;padding:20px;width:420px;max-width:96vw;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.modal h2{font-size:14px;font-weight:700;color:var(--accent);margin-bottom:14px;text-transform:uppercase;letter-spacing:.5px}
+.form-row{margin-bottom:10px}
+.form-row label{display:block;font-size:10px;color:var(--text3);margin-bottom:4px;text-transform:uppercase;letter-spacing:.4px}
+.form-actions{display:flex;gap:8px;margin-top:16px;justify-content:flex-end}
+.fill-bar-wrap{background:var(--bg3);border-radius:3px;height:8px;overflow:hidden;margin-top:4px}
+.fill-bar{height:100%;border-radius:3px;transition:.3s}
+.fill-pass{background:var(--green)}
+.fill-warn{background:var(--yellow)}
+.fill-fail{background:var(--red)}
+.leaflet-container{background:#04090F}
+.leaflet-control-zoom a{background:var(--bg2)!important;color:var(--text)!important;border-color:var(--border)!important}
+.leaflet-control-zoom a:hover{background:var(--bg3)!important}
+.leaflet-popup-content-wrapper{background:var(--bg2);border:1px solid var(--border2);border-radius:6px;color:var(--text);box-shadow:0 4px 20px rgba(0,0,0,.4)}
+.leaflet-popup-tip{background:var(--bg2)}
+.leaflet-popup-content{margin:10px 14px;font-size:12px;line-height:1.6}
+.leaflet-popup-content b{color:var(--accent)}
+.map-icon{width:28px;height:28px;border-radius:50%;border:2px solid;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;box-shadow:0 2px 8px rgba(0,0,0,.4);cursor:pointer;white-space:nowrap}
+.drawing-cursor{cursor:crosshair!important}
+.duct-add-row{display:flex;gap:4px;margin-bottom:6px}
+.duct-add-row select,.duct-add-row input{flex:1}
+.duct-cable-entry{display:flex;align-items:center;gap:6px;padding:4px 0;border-bottom:1px solid var(--border);font-size:11px}
+.duct-cable-entry span:first-child{flex:1;color:var(--text2)}
+.duct-cable-del{color:var(--text3);cursor:pointer;font-size:13px}
+.duct-cable-del:hover{color:var(--red)}
+.sec-label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px;font-weight:600}
+#toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:var(--bg2);border:1px solid var(--border2);border-radius:6px;padding:8px 18px;font-size:12px;color:var(--text);z-index:9999;opacity:0;transition:.3s;pointer-events:none;white-space:nowrap}
+#toast.show{opacity:1}
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+</style>
+</head>
+<body>
+<div id="app">
+<div id="sidebar">
+  <div id="sidebar-header">
+    <h1>FTTH GIS Planner</h1>
+    <p>Fiber Route Design &amp; Field Tool</p>
+  </div>
+  <div id="sidebar-body">
+    <div class="sb-section">
+      <div class="sb-section-title">Mode</div>
+      <div class="sb-content">
+        <div class="tool-grid">
+          <button class="tool-btn active" id="mode-infra" onclick="setMode('infra')">📍 Place<br>Infrastructure</button>
+          <button class="tool-btn" id="mode-route" onclick="setMode('route')">✏️ Draw<br>Route</button>
+          <button class="tool-btn wide" id="mode-select" onclick="setMode('select')">🔍 Select / Inspect</button>
+        </div>
+      </div>
+    </div>
+    <div class="sb-section" id="infra-section">
+      <div class="sb-section-title">Infrastructure Type</div>
+      <div class="sb-content" id="infra-btns"></div>
+    </div>
+    <div class="sb-section" id="route-section" style="display:none">
+      <div class="sb-section-title">Route Type</div>
+      <div class="sb-content">
+        <div class="route-grid" id="route-btns"></div>
+        <div style="margin-top:8px;display:flex;gap:5px;align-items:center">
+          <div class="sec-label" style="margin:0;white-space:nowrap">Group:</div>
+          <select class="form-sel" id="cmp-group" style="flex:1;font-size:10px">
+            <option value="none">None</option>
+            <option value="A">Route A</option>
+            <option value="B">Route B</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="sb-section">
+      <div class="sb-section-title">Map Layer</div>
+      <div class="sb-content">
+        <select id="tile-select" onchange="switchTile(this.value)"></select>
+        <div id="mapbox-wrap" style="margin-top:6px;display:none">
+          <div class="sec-label">Mapbox Token</div>
+          <input id="mapbox-token" class="gps-input" type="password" placeholder="pk.eyJ1..."/>
+          <button class="btn primary full" style="margin-top:5px" onclick="saveMapboxToken()">Apply Token</button>
+        </div>
+      </div>
+    </div>
+    <div class="sb-section">
+      <div class="sb-section-title">GPS Field Tool</div>
+      <div class="sb-content">
+        <div id="gps-status">Ready</div>
+        <button class="btn primary full" onclick="startGPS()">📡 Use Device GPS</button>
+        <div style="margin-top:8px">
+          <div class="sec-label">Manual Coordinates</div>
+          <div class="gps-row">
+            <input class="gps-input" id="gps-lat" placeholder="Latitude" type="number" step="any"/>
+            <input class="gps-input" id="gps-lng" placeholder="Longitude" type="number" step="any"/>
+          </div>
+          <button class="btn full" onclick="dropManualPin()">📌 Drop Pin at Coordinates</button>
+        </div>
+        <div style="margin-top:8px">
+          <button class="btn" id="chain-btn" onclick="toggleChain()" style="width:100%">⛓ Auto-Chain: OFF</button>
+          <div id="chain-status"></div>
+        </div>
+      </div>
+    </div>
+    <div class="sb-section">
+      <div class="sb-section-title">Project</div>
+      <div class="sb-content">
+        <div class="tool-grid" style="margin-bottom:6px">
+          <button class="btn" id="btn-save" onclick="saveProject()">💾 Save</button>
+          <button class="btn" id="btn-load" onclick="loadProject()">📂 Load</button>
+        </div>
+        <div class="sec-label">Export</div>
+        <div class="tool-grid">
+          <button class="btn sm" id="btn-geojson" onclick="exportGeoJSON()">GeoJSON</button>
+          <button class="btn sm" id="btn-kml" onclick="exportKML()">KML</button>
+          <button class="btn sm wide" id="btn-csv" onclick="exportCSV()">CSV / BoM</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="map-wrap">
+  <div id="map"></div>
+  <div id="map-btns">
+    <button class="map-btn" title="Zoom In" onclick="MAP.zoomIn()">+</button>
+    <button class="map-btn" title="Zoom Out" onclick="MAP.zoomOut()">−</button>
+    <button class="map-btn" title="Fit All" onclick="fitAll()" style="font-size:13px">⊡</button>
+  </div>
+  <div id="status-bar">Click map to place infrastructure</div>
+  <div id="coords-bar">—</div>
+</div>
+
+<div id="panel">
+  <div id="panel-tabs">
+    <div class="ptab active" onclick="showTab('elements')">Elements</div>
+    <div class="ptab" onclick="showTab('routes')">Routes</div>
+    <div class="ptab" onclick="showTab('pon')">PON Budget</div>
+    <div class="ptab" onclick="showTab('p2p')">P2P/BHL</div>
+    <div class="ptab" onclick="showTab('bom')">BoM</div>
+    <div class="ptab" onclick="showTab('survey')">Survey</div>
+  </div>
+  <div id="panel-body"></div>
+</div>
+</div>
+
+<!-- Route Properties Modal -->
+<div class="modal-overlay" id="route-modal">
+<div class="modal">
+  <h2>Route Properties</h2>
+  <div class="form-row"><label>Label</label><input class="form-in" id="rm-label" placeholder="e.g. Trunk-01"/></div>
+  <div class="form-row"><label>Cable Specification</label><select class="form-sel" id="rm-cable" onchange="updateRouteModal()"></select></div>
+  <div class="form-row"><label>Quantity</label><input class="form-in" id="rm-qty" type="number" min="1" max="8" value="1" oninput="updateRouteModal()"/></div>
+  <div class="form-row"><label>Total Fibers</label><div class="survey-val" id="rm-fibers">—</div></div>
+  <div class="form-row"><label>Duct / Conduit Size</label><select class="form-sel" id="rm-duct" onchange="updateRouteModal()"></select></div>
+  <div class="form-row"><label>Duct Fill</label>
+    <div id="rm-fill-text" style="font-size:11px;color:var(--text2);margin-bottom:3px">—</div>
+    <div class="fill-bar-wrap"><div class="fill-bar" id="rm-fill-bar" style="width:0%"></div></div>
+  </div>
+  <div class="form-row"><label>Compare Group</label>
+    <select class="form-sel" id="rm-group"><option value="none">None</option><option value="A">Route A</option><option value="B">Route B</option></select>
+  </div>
+  <div class="form-row"><label>Notes</label><input class="form-in" id="rm-notes" placeholder="Optional notes"/></div>
+  <div class="form-actions">
+    <button class="btn" onclick="cancelRoute()">Cancel</button>
+    <button class="btn primary" onclick="confirmRoute()">Confirm Route</button>
+  </div>
+</div>
+</div>
+
+<!-- Label Modal -->
+<div class="modal-overlay" id="label-modal">
+<div class="modal" style="width:340px">
+  <h2 id="lm-title">Place Infrastructure</h2>
+  <div class="form-row"><label>Label</label><input class="form-in" id="lm-label" placeholder="e.g. CO-001"/></div>
+  <div class="form-row"><label>Fiber Capacity</label><input class="form-in" id="lm-fiber" type="number" min="0" placeholder="e.g. 96"/></div>
+  <div class="form-row"><label>Notes</label><input class="form-in" id="lm-notes" placeholder="Optional"/></div>
+  <div class="form-actions">
+    <button class="btn" onclick="cancelLabel()">Cancel</button>
+    <button class="btn primary" onclick="confirmLabel()">Place</button>
+  </div>
+</div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+'use strict';
+// ── CONSTANTS ──
+const INFRA = {
+  co:         {label:'Central Office',   abbr:'CO',   color:'#F59E0B', lossAdd:0,    latUs:0},
+  cabinet:    {label:'Cabinet / FDH',    abbr:'FDH',  color:'#3B82F6', lossAdd:7.2,  latUs:0},
+  odp:        {label:'ODP / FAT',        abbr:'ODP',  color:'#A855F7', lossAdd:10.5, latUs:0},
+  closure:    {label:'Splice Closure',   abbr:'SC',   color:'#22C55E', lossAdd:0.1,  latUs:0},
+  patchpanel: {label:'Patch Panel/ODF',  abbr:'PP',   color:'#EC4899', lossAdd:0.5,  latUs:0},
+  manhole:    {label:'Manhole',          abbr:'MH',   color:'#64748B', lossAdd:0.5,  latUs:0},
+  customer:   {label:'Customer / ONT',   abbr:'ONT',  color:'#06B6D4', lossAdd:0,    latUs:0},
+  rack:       {label:'Rack / FTTB',      abbr:'RK',   color:'#14B8A6', lossAdd:0,    latUs:0},
+  tower:      {label:'Cell Tower/gNB',   abbr:'TWR',  color:'#F97316', lossAdd:0,    latUs:0},
+  pop:        {label:'PoP / Core Node',  abbr:'POP',  color:'#22D3EE', lossAdd:0,    latUs:50},
+  edfa:       {label:'EDFA Amplifier',   abbr:'EDFA', color:'#84CC16', lossAdd:-24,  latUs:0},
+  dwdm:       {label:'DWDM Mux/Demux',   abbr:'WDM',  color:'#F43F5E', lossAdd:3,    latUs:5},
+  otn:        {label:'OTN Switch/Regen', abbr:'OTN',  color:'#8B5CF6', lossAdd:0,    latUs:100},
+};
+const ROUTES = {
+  trench:    {label:'Trench (Direct Bury)', color:'#F97316', dash:'8,5',  weight:3},
+  conduit:   {label:'Conduit',              color:'#94A3B8', dash:'5,4',  weight:3},
+  aerial:    {label:'Aerial',               color:'#3B82F6', dash:'',     weight:3},
+  trussbore: {label:'Trussbore / HDD',      color:'#EF4444', dash:'3,6',  weight:3},
+  underpass: {label:'Underpass',            color:'#A855F7', dash:'2,4',  weight:3},
+};
+const TILES = {
+  'CartoDB Dark':    {url:'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',  opts:{attribution:'CartoDB',subdomains:'abcd',maxZoom:20}},
+  'OSM Street':      {url:'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',             opts:{attribution:'OpenStreetMap',maxZoom:19}},
+  'Esri Satellite':  {url:'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', opts:{attribution:'Esri',maxZoom:19}},
+  'OSM Topo':        {url:'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',               opts:{attribution:'OpenTopoMap',subdomains:'abc',maxZoom:17}},
+  'Google Satellite':{url:'https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',            opts:{attribution:'Google',maxZoom:20}},
+  'Google Hybrid':   {url:'https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}',            opts:{attribution:'Google',maxZoom:20}},
+  'Mapbox Satellite':{url:'__mapbox_sat__',   opts:{attribution:'Mapbox',maxZoom:22}},
+  'Mapbox Streets':  {url:'__mapbox_str__',   opts:{attribution:'Mapbox',maxZoom:22}},
+};
+const XCVR = [
+  {name:'SFP 1GE ZX (80km)',       txPow:5,   rxSens:-23, maxDist:80},
+  {name:'SFP+ 10GE ZR (80km)',     txPow:0,   rxSens:-24, maxDist:80},
+  {name:'SFP+ 10GE ER (40km)',     txPow:4,   rxSens:-15, maxDist:40},
+  {name:'SFP+ 10GE LR (10km)',     txPow:0.5, rxSens:-14, maxDist:10},
+  {name:'QSFP 40GE ER4 (40km)',    txPow:4,   rxSens:-21, maxDist:40},
+  {name:'QSFP28 100GE ZR4 (80km)', txPow:2,   rxSens:-21, maxDist:80},
+  {name:'QSFP28 100GE LR4 (10km)', txPow:4,   rxSens:-10, maxDist:10},
+  {name:'QSFP28 100GE ER4 (40km)', txPow:4,   rxSens:-20, maxDist:40},
+  {name:'QSFP-DD 400GE ZR (80km)', txPow:0,   rxSens:-18, maxDist:80},
+  {name:'CFP2 100GE DWDM',         txPow:0,   rxSens:-27, maxDist:2000},
+  {name:'CFP2 400GE DWDM',         txPow:2,   rxSens:-22, maxDist:1000},
+  {name:'SFP 100M FX (2km)',       txPow:-10, rxSens:-31, maxDist:2},
+];
+const DWDM_CH = [
+  {ch:'C1', nm:1528.77,freq:196.1},{ch:'C2', nm:1530.33,freq:195.9},
+  {ch:'C3', nm:1531.90,freq:195.7},{ch:'C4', nm:1533.47,freq:195.5},
+  {ch:'C5', nm:1535.04,freq:195.3},{ch:'C6', nm:1536.61,freq:195.1},
+  {ch:'C7', nm:1538.19,freq:194.9},{ch:'C8', nm:1539.77,freq:194.7},
+  {ch:'C9', nm:1541.35,freq:194.5},{ch:'C10',nm:1542.94,freq:194.3},
+  {ch:'C11',nm:1544.53,freq:194.1},{ch:'C12',nm:1546.12,freq:193.9},
+  {ch:'C13',nm:1547.72,freq:193.7},{ch:'C14',nm:1549.32,freq:193.5},
+  {ch:'C15',nm:1550.92,freq:193.3},{ch:'C16',nm:1552.52,freq:193.1},
+];
+const CABLES = [
+  {name:'1F Bare Buffer',      fibers:1,   od:1.8},  {name:'2F Micro Blown',     fibers:2,   od:2.0},
+  {name:'4F Micro Blown',      fibers:4,   od:3.2},  {name:'6F Micro Blown',     fibers:6,   od:3.6},
+  {name:'8F Micro Blown',      fibers:8,   od:4.0},  {name:'12F Micro Blown',    fibers:12,  od:4.8},
+  {name:'12F Figure-8 Aerial', fibers:12,  od:10.5}, {name:'24F Micro Blown',    fibers:24,  od:6.0},
+  {name:'24F Figure-8 Aerial', fibers:24,  od:12.0}, {name:'24F Loose Tube',     fibers:24,  od:10.8},
+  {name:'48F Loose Tube',      fibers:48,  od:14.0}, {name:'48F Figure-8 Aerial',fibers:48,  od:15.0},
+  {name:'72F Loose Tube',      fibers:72,  od:16.5}, {name:'96F Standard LT',    fibers:96,  od:18.0},
+  {name:'96F Armoured',        fibers:96,  od:20.0}, {name:'144F Loose Tube',    fibers:144, od:20.5},
+  {name:'144F Ribbon',         fibers:144, od:17.0}, {name:'144F Armoured',      fibers:144, od:22.0},
+  {name:'192F Ribbon',         fibers:192, od:19.0}, {name:'216F Ribbon',        fibers:216, od:21.0},
+  {name:'288F Standard LT',    fibers:288, od:24.0}, {name:'288F Ribbon Compact',fibers:288, od:21.0},
+  {name:'432F Ribbon',         fibers:432, od:27.0}, {name:'576F Ribbon',        fibers:576, od:30.0},
+  {name:'864F Ribbon',         fibers:864, od:35.0},
+];
+const DUCTS = [
+  {id:'10od', label:'10mm OD Microduct', od:10,  area:78.5},
+  {id:'14od', label:'14mm OD Microduct', od:14,  area:153.9},
+  {id:'16od', label:'16mm OD',           od:16,  area:201.1},
+  {id:'20od', label:'20mm OD',           od:20,  area:314.2},
+  {id:'25od', label:'25mm OD',           od:25,  area:490.9},
+  {id:'32od', label:'32mm OD',           od:32,  area:804.2},
+  {id:'40od', label:'40mm OD',           od:40,  area:1256.6},
+  {id:'50od', label:'50mm OD SDR11',     od:50,  area:1963.5},
+  {id:'63od', label:'63mm OD SDR11',     od:63,  area:3117.2},
+  {id:'110od',label:'110mm OD HDPE',     od:110, area:9503.3},
+  {id:'160od',label:'160mm OD Conduit',  od:160, area:20106.2},
+];
+const FILL_SINGLE=53, FILL_MULTIPLE=40, SNAP_DIST=45;
+const GPON_MIN_RX=-28, FIBER_ATTEN=0.35, FIBER_PROP_US=4.9;
+
+const SURVEY_CHECKS = {
+  co:         ['OLT rack space available','Power supply confirmed','Grounding verified','Fibre patch panels installed','Fire suppression OK','AC/temperature OK'],
+  cabinet:    ['Enclosure sealed','Splitter installed','Pigtails dressed','Cable glands torqued','Lock installed','ID label affixed'],
+  odp:        ['Pole/wall mounting secure','Splice tray installed','Fibers fanned out','IP rating intact','Service loop stored','Customer labels printed'],
+  closure:    ['Splice complete','Tray closed','Sealant applied','Water-block confirmed','Entry/exit sealed','Duct sealed'],
+  patchpanel: ['Panel labelled','Adapters cleaned','Patch cords dressed','Cable strain relief OK','Rack screws torqued','Test documentation filed'],
+  manhole:    ['Cover fits and seals','No water ingress','Cable runways complete','Duct sealant OK','Safety signs posted','Traffic management done'],
+  customer:   ['ONT powered','Service authenticated','Speed test passed','CPE provisioned','Invoice issued','Customer signed off'],
+  rack:       ['Rack levelled and anchored','Power strips installed','Cable management fitted','Cooling adequate','Fire suppression present','Access restricted'],
+  tower:      ['Climbing equipment inspection done','Safety locks engaged','Antenna mounted and aligned','RF coax dressed','Ground kit installed','Aviation lighting checked'],
+  pop:        ['Power feeds (A+B) live','Environmental alarms tested','OOB management connected','Routing config pushed','Latency < 50µs baseline recorded','Audit trail signed'],
+  edfa:       ['Gain/output level set','Input loss within spec','Alarm thresholds configured','Optical isolator present','Cooling fan operational','Output power logged'],
+  dwdm:       ['Channel plan loaded','Insertion loss measured per ch','Crosstalk < spec','Label per ITU grid','Patch-through routes documented','OSNR recorded'],
+  otn:        ['Card provisioned','OTU framing confirmed','Protection switching tested','Performance counters cleared','NMS alarm suppressed','Turn-up doc signed'],
+};
+
+// ── STATE ──
+const S = {
+  tool:'infra', infraType:'co', routeType:'trench',
+  drawing:false, pts:[], tempDots:[], tempLine:null,
+  pendingLL:null, pendingType:null,
+  elements:[], routes:[],
+  selElem:null, compareGroup:'none', pendingRoute:null,
+  activePanel:'elements', surveyChecks:{},
+  autoChain:false, chainLast:null, chainSeq:[],
+  mapboxToken:'', ductCalcItems:[], p2pSub:'link',
+};
+let MAP, tileLayer, _elemId=0, _routeId=0, _toastTimer;
+
+// ── MAP ──
+function initMap() {
+  const saved = JSON.parse(localStorage.getItem('ftth_map')||'null');
+  MAP = L.map('map',{center:saved?[saved.lat,saved.lng]:[6.5244,3.3792],zoom:saved?saved.zoom:13,zoomControl:false});
+  MAP.attributionControl.setPrefix('');
+  const t=TILES['CartoDB Dark'];
+  tileLayer=L.tileLayer(t.url,t.opts).addTo(MAP);
+  const sel=document.getElementById('tile-select');
+  Object.keys(TILES).forEach(k=>{const o=document.createElement('option');o.value=k;o.textContent=k;sel.appendChild(o);});
+  MAP.on('click',onMapClick);
+  MAP.on('dblclick',e=>{if(S.drawing){L.DomEvent.stop(e);finishDraw();}});
+  MAP.on('mousemove',e=>{
+    const ll=e.latlng;
+    document.getElementById('coords-bar').textContent=`${ll.lat.toFixed(5)}, ${ll.lng.toFixed(5)}`;
+    if(S.drawing) updateDrawLine(ll);
+  });
+  MAP.on('moveend',()=>{const c=MAP.getCenter();localStorage.setItem('ftth_map',JSON.stringify({lat:c.lat,lng:c.lng,zoom:MAP.getZoom()}));});
+  document.addEventListener('keydown',e=>{
+    if(e.key==='Enter'&&S.drawing)finishDraw();
+    if(e.key==='Escape'){cancelDraw();cancelLabel();cancelRoute();}
+  });
+}
+
+function switchTile(key){
+  const t=TILES[key]; if(!t)return;
+  const needsMapbox=key.startsWith('Mapbox');
+  document.getElementById('mapbox-wrap').style.display=needsMapbox?'block':'none';
+  let url=t.url;
+  if(needsMapbox){
+    const tok=S.mapboxToken||localStorage.getItem('ftth_mapbox')||'';
+    if(!tok){toast('Enter a Mapbox token first');return;}
+    const style=key==='Mapbox Satellite'?'mapbox/satellite-v9':'mapbox/satellite-streets-v11';
+    url=`https://api.mapbox.com/styles/v1/${style}/tiles/{z}/{x}/{y}?access_token=${tok}`;
+  }
+  if(tileLayer)MAP.removeLayer(tileLayer);
+  tileLayer=L.tileLayer(url,{...t.opts}).addTo(MAP);
+}
+function saveMapboxToken(){
+  const tok=document.getElementById('mapbox-token').value.trim();
+  if(!tok.startsWith('pk.')){toast('Token must start with pk.');return;}
+  S.mapboxToken=tok; localStorage.setItem('ftth_mapbox',tok);
+  switchTile(document.getElementById('tile-select').value);
+  toast('Mapbox token saved');
+}
+
+// ── MODE ──
+function setMode(mode){
+  S.tool=mode;
+  ['infra','route','select'].forEach(m=>document.getElementById('mode-'+m).classList.toggle('active',m===mode));
+  document.getElementById('infra-section').style.display=mode==='infra'?'':'none';
+  document.getElementById('route-section').style.display=mode==='route'?'':'none';
+  if(mode!=='route')cancelDraw();
+  updateStatus();
+}
+function buildInfraBtns(){
+  const wrap=document.getElementById('infra-btns');
+  const grid=document.createElement('div'); grid.className='tool-grid';
+  Object.entries(INFRA).forEach(([id,cfg])=>{
+    const b=document.createElement('button');
+    b.className='tool-btn'+(id===S.infraType?' active':'');
+    b.id='ib-'+id;
+    b.innerHTML=`<span style="color:${cfg.color}">●</span> ${cfg.abbr}<br><span style="font-size:9px;color:var(--text3)">${cfg.label}</span>`;
+    b.onclick=()=>selectInfra(id);
+    grid.appendChild(b);
+  });
+  wrap.appendChild(grid);
+}
+function selectInfra(id){
+  S.infraType=id;
+  document.querySelectorAll('[id^="ib-"]').forEach(b=>b.classList.remove('active'));
+  document.getElementById('ib-'+id)?.classList.add('active');
+}
+function buildRouteBtns(){
+  const wrap=document.getElementById('route-btns'); wrap.innerHTML='';
+  Object.entries(ROUTES).forEach(([id,cfg])=>{
+    const b=document.createElement('button');
+    b.className='rb'+(id===S.routeType?' active':'');
+    b.id='rb-'+id;
+    b.innerHTML=`<span style="color:${cfg.color}">━</span> ${cfg.label}`;
+    b.onclick=()=>{S.routeType=id;document.querySelectorAll('[id^="rb-"]').forEach(x=>x.classList.remove('active'));b.classList.add('active');};
+    wrap.appendChild(b);
+  });
+}
+
+// ── MAP CLICK ──
+function onMapClick(e){
+  if(S.tool==='infra') openLabelModal(e.latlng,S.infraType);
+  else if(S.tool==='route') addDrawPoint(e.latlng);
+}
+function updateStatus(){
+  const msgs={
+    infra:`Click map to place ${INFRA[S.infraType]?.label||'infrastructure'}`,
+    route:S.drawing?`Waypoints: ${S.pts.length} — Enter or double-click to finish`:`Click map to start drawing ${ROUTES[S.routeType]?.label||'route'}`,
+    select:'Click an element to inspect',
+  };
+  document.getElementById('status-bar').textContent=msgs[S.tool]||'';
+}
+
+// ── LABEL MODAL ──
+function openLabelModal(ll,type){
+  S.pendingLL=ll; S.pendingType=type;
+  const cfg=INFRA[type];
+  const count=S.elements.filter(e=>e.type===type).length+1;
+  document.getElementById('lm-title').textContent=`Place ${cfg.label}`;
+  document.getElementById('lm-label').value=`${cfg.abbr}-${String(count).padStart(3,'0')}`;
+  document.getElementById('lm-fiber').value='';
+  document.getElementById('lm-notes').value='';
+  document.getElementById('label-modal').classList.add('open');
+  setTimeout(()=>document.getElementById('lm-label').select(),50);
+}
+function confirmLabel(){
+  const label=document.getElementById('lm-label').value.trim()||`${S.pendingType}-001`;
+  const fiber=parseInt(document.getElementById('lm-fiber').value)||0;
+  const notes=document.getElementById('lm-notes').value.trim();
+  document.getElementById('label-modal').classList.remove('open');
+  placeElem(S.pendingType,S.pendingLL,label,fiber,notes);
+}
+function cancelLabel(){document.getElementById('label-modal').classList.remove('open');S.pendingLL=null;S.pendingType=null;}
+
+// ── PLACE ELEMENT ──
+function placeElem(type,ll,label,fiber,notes){
+  const id='e'+(++_elemId);
+  const cfg=INFRA[type];
+  const icon=L.divIcon({
+    className:'',
+    html:`<div class="map-icon" style="background:${cfg.color}22;border-color:${cfg.color};color:${cfg.color}">${cfg.abbr.substring(0,3)}</div>`,
+    iconSize:[28,28],iconAnchor:[14,14],popupAnchor:[0,-16],
+  });
+  const marker=L.marker([ll.lat,ll.lng],{icon,draggable:true}).addTo(MAP);
+  marker.bindPopup(`<b>${cfg.label}</b><br>${label}${fiber?'<br>'+fiber+'F':''}${notes?'<br><span style="color:var(--text3)">'+notes+'</span>':''}`);
+  marker.on('click',()=>selectElem(id));
+  marker.on('dragend',()=>{
+    const p=marker.getLatLng();
+    const el=S.elements.find(e=>e.id===id);
+    if(el){el.ll={lat:p.lat,lng:p.lng};rebuildRouteEndpoints(id);updateUI();}
+  });
+  const el={id,type,ll:{lat:ll.lat,lng:ll.lng},label,fiber,notes,marker};
+  S.elements.push(el);
+  if(S.autoChain&&S.chainLast){
+    const prev=S.elements.find(e=>e.id===S.chainLast);
+    if(prev)autoChainRoute(prev,el);
+  }
+  if(S.autoChain){S.chainLast=id;S.chainSeq.push(label);document.getElementById('chain-status').textContent=S.chainSeq.join(' → ');}
+  updateUI();
+  return el;
+}
+function rebuildRouteEndpoints(id){
+  const el=S.elements.find(e=>e.id===id); if(!el)return;
+  S.routes.forEach(r=>{
+    if(!r.line)return;
+    const pts=r.line.getLatLngs();
+    if(r.fromEl===id)pts[0]=L.latLng(el.ll.lat,el.ll.lng);
+    if(r.toEl===id)pts[pts.length-1]=L.latLng(el.ll.lat,el.ll.lng);
+    r.line.setLatLngs(pts);
+  });
+}
+function selectElem(id){
+  S.selElem=id;
+  document.querySelectorAll('.elem-item').forEach(el=>el.classList.toggle('selected',el.dataset.id===id));
+}
+function deleteElem(id){
+  const idx=S.elements.findIndex(e=>e.id===id); if(idx<0)return;
+  const el=S.elements[idx];
+  if(el.marker)MAP.removeLayer(el.marker);
+  [...S.routes].filter(r=>r.fromEl===id||r.toEl===id).forEach(r=>deleteRoute(r.id));
+  S.elements.splice(idx,1);
+  if(S.selElem===id)S.selElem=null;
+  updateUI();
+}
+
+// ── ROUTE DRAWING ──
+function addDrawPoint(ll){
+  if(!S.drawing){S.drawing=true;S.pts=[ll];MAP.getContainer().classList.add('drawing-cursor');}
+  else S.pts.push(ll);
+  const dot=L.circleMarker(ll,{radius:4,color:'#00D9FF',fillColor:'#00D9FF',fillOpacity:1,weight:2}).addTo(MAP);
+  S.tempDots.push(dot);
+  updateStatus();
+}
+function updateDrawLine(ll){
+  if(!S.drawing||!S.pts.length)return;
+  if(S.tempLine)MAP.removeLayer(S.tempLine);
+  const rcfg=ROUTES[S.routeType];
+  S.tempLine=L.polyline([...S.pts,ll],{color:rcfg.color,weight:rcfg.weight,dashArray:rcfg.dash||null,opacity:.6}).addTo(MAP);
+}
+function cancelDraw(){
+  S.drawing=false;S.pts=[];
+  if(S.tempLine){MAP.removeLayer(S.tempLine);S.tempLine=null;}
+  S.tempDots.forEach(d=>MAP.removeLayer(d));S.tempDots=[];
+  MAP.getContainer().classList.remove('drawing-cursor');
+  updateStatus();
+}
+function finishDraw(){
+  if(!S.drawing||S.pts.length<2){cancelDraw();return;}
+  const pts=[...S.pts]; cancelDraw();
+  S.pendingRoute={pts,fromEl:snapToElem(pts[0]),toEl:snapToElem(pts[pts.length-1])};
+  openRouteModal();
+}
+function snapToElem(ll){
+  let best=null,bestD=SNAP_DIST;
+  S.elements.forEach(e=>{const d=MAP.distance(ll,L.latLng(e.ll.lat,e.ll.lng));if(d<bestD){bestD=d;best=e.id;}});
+  return best;
+}
+
+// ── ROUTE MODAL ──
+function openRouteModal(){
+  const csel=document.getElementById('rm-cable');
+  if(!csel.options.length)CABLES.forEach((c,i)=>{const o=document.createElement('option');o.value=i;o.textContent=c.name;csel.appendChild(o);});
+  const dsel=document.getElementById('rm-duct');
+  if(!dsel.options.length){
+    const none=document.createElement('option');none.value='none';none.textContent='No duct / direct bury';dsel.appendChild(none);
+    DUCTS.forEach(d=>{const o=document.createElement('option');o.value=d.id;o.textContent=d.label;dsel.appendChild(o);});
+  }
+  const rcnt=S.routes.length+1;
+  document.getElementById('rm-label').value=`${S.routeType.substring(0,3).toUpperCase()}-${String(rcnt).padStart(3,'0')}`;
+  document.getElementById('rm-qty').value=1;
+  document.getElementById('rm-group').value=document.getElementById('cmp-group').value;
+  document.getElementById('rm-notes').value='';
+  updateRouteModal();
+  document.getElementById('route-modal').classList.add('open');
+}
+function updateRouteModal(){
+  const ci=parseInt(document.getElementById('rm-cable').value)||0;
+  const qty=Math.max(1,parseInt(document.getElementById('rm-qty').value)||1);
+  const cable=CABLES[ci];
+  document.getElementById('rm-fibers').textContent=`${cable.fibers*qty} fibers`;
+  const did=document.getElementById('rm-duct').value;
+  if(did==='none'){document.getElementById('rm-fill-text').textContent='No duct';document.getElementById('rm-fill-bar').style.width='0%';return;}
+  const duct=DUCTS.find(d=>d.id===did); if(!duct)return;
+  const totalArea=Math.PI*(cable.od/2)**2*qty;
+  const fillPct=totalArea/duct.area*100;
+  const limit=qty===1?FILL_SINGLE:FILL_MULTIPLE;
+  document.getElementById('rm-fill-text').textContent=`Fill: ${fillPct.toFixed(1)}% (limit ${limit}%) — ${fillPct<=limit?'✓ OK':'✗ OVER'}`;
+  const bar=document.getElementById('rm-fill-bar');
+  bar.style.width=Math.min(fillPct,100)+'%';
+  bar.className='fill-bar '+(fillPct>limit?'fill-fail':fillPct>limit*.85?'fill-warn':'fill-pass');
+}
+function confirmRoute(){
+  const label=document.getElementById('rm-label').value.trim();
+  const ci=parseInt(document.getElementById('rm-cable').value)||0;
+  const qty=Math.max(1,parseInt(document.getElementById('rm-qty').value)||1);
+  const did=document.getElementById('rm-duct').value;
+  const grp=document.getElementById('rm-group').value;
+  const notes=document.getElementById('rm-notes').value.trim();
+  document.getElementById('route-modal').classList.remove('open');
+  commitRoute(label,CABLES[ci].fibers*qty,grp,notes,{cable:CABLES[ci],qty,duct:did,cableIdx:ci});
+}
+function cancelRoute(){document.getElementById('route-modal').classList.remove('open');S.pendingRoute=null;}
+
+function commitRoute(label,fibers,grp,notes,opts){
+  if(!S.pendingRoute)return;
+  const {pts,fromEl,toEl}=S.pendingRoute; S.pendingRoute=null;
+  const id='r'+(++_routeId);
+  const rcfg=ROUTES[S.routeType];
+  const dist=calcRouteDist(pts);
+  const line=L.polyline(pts,{color:rcfg.color,weight:rcfg.weight,dashArray:rcfg.dash||null,opacity:.85}).addTo(MAP);
+  const midPt=pts[Math.floor(pts.length/2)];
+  const lbl=L.marker(midPt,{icon:L.divIcon({className:'',html:`<div style="background:rgba(8,15,26,.85);border:1px solid ${rcfg.color};color:${rcfg.color};border-radius:3px;padding:1px 5px;font-size:9px;white-space:nowrap">${label}</div>`,iconAnchor:[0,8]}),interactive:false}).addTo(MAP);
+  line.bindPopup(`<b>${label}</b><br>${rcfg.label}<br>${fibers}F | ${dist.toFixed(0)}m`);
+  line.on('click',()=>showTab('routes'));
+  const route={id,type:S.routeType,label,pts,fibers,grp,notes,dist,fromEl,toEl,line,lblMarker:lbl,opts};
+  S.routes.push(route);
+  updateUI();
+  toast(`Route "${label}" — ${(dist/1000).toFixed(3)} km`);
+}
+function deleteRoute(id){
+  const idx=S.routes.findIndex(r=>r.id===id); if(idx<0)return;
+  const r=S.routes[idx];
+  if(r.line)MAP.removeLayer(r.line);
+  if(r.lblMarker)MAP.removeLayer(r.lblMarker);
+  S.routes.splice(idx,1);
+  updateUI();
+}
+function calcRouteDist(pts){let d=0;for(let i=1;i<pts.length;i++)d+=MAP.distance(pts[i-1],pts[i]);return d;}
+function fitAll(){
+  const pts=[];
+  S.elements.forEach(e=>pts.push([e.ll.lat,e.ll.lng]));
+  S.routes.forEach(r=>r.pts.forEach(p=>pts.push([p.lat,p.lng])));
+  if(pts.length)MAP.fitBounds(L.latLngBounds(pts),{padding:[40,40]});
+}
+
+// ── GPS ──
+function startGPS(){
+  if(!navigator.geolocation){toast('Geolocation not supported');return;}
+  document.getElementById('gps-status').textContent='Acquiring GPS…';
+  navigator.geolocation.getCurrentPosition(pos=>{
+    const ll={lat:pos.coords.latitude,lng:pos.coords.longitude};
+    MAP.setView([ll.lat,ll.lng],17);
+    document.getElementById('gps-lat').value=ll.lat.toFixed(6);
+    document.getElementById('gps-lng').value=ll.lng.toFixed(6);
+    document.getElementById('gps-status').textContent=`GPS: ±${Math.round(pos.coords.accuracy)}m`;
+    openLabelModal(L.latLng(ll.lat,ll.lng),S.infraType);
+  },err=>{document.getElementById('gps-status').textContent='GPS error: '+err.message;},{enableHighAccuracy:true,timeout:10000});
+}
+function dropManualPin(){
+  const lat=parseFloat(document.getElementById('gps-lat').value);
+  const lng=parseFloat(document.getElementById('gps-lng').value);
+  if(isNaN(lat)||isNaN(lng)){toast('Enter valid lat/lng');return;}
+  MAP.setView([lat,lng],MAP.getZoom()<15?16:MAP.getZoom());
+  openLabelModal(L.latLng(lat,lng),S.infraType);
+}
+function toggleChain(){
+  S.autoChain=!S.autoChain;S.chainLast=null;S.chainSeq=[];
+  document.getElementById('chain-btn').textContent=`⛓ Auto-Chain: ${S.autoChain?'ON':'OFF'}`;
+  document.getElementById('chain-btn').className='btn'+(S.autoChain?' primary':'')+' full';
+  document.getElementById('chain-status').textContent=S.autoChain?'Drop pins to auto-chain':'';
+}
+function autoChainRoute(prevEl,newEl){
+  const rcfg=ROUTES[S.routeType];
+  const pts=[L.latLng(prevEl.ll.lat,prevEl.ll.lng),L.latLng(newEl.ll.lat,newEl.ll.lng)];
+  const dist=calcRouteDist(pts);
+  const id='r'+(++_routeId);
+  const label=`CHN-${String(S.routes.length+1).padStart(3,'0')}`;
+  const line=L.polyline(pts,{color:rcfg.color,weight:rcfg.weight,dashArray:rcfg.dash||null,opacity:.85}).addTo(MAP);
+  const lbl=L.marker(pts[0],{icon:L.divIcon({className:'',html:`<div style="background:rgba(8,15,26,.8);border:1px solid ${rcfg.color};color:${rcfg.color};border-radius:3px;padding:1px 5px;font-size:9px">${label}</div>`,iconAnchor:[0,0]}),interactive:false}).addTo(MAP);
+  S.routes.push({id,type:S.routeType,label,pts,fibers:0,grp:'none',notes:'auto-chain',dist,fromEl:prevEl.id,toEl:newEl.id,line,lblMarker:lbl,opts:{cable:CABLES[0],qty:1,duct:'none'}});
+}
+
+// ── GRAPH / PATH ──
+function buildGraph(){
+  const g={};
+  S.elements.forEach(e=>g[e.id]=[]);
+  S.routes.forEach(r=>{
+    if(r.fromEl&&r.toEl){
+      if(!g[r.fromEl])g[r.fromEl]=[];
+      if(!g[r.toEl])g[r.toEl]=[];
+      g[r.fromEl].push({to:r.toEl,route:r});
+      g[r.toEl].push({to:r.fromEl,route:r});
+    }
+  });
+  return g;
+}
+function findPath(fromId,toId){
+  const g=buildGraph();
+  const queue=[[fromId,[]]]; const visited=new Set();
+  while(queue.length){
+    const [cur,path]=queue.shift();
+    if(cur===toId)return path;
+    if(visited.has(cur))continue;
+    visited.add(cur);
+    (g[cur]||[]).forEach(({to,route})=>{if(!visited.has(to))queue.push([to,[...path,{fromId:cur,toId:to,route}]]);});
+  }
+  return null;
+}
+function calcLoss(fromId,toId){
+  const path=findPath(fromId,toId); if(!path)return null;
+  let totalLoss=0,breakdown=[],totalDist=0;
+  path.forEach(step=>{
+    const r=step.route;
+    const distKm=r.dist/1000; totalDist+=distKm;
+    const fl=distKm*FIBER_ATTEN; totalLoss+=fl;
+    breakdown.push({label:`Fiber ${r.label} (${r.dist.toFixed(0)}m)`,loss:fl});
+    const el=S.elements.find(e=>e.id===step.toId);
+    if(el){const cfg=INFRA[el.type];if(cfg&&cfg.lossAdd!==0){totalLoss+=cfg.lossAdd;breakdown.push({label:`${cfg.label} (${el.label})`,loss:cfg.lossAdd});}}
+  });
+  totalLoss+=1.0; breakdown.push({label:'Connectors',loss:1.0});
+  return{totalLoss,breakdown,totalDist};
+}
+
+// ── EXPORTS ──
+function exportGeoJSON(){
+  const features=[];
+  S.elements.forEach(e=>features.push({type:'Feature',geometry:{type:'Point',coordinates:[e.ll.lng,e.ll.lat]},properties:{id:e.id,type:e.type,label:e.label,fiber:e.fiber,notes:e.notes}}));
+  S.routes.forEach(r=>features.push({type:'Feature',geometry:{type:'LineString',coordinates:r.pts.map(p=>[p.lng,p.lat])},properties:{id:r.id,type:r.type,label:r.label,fibers:r.fibers,dist_m:r.dist.toFixed(1),group:r.grp,notes:r.notes}}));
+  download('ftth-design.geojson',JSON.stringify({type:'FeatureCollection',features},null,2),'application/geo+json');
+  toast('GeoJSON exported');
+}
+function exportKML(){
+  let kml=`<?xml version="1.0" encoding="UTF-8"?>\n<kml xmlns="http://www.opengis.net/kml/2.2">\n<Document><name>FTTH Design</name>\n`;
+  S.elements.forEach(e=>{const cfg=INFRA[e.type];kml+=`<Placemark><name>${e.label}</name><description>${cfg.label}</description><Point><coordinates>${e.ll.lng},${e.ll.lat},0</coordinates></Point></Placemark>\n`;});
+  S.routes.forEach(r=>{const rc=ROUTES[r.type];kml+=`<Placemark><name>${r.label}</name><description>${rc.label} - ${r.fibers}F - ${r.dist.toFixed(0)}m</description><LineString><coordinates>${r.pts.map(p=>`${p.lng},${p.lat},0`).join(' ')}</coordinates></LineString></Placemark>\n`;});
+  kml+='</Document></kml>';
+  download('ftth-design.kml',kml,'application/vnd.google-earth.kml+xml');
+  toast('KML exported');
+}
+function exportCSV(){
+  let csv='ELEMENTS\nID,Type,Label,Lat,Lng,Fiber,Notes\n';
+  S.elements.forEach(e=>{csv+=`${e.id},${e.type},"${e.label}",${e.ll.lat.toFixed(6)},${e.ll.lng.toFixed(6)},${e.fiber},"${e.notes}"\n`;});
+  csv+='\nROUTES\nID,Type,Label,Fibers,Distance_m,Group,Notes\n';
+  S.routes.forEach(r=>{csv+=`${r.id},${r.type},"${r.label}",${r.fibers},${r.dist.toFixed(1)},${r.grp},"${r.notes}"\n`;});
+  download('ftth-bom.csv',csv,'text/csv');
+  toast('CSV/BoM exported');
+}
+function download(name,content,mime){
+  if(window.electronAPI){window.electronAPI.saveFile(name,content,mime);return;}
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([content],{type:mime}));
+  a.download=name; a.click(); URL.revokeObjectURL(a.href);
+}
+
+// ── SAVE / LOAD ──
+function saveProject(){
+  const data={version:1,
+    elements:S.elements.map(e=>({id:e.id,type:e.type,ll:e.ll,label:e.label,fiber:e.fiber,notes:e.notes})),
+    routes:S.routes.map(r=>({id:r.id,type:r.type,label:r.label,pts:r.pts.map(p=>({lat:p.lat,lng:p.lng})),fibers:r.fibers,grp:r.grp,notes:r.notes,dist:r.dist,fromEl:r.fromEl,toEl:r.toEl,opts:r.opts})),
+  };
+  const json=JSON.stringify(data);
+  if(window.electronAPI){window.electronAPI.saveFile('ftth-design.json',json,'application/json').then(()=>toast('Saved'));return;}
+  localStorage.setItem('ftth_project',json);
+  toast('Project saved');
+}
+function loadProject(){
+  if(window.electronAPI){window.electronAPI.openFile().then(c=>{if(c)restoreProject(c);});return;}
+  const json=localStorage.getItem('ftth_project');
+  if(!json){toast('No saved project found');return;}
+  restoreProject(json);
+}
+function restoreProject(json){
+  try{
+    const data=JSON.parse(json);
+    S.elements.forEach(e=>{if(e.marker)MAP.removeLayer(e.marker);});
+    S.routes.forEach(r=>{if(r.line)MAP.removeLayer(r.line);if(r.lblMarker)MAP.removeLayer(r.lblMarker);});
+    S.elements=[];S.routes=[];S.selElem=null;_elemId=0;_routeId=0;
+    data.elements.forEach(e=>{
+      _elemId=Math.max(_elemId,parseInt(e.id.replace('e',''))||0);
+      const placed=placeElem(e.type,L.latLng(e.ll.lat,e.ll.lng),e.label,e.fiber,e.notes);
+      placed.id=e.id;
+    });
+    data.routes.forEach(r=>{
+      _routeId=Math.max(_routeId,parseInt(r.id.replace('r',''))||0);
+      restoreRoute(r);
+    });
+    updateUI(); fitAll(); toast('Project loaded');
+  }catch(err){toast('Load error: '+err.message);}
+}
+function restoreRoute(data){
+  const pts=data.pts.map(p=>L.latLng(p.lat,p.lng));
+  const rcfg=ROUTES[data.type]||ROUTES.trench;
+  const line=L.polyline(pts,{color:rcfg.color,weight:rcfg.weight,dashArray:rcfg.dash||null,opacity:.85}).addTo(MAP);
+  const midPt=pts[Math.floor(pts.length/2)];
+  const lbl=L.marker(midPt,{icon:L.divIcon({className:'',html:`<div style="background:rgba(8,15,26,.85);border:1px solid ${rcfg.color};color:${rcfg.color};border-radius:3px;padding:1px 5px;font-size:9px">${data.label}</div>`,iconAnchor:[0,8]}),interactive:false}).addTo(MAP);
+  line.bindPopup(`<b>${data.label}</b><br>${rcfg.label}<br>${data.fibers}F`);
+  S.routes.push({...data,pts,line,lblMarker:lbl});
+}
+
+// ── BOM ──
+function calcBoM(){
+  const routeMap={},infraMap={};
+  S.routes.forEach(r=>{
+    if(!routeMap[r.type])routeMap[r.type]={label:ROUTES[r.type]?.label||r.type,dist:0};
+    routeMap[r.type].dist+=r.dist;
+  });
+  S.elements.forEach(e=>{
+    if(!infraMap[e.type])infraMap[e.type]={label:INFRA[e.type]?.label||e.type,count:0};
+    infraMap[e.type].count++;
+  });
+  return{routes:Object.values(routeMap),infra:Object.values(infraMap),
+    totalDist:S.routes.reduce((a,r)=>a+r.dist,0)};
+}
+
+// ── TABS ──
+function showTab(name){
+  S.activePanel=name;
+  const tabs=['elements','routes','pon','p2p','bom','survey'];
+  document.querySelectorAll('.ptab').forEach((t,i)=>t.classList.toggle('active',tabs[i]===name));
+  updateUI();
+}
+function updateUI(){
+  const pb=document.getElementById('panel-body');
+  switch(S.activePanel){
+    case 'elements': pb.innerHTML=renderElements(); bindElemEvents(); break;
+    case 'routes':   pb.innerHTML=renderRoutes(); break;
+    case 'pon':      pb.innerHTML=renderPON(); bindPONEvents(); break;
+    case 'p2p':      pb.innerHTML=renderP2P(); bindP2PEvents(); break;
+    case 'bom':      pb.innerHTML=renderBoM(); bindBoMEvents(); break;
+    case 'survey':   pb.innerHTML=renderSurvey(); bindSurveyEvents(); break;
+  }
+}
+
+// ── ELEMENTS ──
+function renderElements(){
+  if(!S.elements.length)return '<p style="color:var(--text3);font-size:11px;text-align:center;padding:24px">No infrastructure placed.<br>Choose a type and click the map.</p>';
+  const groups={};
+  S.elements.forEach(e=>{if(!groups[e.type])groups[e.type]=[];groups[e.type].push(e);});
+  return '<div>'+Object.entries(groups).map(([type,els])=>{
+    const cfg=INFRA[type];
+    return `<div class="elem-group-title">${cfg.label} (${els.length})</div>`+
+      els.map(e=>`<div class="elem-item${e.id===S.selElem?' selected':''}" id="ei-${e.id}" data-id="${e.id}">
+        <div class="elem-dot" style="background:${cfg.color}"></div>
+        <span class="elem-label">${e.label}${e.fiber?` <span style="color:var(--text3);font-size:9px">${e.fiber}F</span>`:''}</span>
+        <button class="elem-del" data-del="${e.id}" title="Delete">✕</button>
+      </div>`).join('');
+  }).join('')+'</div>';
+}
+function bindElemEvents(){
+  document.querySelectorAll('.elem-item').forEach(el=>{
+    el.addEventListener('click',ev=>{
+      if(ev.target.dataset.del)return;
+      const elem=S.elements.find(e=>e.id===el.dataset.id);
+      if(elem){MAP.panTo([elem.ll.lat,elem.ll.lng]);elem.marker?.openPopup();}
+      selectElem(el.dataset.id);
+    });
+  });
+  document.querySelectorAll('[data-del]').forEach(btn=>{
+    btn.addEventListener('click',ev=>{ev.stopPropagation();deleteElem(btn.dataset.del);});
+  });
+}
+
+// ── ROUTES ──
+function renderRoutes(){
+  if(!S.routes.length)return '<p style="color:var(--text3);font-size:11px;text-align:center;padding:24px">No routes drawn.<br>Switch to Draw Route mode.</p>';
+  const rA=S.routes.filter(r=>r.grp==='A'),rB=S.routes.filter(r=>r.grp==='B');
+  let html='';
+  if(rA.length&&rB.length){
+    const dA=rA.reduce((a,r)=>a+r.dist,0),dB=rB.reduce((a,r)=>a+r.dist,0);
+    html+=`<div style="margin-bottom:14px"><div class="sec-label" style="margin-bottom:6px">Route A vs B</div>
+    <table class="cmp-table"><tr><th></th><th>Route A</th><th>Route B</th></tr>
+    <tr><td>Distance</td><td class="${dA<=dB?'winner':''}">${(dA/1000).toFixed(2)} km</td><td class="${dB<dA?'winner':''}">${(dB/1000).toFixed(2)} km</td></tr>
+    <tr><td>Fibers</td><td>${rA.reduce((a,r)=>a+r.fibers,0)}F</td><td>${rB.reduce((a,r)=>a+r.fibers,0)}F</td></tr>
+    </table></div>`;
+  }
+  html+=S.routes.map(r=>{
+    const rc=ROUTES[r.type]||{};
+    return `<div class="route-item">
+      <div class="route-item-head">
+        <div class="route-color-bar" style="background:${rc.color}"></div>
+        <div class="route-label">${r.label}</div>
+        <button class="btn sm danger" onclick="deleteRoute('${r.id}')">✕</button>
+      </div>
+      <div class="route-meta">
+        <span>${rc.label}</span><span>${r.fibers}F</span><span>${(r.dist/1000).toFixed(3)} km</span>
+        ${r.opts?.cable?`<span>${r.opts.cable.name}</span>`:''}
+        ${r.grp!=='none'?`<span>Grp ${r.grp}</span>`:''}
+        ${r.notes?`<span>${r.notes}</span>`:''}
+      </div>
+    </div>`;
+  }).join('');
+  return html;
+}
+
+// ── PON BUDGET ──
+function renderPON(){
+  const cos=S.elements.filter(e=>e.type==='co');
+  const onts=S.elements.filter(e=>e.type==='customer');
+  return `<div class="ph"><h3>PON Loss Budget</h3></div>
+  <div class="form-row"><label>Central Office (OLT)</label>
+    <select class="form-sel" id="pon-co"><option value="">— Select CO —</option>${cos.map(e=>`<option value="${e.id}">${e.label}</option>`).join('')}</select></div>
+  <div class="form-row"><label>Customer / ONT</label>
+    <select class="form-sel" id="pon-ont"><option value="">— Select ONT —</option>${onts.map(e=>`<option value="${e.id}">${e.label}</option>`).join('')}</select></div>
+  <button class="btn primary full" id="pon-calc" style="margin-bottom:12px">Calculate</button>
+  <div id="pon-result"></div>`;
+}
+function bindPONEvents(){
+  document.getElementById('pon-calc')?.addEventListener('click',()=>{
+    const coId=document.getElementById('pon-co').value;
+    const ontId=document.getElementById('pon-ont').value;
+    const res=document.getElementById('pon-result');
+    if(!coId||!ontId){res.innerHTML='<p style="color:var(--yellow);font-size:11px">Select CO and ONT</p>';return;}
+    const result=calcLoss(coId,ontId);
+    if(!result){res.innerHTML='<p style="color:var(--red);font-size:11px">No connected path found</p>';return;}
+    const txPow=5, rxPow=txPow-result.totalLoss, margin=rxPow-GPON_MIN_RX, pass=margin>=0;
+    res.innerHTML=`<div style="margin-bottom:10px;display:flex;align-items:center;gap:8px">
+      <span class="badge ${pass?'pass':'fail'}">${pass?'PASS':'FAIL'}</span>
+      <span style="font-size:11px;color:var(--text2)">Rx: <b style="color:${pass?'var(--green)':'var(--red)'}">${rxPow.toFixed(2)} dBm</b> | Margin: ${margin.toFixed(2)} dB</span>
+    </div>
+    <div style="font-size:10px;color:var(--text3);margin-bottom:8px">Path: ${result.totalDist.toFixed(2)} km | TX +${txPow} dBm | Limit ${GPON_MIN_RX} dBm</div>
+    ${result.breakdown.map(b=>`<div class="lb-row"><span class="lb-label">${b.label}</span><span class="lb-val ${b.loss<0?'lb-gain':'lb-loss'}">${b.loss<0?'+':'−'}${Math.abs(b.loss).toFixed(2)} dB</span></div>`).join('')}
+    <div class="lb-row" style="font-weight:600"><span class="lb-label">Total Loss</span><span class="lb-val lb-loss">${result.totalLoss.toFixed(2)} dB</span></div>`;
+  });
+}
+
+// ── P2P/BHL ──
+function renderP2P(){
+  const sub=S.p2pSub;
+  let html=`<div class="ph"><h3>P2P / Backhaul</h3></div>
+  <div class="sub-tabs">
+    ${['link','lat','ring','dwdm'].map(s=>`<div class="stab${sub===s?' active':''}" onclick="switchP2PSub('${s}')">${{link:'Link Budget',lat:'Latency',ring:'Ring',dwdm:'DWDM'}[s]}</div>`).join('')}
+  </div>`;
+  if(sub==='link'){
+    html+=`<div class="form-row"><label>Transceiver</label><select class="form-sel" id="xcvr-sel" onchange="calcLink()">${XCVR.map((x,i)=>`<option value="${i}">${x.name}</option>`).join('')}</select></div>
+    <div class="form-row"><label>Span Distance (km)</label><input class="form-in" id="link-dist" type="number" step="0.1" value="${(S.routes.reduce((a,r)=>a+r.dist,0)/1000).toFixed(1)}" oninput="calcLink()"/></div>
+    <div class="form-row"><label>Fiber Grade</label><select class="form-sel" id="link-grade" onchange="calcLink()">
+      <option value="0.35">G.652D — 0.35 dB/km</option>
+      <option value="0.25">G.654E — 0.25 dB/km</option>
+      <option value="0.40">G.652B — 0.40 dB/km</option>
+    </select></div>
+    <div class="form-row"><label>EDFA Amplifiers</label><input class="form-in" id="link-edfa" type="number" min="0" value="0" oninput="calcLink()"/></div>
+    <div id="link-result"></div>`;
+  } else if(sub==='lat'){
+    const distKm=S.routes.reduce((a,r)=>a+r.dist,0)/1000;
+    const fLat=distKm*FIBER_PROP_US;
+    let nLat=0,nBrk=[];
+    S.elements.forEach(e=>{const c=INFRA[e.type];if(c?.latUs){nLat+=c.latUs;nBrk.push({label:e.label,lat:c.latUs});}});
+    const tot=fLat+nLat;
+    html+=`<div style="margin-bottom:8px"><span class="badge ${tot<=100?'pass':'warn'}">3GPP 5G ${tot<=100?'≤100µs ✓':'>100µs'}</span></div>
+    <div class="lb-row"><span class="lb-label">Fiber (${distKm.toFixed(2)} km)</span><span class="lb-val">${fLat.toFixed(1)} µs</span></div>
+    ${nBrk.map(n=>`<div class="lb-row"><span class="lb-label">${n.label}</span><span class="lb-val">${n.lat} µs</span></div>`).join('')}
+    <div class="lb-row" style="font-weight:600"><span class="lb-label">Total One-Way</span><span class="lb-val">${tot.toFixed(1)} µs</span></div>`;
+  } else if(sub==='ring'){
+    const rA=S.routes.filter(r=>r.grp==='A'),rB=S.routes.filter(r=>r.grp==='B');
+    const dA=rA.reduce((a,r)=>a+r.dist,0),dB=rB.reduce((a,r)=>a+r.dist,0);
+    html+=`<div class="sec-label" style="margin-bottom:8px">MSP 1+1 Ring Analysis</div>
+    <div class="lb-row"><span class="lb-label">Route A (Primary)</span><span class="lb-val">${(dA/1000).toFixed(2)} km</span></div>
+    <div class="lb-row"><span class="lb-label">Route B (Protection)</span><span class="lb-val">${(dB/1000).toFixed(2)} km</span></div>
+    <div class="lb-row"><span class="lb-label">Circumference</span><span class="lb-val">${((dA+dB)/1000).toFixed(2)} km</span></div>
+    <div class="lb-row"><span class="lb-label">Path Difference</span><span class="lb-val">${(Math.abs(dA-dB)/1000).toFixed(2)} km</span></div>
+    <div class="lb-row"><span class="lb-label">Max Delay Diff</span><span class="lb-val">${(Math.abs(dA-dB)/1000*FIBER_PROP_US).toFixed(1)} µs</span></div>
+    ${(!rA.length||!rB.length)?'<p style="color:var(--yellow);font-size:11px;margin-top:8px">Assign routes to Groups A and B to use ring analysis.</p>':''}`;
+  } else if(sub==='dwdm'){
+    const used=new Set();
+    S.routes.forEach(r=>{const m=r.label?.match(/C(\d+)/i);if(m)used.add('C'+m[1]);});
+    html+=`<div class="sec-label" style="margin-bottom:8px">C-Band 16-Channel Grid</div>
+    <div class="dwdm-grid">${DWDM_CH.map(c=>`<div class="dwdm-ch${used.has(c.ch)?' used':''}"><div style="font-weight:700">${c.ch}</div><div>${c.nm}nm</div><div style="font-size:8px">${c.freq}THz</div></div>`).join('')}</div>
+    <p style="font-size:10px;color:var(--text3);margin-top:8px">Label routes with C1–C16 to highlight used channels.</p>`;
+  }
+  return html;
+}
+function switchP2PSub(sub){S.p2pSub=sub;updateUI();}
+function bindP2PEvents(){if(S.p2pSub==='link')setTimeout(calcLink,30);}
+function calcLink(){
+  const xi=parseInt(document.getElementById('xcvr-sel')?.value)||0;
+  const dist=parseFloat(document.getElementById('link-dist')?.value)||0;
+  const atten=parseFloat(document.getElementById('link-grade')?.value)||0.35;
+  const edfa=parseInt(document.getElementById('link-edfa')?.value)||0;
+  const x=XCVR[xi];
+  const fLoss=dist*atten, connLoss=1.0, eGain=edfa*20;
+  const rxPow=x.txPow-(fLoss+connLoss-eGain);
+  const margin=rxPow-x.rxSens, pass=margin>=0;
+  const el=document.getElementById('link-result'); if(!el)return;
+  el.innerHTML=`<div style="margin:10px 0 8px;display:flex;align-items:center;gap:8px">
+    <span class="badge ${pass?'pass':'fail'}">${pass?'LINK OK':'LINK FAIL'}</span>
+    <span style="font-size:11px;color:var(--text2)">Margin: <b style="color:${pass?'var(--green)':'var(--red)'}">${margin.toFixed(2)} dB</b></span>
+  </div>
+  <div class="lb-row"><span class="lb-label">TX Power</span><span class="lb-val">+${x.txPow} dBm</span></div>
+  <div class="lb-row"><span class="lb-label">Fiber Loss</span><span class="lb-val lb-loss">−${fLoss.toFixed(2)} dB</span></div>
+  <div class="lb-row"><span class="lb-label">Connector Loss</span><span class="lb-val lb-loss">−${connLoss} dB</span></div>
+  ${edfa?`<div class="lb-row"><span class="lb-label">EDFA ×${edfa}</span><span class="lb-val lb-gain">+${eGain} dB</span></div>`:''}
+  <div class="lb-row"><span class="lb-label">RX Power</span><span class="lb-val">${rxPow.toFixed(2)} dBm</span></div>
+  <div class="lb-row"><span class="lb-label">RX Sensitivity</span><span class="lb-val">${x.rxSens} dBm</span></div>
+  <div class="lb-row"><span class="lb-label">Max Rated Reach</span><span class="lb-val">${x.maxDist} km</span></div>`;
+}
+
+// ── BOM ──
+function renderBoM(){
+  const bom=calcBoM();
+  const RATE={trench:35,conduit:28,aerial:18,trussbore:120,underpass:90};
+  let html=`<div class="ph"><h3>Bill of Materials</h3></div>`;
+  html+=`<div class="bom-section"><h4>Fiber Routes</h4><table class="data-table">
+    <tr><th>Type</th><th>Distance</th><th>Est. Cost</th></tr>
+    ${bom.routes.map(r=>{
+      const rKey=Object.keys(ROUTES).find(k=>ROUTES[k].label===r.label)||'trench';
+      return `<tr><td>${r.label}</td><td>${(r.dist/1000).toFixed(2)} km</td><td>$${((r.dist/1000)*(RATE[rKey]||30)).toFixed(0)}</td></tr>`;
+    }).join('')}
+    <tr><td><b>Total</b></td><td><b>${(bom.totalDist/1000).toFixed(2)} km</b></td><td></td></tr>
+  </table></div>`;
+  html+=`<div class="bom-section"><h4>Infrastructure</h4><table class="data-table">
+    <tr><th>Type</th><th>Count</th></tr>
+    ${bom.infra.map(i=>`<tr><td>${i.label}</td><td>${i.count}</td></tr>`).join('')}
+  </table></div>`;
+  if(S.routes.some(r=>r.opts?.cable)){
+    html+=`<div class="bom-section"><h4>Cables (incl. 15% slack)</h4><table class="data-table">
+      <tr><th>Route</th><th>Cable</th><th>Qty</th><th>Length</th></tr>
+      ${S.routes.filter(r=>r.opts?.cable).map(r=>`<tr><td>${r.label}</td><td>${r.opts.cable.name}</td><td>${r.opts.qty||1}</td><td>${((r.dist/1000)*1.15).toFixed(2)} km</td></tr>`).join('')}
+    </table></div>`;
+  }
+  html+=`<div class="bom-section"><h4>Duct Fill Calculator</h4>
+    <div class="form-row"><label>Duct Size</label><select class="form-sel" id="dc-duct" onchange="updateDuctCalc()">${DUCTS.map(d=>`<option value="${d.id}">${d.label}</option>`).join('')}</select></div>
+    <div class="duct-add-row">
+      <select class="form-sel" id="dc-cable" style="flex:2">${CABLES.map((c,i)=>`<option value="${i}">${c.name}</option>`).join('')}</select>
+      <input class="form-in" id="dc-qty" type="number" min="1" value="1" style="width:55px;flex:none"/>
+      <button class="btn primary sm" onclick="addDuctCable()">Add</button>
+    </div>
+    <div id="duct-cables-list"></div>
+    <div id="duct-result" style="margin-top:8px"></div>
+  </div>`;
+  return html;
+}
+function bindBoMEvents(){updateDuctCalc();}
+function addDuctCable(){
+  const ci=parseInt(document.getElementById('dc-cable')?.value)||0;
+  const qty=Math.max(1,parseInt(document.getElementById('dc-qty')?.value)||1);
+  S.ductCalcItems.push({ci,qty});updateDuctCalc();
+}
+function removeDuctCable(i){S.ductCalcItems.splice(i,1);updateDuctCalc();}
+function updateDuctCalc(){
+  const did=document.getElementById('dc-duct')?.value; if(!did)return;
+  const duct=DUCTS.find(d=>d.id===did);
+  const listEl=document.getElementById('duct-cables-list');
+  const resEl=document.getElementById('duct-result');
+  if(!listEl||!resEl||!duct)return;
+  listEl.innerHTML=S.ductCalcItems.length
+    ?S.ductCalcItems.map((item,i)=>`<div class="duct-cable-entry"><span>${CABLES[item.ci].name} ×${item.qty}</span><span class="duct-cable-del" onclick="removeDuctCable(${i})">✕</span></div>`).join('')
+    :'<div style="color:var(--text3);font-size:10px;padding:4px 0">No cables added</div>';
+  if(!S.ductCalcItems.length){resEl.innerHTML='';return;}
+  const totalArea=S.ductCalcItems.reduce((a,item)=>a+Math.PI*(CABLES[item.ci].od/2)**2*item.qty,0);
+  const totalQty=S.ductCalcItems.reduce((a,i)=>a+i.qty,0);
+  const fillPct=totalArea/duct.area*100;
+  const limit=totalQty===1?FILL_SINGLE:FILL_MULTIPLE;
+  const pass=fillPct<=limit;
+  const canFit=Math.max(0,Math.floor((duct.area*(limit/100)-totalArea)/(Math.PI*(CABLES[0].od/2)**2)));
+  resEl.innerHTML=`<div class="fill-bar-wrap" style="margin-bottom:5px"><div class="fill-bar ${pass?'fill-pass':'fill-fail'}" style="width:${Math.min(fillPct,100)}%"></div></div>
+  <div style="font-size:11px;color:${pass?'var(--green)':'var(--red)'};font-weight:600">${fillPct.toFixed(1)}% — ${pass?'WITHIN LIMIT':'OVER LIMIT'} (${limit}%)</div>
+  <div style="font-size:10px;color:var(--text3);margin-top:3px">~${canFit} more ${CABLES[0].name} cables fit</div>`;
+}
+
+// ── SURVEY ──
+function renderSurvey(){
+  const el=S.selElem?S.elements.find(e=>e.id===S.selElem):null;
+  if(!el)return `<div class="ph"><h3>Site Survey</h3></div><p style="color:var(--text3);font-size:11px;text-align:center;padding:24px">Select an element from the Elements tab.</p>`;
+  const cfg=INFRA[el.type];
+  const checks=SURVEY_CHECKS[el.type]||[];
+  const done=S.surveyChecks[el.id]||new Set();
+  const pct=checks.length?Math.round(done.size/checks.length*100):0;
+  return `<div class="ph"><h3>${el.label}</h3><span class="badge ${pct===100?'pass':pct>0?'warn':'fail'}">${pct}%</span></div>
+  <div class="survey-field"><div class="survey-label">Type</div><div class="survey-val">${cfg.label}</div></div>
+  <div class="survey-field"><div class="survey-label">GPS</div><div class="survey-val">${el.ll.lat.toFixed(6)}, ${el.ll.lng.toFixed(6)}</div></div>
+  ${el.fiber?`<div class="survey-field"><div class="survey-label">Fiber Capacity</div><div class="survey-val">${el.fiber}F</div></div>`:''}
+  ${el.notes?`<div class="survey-field"><div class="survey-label">Notes</div><div class="survey-val">${el.notes}</div></div>`:''}
+  <div style="margin:12px 0 4px;font-size:10px;color:var(--text3);font-weight:600;text-transform:uppercase">Checklist (${done.size}/${checks.length})</div>
+  ${checks.map((c,i)=>`<div class="survey-check${done.has(i)?' done':''}" data-check="${i}">
+    <input type="checkbox" ${done.has(i)?'checked':''}/>
+    <span class="survey-check-label">${c}</span>
+  </div>`).join('')}
+  <div style="margin-top:14px;display:flex;gap:6px">
+    <button class="btn primary" onclick="printSurvey('${el.id}')">🖨 Print Card</button>
+    <button class="btn sm" onclick="clearChecks('${el.id}')">Reset</button>
+  </div>`;
+}
+function bindSurveyEvents(){
+  document.querySelectorAll('.survey-check').forEach(div=>{
+    div.addEventListener('click',()=>{
+      const i=parseInt(div.dataset.check);
+      if(!S.surveyChecks[S.selElem])S.surveyChecks[S.selElem]=new Set();
+      const s=S.surveyChecks[S.selElem];
+      s.has(i)?s.delete(i):s.add(i);
+      updateUI();
+    });
+  });
+}
+function clearChecks(id){S.surveyChecks[id]=new Set();updateUI();}
+function printSurvey(id){
+  const el=S.elements.find(e=>e.id===id); if(!el)return;
+  const cfg=INFRA[el.type];
+  const checks=SURVEY_CHECKS[el.type]||[];
+  const done=S.surveyChecks[id]||new Set();
+  const w=window.open('','_blank');
+  w.document.write(`<!DOCTYPE html><html><head><title>Survey: ${el.label}</title>
+  <style>body{font-family:Arial,sans-serif;margin:24px;color:#000;font-size:12px}h1{font-size:16px;margin-bottom:4px}h2{font-size:12px;color:#555;margin-bottom:14px}table{border-collapse:collapse;width:100%;margin-bottom:14px}td,th{border:1px solid #ccc;padding:5px 8px}.check{margin:3px 0}.done{text-decoration:line-through;color:#888}.footer{margin-top:30px;border-top:1px solid #ccc;padding-top:10px;font-size:11px;color:#666}</style></head>
+  <body><h1>FTTH Site Survey</h1><h2>${cfg.label} — ${el.label}</h2>
+  <table><tr><th>GPS</th><td>${el.ll.lat.toFixed(6)}, ${el.ll.lng.toFixed(6)}</td></tr>
+  ${el.fiber?`<tr><th>Fiber Capacity</th><td>${el.fiber}F</td></tr>`:''}
+  ${el.notes?`<tr><th>Notes</th><td>${el.notes}</td></tr>`:''}
+  <tr><th>Survey Date</th><td>${new Date().toLocaleDateString()}</td></tr></table>
+  <b>Checklist</b>
+  ${checks.map((c,i)=>`<div class="check${done.has(i)?' done':''}"><input type="checkbox" ${done.has(i)?'checked':''}/> ${c}</div>`).join('')}
+  <div class="footer">Technician: ___________________________ &nbsp; Signature: ___________________________</div>
+  </body></html>`);
+  w.document.close(); w.print();
+}
+
+// ── TOAST ──
+function toast(msg){
+  const el=document.getElementById('toast');
+  el.textContent=msg; el.classList.add('show');
+  clearTimeout(_toastTimer);
+  _toastTimer=setTimeout(()=>el.classList.remove('show'),2800);
+}
+
+// ── INIT ──
+function init(){
+  S.mapboxToken=localStorage.getItem('ftth_mapbox')||'';
+  initMap();
+  buildInfraBtns();
+  buildRouteBtns();
+  showTab('elements');
+  updateStatus();
+}
+document.addEventListener('DOMContentLoaded',init);
+</script>
+</body>
+</html>
