@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
 <title>FTTH GIS Route Planner</title>
 <link rel="manifest" href="manifest.json"/>
 <meta name="theme-color" content="#00D9FF"/>
@@ -20,12 +20,72 @@
   --amber:#F59E0B;--purple:#A855F7;--pink:#EC4899;--teal:#14B8A6;
   --lime:#84CC16;--rose:#F43F5E;--violet:#8B5CF6;--slate:#64748B;
 }
-html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;font-size:13px}
-#app{display:flex;height:100vh;width:100vw}
-#sidebar{width:260px;min-width:220px;background:var(--bg1);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;z-index:10}
-#map-wrap{flex:1;position:relative}
+html{height:100%;height:-webkit-fill-available}
+body{height:100%;min-height:100%;min-height:-webkit-fill-available;overflow:hidden;background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;font-size:13px}
+#app{display:flex;height:100vh;height:100dvh;width:100vw;flex-direction:row}
+#sidebar{width:260px;min-width:220px;background:var(--bg1);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;z-index:200;transition:transform .28s cubic-bezier(.4,0,.2,1)}
+#map-wrap{flex:1;position:relative;overflow:hidden}
 #map{width:100%;height:100%}
-#panel{width:320px;min-width:260px;background:var(--bg1);border-left:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;z-index:10}
+#panel{width:320px;min-width:260px;background:var(--bg1);border-left:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;z-index:200;transition:transform .28s cubic-bezier(.4,0,.2,1)}
+/* mobile header — hidden on desktop */
+#mobile-header{display:none;position:fixed;top:0;left:0;right:0;z-index:300;background:var(--bg1);border-bottom:1px solid var(--border);align-items:center;padding:0 10px;padding-top:env(safe-area-inset-top);height:calc(48px + env(safe-area-inset-top));flex-shrink:0}
+#mobile-header h1{flex:1;font-size:13px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.5px;text-align:center}
+.mhdr-btn{width:40px;height:40px;border:none;background:none;color:var(--text);font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center;border-radius:8px;-webkit-tap-highlight-color:transparent}
+.mhdr-btn:active{background:var(--bg2)}
+/* overlay */
+#overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:150;backdrop-filter:blur(2px)}
+#overlay.open{display:block}
+/* bottom panel handle */
+#panel-handle{display:none;justify-content:center;padding:8px 0 4px;cursor:pointer;flex-shrink:0;-webkit-tap-highlight-color:transparent}
+#panel-handle-bar{width:36px;height:4px;background:var(--border2);border-radius:2px}
+/* ── MOBILE LAYOUT ── */
+@media(max-width:768px){
+  #app{flex-direction:column}
+  #mobile-header{display:flex}
+  #sidebar{
+    position:fixed;left:0;top:0;bottom:0;
+    width:min(80vw,300px);
+    padding-top:calc(48px + env(safe-area-inset-top));
+    transform:translateX(-105%);
+    box-shadow:6px 0 24px rgba(0,0,0,.5);
+    z-index:250;
+  }
+  #sidebar.mob-open{transform:translateX(0)}
+  #sidebar-header{display:none}
+  #map-wrap{
+    position:absolute;
+    inset:0;
+    top:calc(48px + env(safe-area-inset-top));
+  }
+  #panel{
+    position:fixed;left:0;right:0;bottom:0;
+    width:100%;
+    height:58vh;
+    border-left:none;
+    border-top:1px solid var(--border);
+    border-radius:14px 14px 0 0;
+    transform:translateY(100%);
+    z-index:250;
+    padding-bottom:env(safe-area-inset-bottom);
+  }
+  #panel.mob-open{transform:translateY(0)}
+  #panel-handle{display:flex}
+  #panel-tabs{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  .ptab{padding:10px 12px;font-size:11px}
+  #map-btns{top:calc(56px + env(safe-area-inset-top));left:10px}
+  #status-bar{bottom:calc(12px + env(safe-area-inset-bottom));font-size:10px;max-width:55vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  #coords-bar{display:none}
+  .modal{width:96vw;max-width:420px;max-height:88vh;border-radius:14px}
+  /* bigger touch targets */
+  .btn{min-height:40px;font-size:12px}
+  .tool-btn{min-height:48px;font-size:11px}
+  .rb{min-height:40px}
+  .ptab{min-height:42px}
+  .elem-item{min-height:42px}
+  .survey-check{min-height:40px}
+  select.form-sel,input.form-in{min-height:40px;font-size:16px}/* 16px prevents iOS auto-zoom on input focus */
+  textarea{font-size:16px}
+}
 #sidebar-header{padding:12px 14px 10px;border-bottom:1px solid var(--border);flex-shrink:0}
 #sidebar-header h1{font-size:13px;font-weight:700;color:var(--accent);letter-spacing:.5px;text-transform:uppercase}
 #sidebar-header p{font-size:10px;color:var(--text3);margin-top:2px}
@@ -185,6 +245,15 @@ input.form-in:focus,select.form-sel:focus{outline:1px solid var(--accent);border
 </style>
 </head>
 <body>
+<!-- Mobile header (hidden on desktop) -->
+<div id="mobile-header">
+  <button class="mhdr-btn" onclick="toggleMobileSidebar()" title="Menu">☰</button>
+  <h1>FTTH Planner</h1>
+  <button class="mhdr-btn" onclick="toggleMobilePanel()" title="Info Panel" id="panel-toggle-btn">⬆</button>
+</div>
+<!-- Overlay backdrop -->
+<div id="overlay" onclick="closeMobileDrawers()"></div>
+
 <div id="app">
 <div id="sidebar">
   <div id="sidebar-header">
@@ -312,6 +381,7 @@ input.form-in:focus,select.form-sel:focus{outline:1px solid var(--accent);border
 </div>
 
 <div id="panel">
+  <div id="panel-handle" onclick="toggleMobilePanel()"><div id="panel-handle-bar"></div></div>
   <div id="panel-tabs">
     <div class="ptab active" onclick="showTab('elements')">Elements</div>
     <div class="ptab" onclick="showTab('routes')">Routes</div>
@@ -1819,8 +1889,54 @@ function toast(msg){
 }
 
 // ── INIT ──
+// ── Mobile drawer helpers ──
+function toggleMobileSidebar(){
+  const sb=document.getElementById('sidebar');
+  const ov=document.getElementById('overlay');
+  const open=sb.classList.toggle('mob-open');
+  ov.classList.toggle('open',open);
+  // close panel if opening sidebar
+  if(open) document.getElementById('panel').classList.remove('mob-open');
+}
+function toggleMobilePanel(){
+  const pn=document.getElementById('panel');
+  const ov=document.getElementById('overlay');
+  const btn=document.getElementById('panel-toggle-btn');
+  const open=pn.classList.toggle('mob-open');
+  ov.classList.toggle('open',open);
+  if(btn) btn.textContent=open?'⬇':'⬆';
+  // close sidebar if opening panel
+  if(open) document.getElementById('sidebar').classList.remove('mob-open');
+  if(open) setTimeout(()=>MAP.invalidateSize(),300);
+}
+function closeMobileDrawers(){
+  document.getElementById('sidebar').classList.remove('mob-open');
+  document.getElementById('panel').classList.remove('mob-open');
+  document.getElementById('overlay').classList.remove('open');
+  const btn=document.getElementById('panel-toggle-btn');
+  if(btn) btn.textContent='⬆';
+}
+// On mobile, auto-open panel when a tab is tapped
+const _origShowTab=window.showTab;
+function showTab(name){
+  const isMobile=window.innerWidth<=768;
+  // call original logic
+  S.activePanel=name;
+  const tabs=['elements','routes','pon','p2p','bom','survey'];
+  document.querySelectorAll('.ptab').forEach((t,i)=>t.classList.toggle('active',tabs[i]===name));
+  updateUI();
+  if(isMobile){
+    const pn=document.getElementById('panel');
+    if(!pn.classList.contains('mob-open')) toggleMobilePanel();
+  }
+}
+
 function init(){
   S.mapboxToken=localStorage.getItem('ftth_mapbox')||'';
+  // Fix iOS vh — set CSS variable from actual window height
+  function setVH(){ document.documentElement.style.setProperty('--real-vh', window.innerHeight+'px'); }
+  setVH();
+  window.addEventListener('resize', ()=>{ setVH(); if(MAP) MAP.invalidateSize(); });
   initMap();
   buildInfraBtns();
   buildRouteBtns();
