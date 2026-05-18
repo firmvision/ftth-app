@@ -28,10 +28,10 @@ body{height:100%;min-height:100%;min-height:-webkit-fill-available;overflow:hidd
 #map{width:100%;height:100%}
 #panel{width:320px;min-width:260px;background:var(--bg1);border-left:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;z-index:200;transition:transform .28s cubic-bezier(.4,0,.2,1)}
 /* mobile header — hidden on desktop */
-#mobile-header{display:none;position:fixed;top:0;left:0;right:0;z-index:300;background:var(--bg1);border-bottom:1px solid var(--border);align-items:center;padding:0 10px;padding-top:env(safe-area-inset-top);height:calc(48px + env(safe-area-inset-top));flex-shrink:0}
-#mobile-header h1{flex:1;font-size:13px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.5px;text-align:center}
-.mhdr-btn{width:40px;height:40px;border:none;background:none;color:var(--text);font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center;border-radius:8px;-webkit-tap-highlight-color:transparent}
-.mhdr-btn:active{background:var(--bg2)}
+#mobile-header{display:none;position:fixed;top:0;left:0;right:0;z-index:300;background:var(--bg1);border-bottom:1px solid var(--border);align-items:center;padding:0 6px;padding-top:env(safe-area-inset-top);height:calc(48px + env(safe-area-inset-top));flex-shrink:0;user-select:none;-webkit-user-select:none}
+#mobile-header h1{flex:1;font-size:13px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.5px;text-align:center;pointer-events:none}
+.mhdr-btn{width:44px;height:44px;border:none;background:none;color:var(--text);font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center;border-radius:10px;-webkit-tap-highlight-color:transparent;touch-action:manipulation;user-select:none;-webkit-user-select:none;flex-shrink:0}
+.mhdr-btn:active{background:var(--bg3)}
 /* overlay */
 #overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:150;backdrop-filter:blur(2px)}
 #overlay.open{display:block}
@@ -70,21 +70,25 @@ body{height:100%;min-height:100%;min-height:-webkit-fill-available;overflow:hidd
   }
   #panel.mob-open{transform:translateY(0)}
   #panel-handle{display:flex}
-  #panel-tabs{overflow-x:auto;-webkit-overflow-scrolling:touch}
-  .ptab{padding:10px 12px;font-size:11px}
-  #map-btns{top:calc(56px + env(safe-area-inset-top));left:10px}
+  #panel-tabs{overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+  #panel-tabs::-webkit-scrollbar{display:none}
+  #sidebar-body{-webkit-overflow-scrolling:touch}
+  #panel-body{-webkit-overflow-scrolling:touch}
+  #map-btns{top:calc(56px + env(safe-area-inset-top));left:10px;right:auto}
   #status-bar{bottom:calc(12px + env(safe-area-inset-bottom));font-size:10px;max-width:55vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   #coords-bar{display:none}
   .modal{width:96vw;max-width:420px;max-height:88vh;border-radius:14px}
-  /* bigger touch targets */
-  .btn{min-height:40px;font-size:12px}
+  /* 44pt minimum touch targets (iOS HIG) */
+  .mhdr-btn{width:44px;height:44px;font-size:22px}
+  .btn{min-height:44px;font-size:12px}
   .tool-btn{min-height:48px;font-size:11px}
-  .rb{min-height:40px}
-  .ptab{min-height:42px}
-  .elem-item{min-height:42px}
-  .survey-check{min-height:40px}
-  select.form-sel,input.form-in{min-height:40px;font-size:16px}/* 16px prevents iOS auto-zoom on input focus */
-  textarea{font-size:16px}
+  .rb{min-height:44px}
+  .ptab{min-height:44px;padding:12px 12px;font-size:11px}
+  .map-btn{width:40px;height:40px;font-size:18px}
+  .elem-item{min-height:44px;padding:8px}
+  .survey-check{min-height:44px}
+  select.form-sel,input.form-in{min-height:44px;font-size:16px}/* 16px prevents iOS auto-zoom on input focus */
+  textarea{font-size:16px;min-height:64px}
 }
 #sidebar-header{padding:12px 14px 10px;border-bottom:1px solid var(--border);flex-shrink:0}
 #sidebar-header h1{font-size:13px;font-weight:700;color:var(--accent);letter-spacing:.5px;text-transform:uppercase}
@@ -209,6 +213,9 @@ input.form-in:focus,select.form-sel:focus{outline:1px solid var(--accent);border
 .fill-pass{background:var(--green)}
 .fill-warn{background:var(--yellow)}
 .fill-fail{background:var(--red)}
+/* Touch interaction fixes — eliminates iOS 300ms tap delay */
+button,.btn,.tool-btn,.rb,.ptab,.stab,.map-btn,.elem-item,.survey-check,.mhdr-btn{touch-action:manipulation;-webkit-tap-highlight-color:transparent;}
+#overlay{cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent;}
 .leaflet-container{background:#04090F}
 .leaflet-control-zoom a{background:var(--bg2)!important;color:var(--text)!important;border-color:var(--border)!important}
 .leaflet-control-zoom a:hover{background:var(--bg3)!important}
@@ -239,6 +246,9 @@ input.form-in:focus,select.form-sel:focus{outline:1px solid var(--accent);border
 #map-wrap.import-drag{outline:3px dashed var(--accent);outline-offset:-6px}
 #toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:var(--bg2);border:1px solid var(--border2);border-radius:6px;padding:8px 18px;font-size:12px;color:var(--text);z-index:9999;opacity:0;transition:.3s;pointer-events:none;white-space:nowrap}
 #toast.show{opacity:1}
+/* locate button */
+#locate-btn.locating{border-color:var(--accent)!important;color:var(--accent)!important;animation:pulse-dot 1.5s ease-in-out infinite}
+#locate-btn.located{border-color:var(--green)!important;color:var(--green)!important}
 ::-webkit-scrollbar{width:4px;height:4px}
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
@@ -247,12 +257,12 @@ input.form-in:focus,select.form-sel:focus{outline:1px solid var(--accent);border
 <body>
 <!-- Mobile header (hidden on desktop) -->
 <div id="mobile-header">
-  <button class="mhdr-btn" onclick="toggleMobileSidebar()" title="Menu">☰</button>
+  <button class="mhdr-btn" id="menu-btn" title="Menu" aria-label="Open menu">☰</button>
   <h1>FTTH Planner</h1>
-  <button class="mhdr-btn" onclick="toggleMobilePanel()" title="Info Panel" id="panel-toggle-btn">⬆</button>
+  <button class="mhdr-btn" id="panel-toggle-btn" title="Info Panel" aria-label="Toggle info panel">⬆</button>
 </div>
 <!-- Overlay backdrop -->
-<div id="overlay" onclick="closeMobileDrawers()"></div>
+<div id="overlay" onclick="closeMobileDrawers()" ontouchend="closeMobileDrawers()"></div>
 
 <div id="app">
 <div id="sidebar">
@@ -375,6 +385,9 @@ input.form-in:focus,select.form-sel:focus{outline:1px solid var(--accent);border
     <button class="map-btn" title="Zoom In" onclick="MAP.zoomIn()">+</button>
     <button class="map-btn" title="Zoom Out" onclick="MAP.zoomOut()">−</button>
     <button class="map-btn" title="Fit All" onclick="fitAll()" style="font-size:13px">⊡</button>
+    <button class="map-btn" id="locate-btn" title="My Location" onclick="locateUser()" style="font-size:15px;margin-top:6px">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/><circle cx="12" cy="12" r="10" stroke-width="1" stroke-dasharray="3 3"/></svg>
+    </button>
   </div>
   <div id="status-bar">Click map to place infrastructure</div>
   <div id="coords-bar">—</div>
@@ -915,6 +928,68 @@ function fitAll(){
   S.elements.forEach(e=>pts.push([e.ll.lat,e.ll.lng]));
   S.routes.forEach(r=>r.pts.forEach(p=>pts.push([p.lat,p.lng])));
   if(pts.length)MAP.fitBounds(L.latLngBounds(pts),{padding:[40,40]});
+}
+
+// ── LOCATE ME (map button) ──
+let _locateMarker=null, _locateCircle=null, _locating=false;
+function locateUser(){
+  if(!navigator.geolocation){toast('Geolocation not supported on this device');return;}
+  const btn=document.getElementById('locate-btn');
+  // If already showing a location, toggle off
+  if(_locateMarker&&!_locating){
+    MAP.removeLayer(_locateMarker); _locateMarker=null;
+    if(_locateCircle){MAP.removeLayer(_locateCircle);_locateCircle=null;}
+    btn.classList.remove('located');
+    toast('Location cleared');
+    return;
+  }
+  if(_locating) return; // already requesting
+  _locating=true;
+  btn.classList.add('locating');
+  toast('Finding your location…');
+  navigator.geolocation.getCurrentPosition(
+    pos=>{
+      _locating=false;
+      btn.classList.remove('locating');
+      btn.classList.add('located');
+      const lat=pos.coords.latitude, lng=pos.coords.longitude, acc=pos.coords.accuracy;
+      const ll=L.latLng(lat,lng);
+      // Remove old markers
+      if(_locateMarker){MAP.removeLayer(_locateMarker);_locateMarker=null;}
+      if(_locateCircle){MAP.removeLayer(_locateCircle);_locateCircle=null;}
+      // Accuracy circle
+      if(acc<500){
+        _locateCircle=L.circle(ll,{radius:acc,color:'#00D9FF',fillColor:'#00D9FF',fillOpacity:0.07,weight:1,interactive:false}).addTo(MAP);
+      }
+      // Pulsing "you are here" dot
+      _locateMarker=L.marker(ll,{
+        icon:L.divIcon({
+          className:'',
+          html:`<div style="position:relative;width:18px;height:18px">
+            <div style="position:absolute;inset:0;border:2px solid #00D9FF;border-radius:50%;animation:pulse-ring 1.5s ease-out infinite"></div>
+            <div style="position:absolute;top:3px;left:3px;width:12px;height:12px;background:#00D9FF;border:2px solid #fff;border-radius:50%;animation:pulse-dot 1.5s ease-in-out infinite;box-shadow:0 0 8px #00D9FF88"></div>
+          </div>`,
+          iconSize:[18,18],iconAnchor:[9,9]
+        }),
+        zIndexOffset:2000,
+        interactive:true
+      }).addTo(MAP);
+      _locateMarker.bindPopup(`<b>📍 You are here</b><br>Accuracy: ±${Math.round(acc)} m<br>${lat.toFixed(5)}, ${lng.toFixed(5)}`);
+      // Fly to location smoothly
+      MAP.flyTo(ll,Math.max(MAP.getZoom(),16),{animate:true,duration:1.2});
+      toast(`Located ✓  Accuracy ±${Math.round(acc)} m`);
+      // Also fill the GPS field tool inputs
+      document.getElementById('gps-lat').value=lat.toFixed(6);
+      document.getElementById('gps-lng').value=lng.toFixed(6);
+    },
+    err=>{
+      _locating=false;
+      btn.classList.remove('locating');
+      const msgs={1:'Location permission denied — enable in Settings',2:'Location signal unavailable',3:'Location request timed out'};
+      toast(msgs[err.code]||'Could not get location');
+    },
+    {enableHighAccuracy:true,timeout:15000,maximumAge:10000}
+  );
 }
 
 // ── GPS ──
@@ -1943,6 +2018,22 @@ function init(){
   showTab('elements');
   updateStatus();
   initDropZone();
+  // Wire mobile header buttons via addEventListener for reliable iOS touch
+  _wireTap('menu-btn', toggleMobileSidebar);
+  _wireTap('panel-toggle-btn', toggleMobilePanel);
+}
+// Attach both touchend and click; touchend fires first on iOS and we use preventDefault
+// to stop the ghost click that follows ~300ms later.
+function _wireTap(id, fn){
+  const el=document.getElementById(id); if(!el) return;
+  let _touched=false;
+  el.addEventListener('touchend', e=>{
+    e.preventDefault(); // block ghost click
+    _touched=true;
+    fn();
+    setTimeout(()=>{ _touched=false; }, 600);
+  }, {passive:false});
+  el.addEventListener('click', ()=>{ if(!_touched) fn(); });
 }
 document.addEventListener('DOMContentLoaded',init);
 
