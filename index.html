@@ -8,6 +8,7 @@
 <meta name="theme-color" content="#00D9FF"/>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/jszip@3.10.1/dist/jszip.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -153,6 +154,18 @@ input.form-in:focus,select.form-sel:focus{outline:1px solid var(--accent);border
 .duct-cable-del{color:var(--text3);cursor:pointer;font-size:13px}
 .duct-cable-del:hover{color:var(--red)}
 .sec-label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px;font-weight:600}
+/* import */
+.drop-zone{border:2px dashed var(--border2);border-radius:6px;padding:18px;text-align:center;cursor:pointer;transition:.15s;color:var(--text3);font-size:11px}
+.drop-zone:hover,.drop-zone.drag-over{border-color:var(--accent);color:var(--accent);background:rgba(0,217,255,.05)}
+.drop-zone input[type=file]{display:none}
+.import-preview{margin-top:10px;max-height:160px;overflow-y:auto}
+.import-row{display:flex;align-items:center;gap:6px;padding:4px 0;border-bottom:1px solid var(--border);font-size:10px;color:var(--text2)}
+.import-row .ir-icon{font-size:12px;flex-shrink:0}
+.import-row .ir-name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.import-row .ir-type{color:var(--text3);font-size:9px}
+.import-infra-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-top:8px}
+/* map drop highlight */
+#map-wrap.import-drag{outline:3px dashed var(--accent);outline-offset:-6px}
 #toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:var(--bg2);border:1px solid var(--border2);border-radius:6px;padding:8px 18px;font-size:12px;color:var(--text);z-index:9999;opacity:0;transition:.3s;pointer-events:none;white-space:nowrap}
 #toast.show{opacity:1}
 ::-webkit-scrollbar{width:4px;height:4px}
@@ -241,8 +254,25 @@ input.form-in:focus,select.form-sel:focus{outline:1px solid var(--accent);border
         </div>
       </div>
     </div>
-  </div>
-</div>
+    <!-- Import section -->
+    <div class="sb-section">
+      <div class="sb-section-title">Import Data</div>
+      <div class="sb-content">
+        <button class="btn primary full" onclick="openImportModal()">📥 Import KMZ / KML / GeoJSON</button>
+        <div style="margin-top:8px">
+          <div class="sec-label">Google Maps / Street View URL</div>
+          <input class="gps-input" id="gmaps-url" placeholder="Paste Google Maps share link…" style="width:100%;margin-bottom:4px"/>
+          <button class="btn full" onclick="extractGoogleMapsCoord()">📍 Extract &amp; Drop Pin</button>
+        </div>
+        <div style="margin-top:8px">
+          <div class="sec-label">Paste CSV Coordinates</div>
+          <textarea id="csv-paste" placeholder="lat,lng,name&#10;6.5244,3.3792,CO-001&#10;6.5200,3.3850,FDH-001" style="width:100%;height:64px;background:var(--bg2);border:1px solid var(--border2);color:var(--text);border-radius:4px;padding:5px 7px;font-size:10px;resize:vertical"></textarea>
+          <button class="btn full" style="margin-top:4px" onclick="importCSVPaste()">Import Rows</button>
+        </div>
+      </div>
+    </div>
+  </div><!-- /sidebar-body -->
+</div><!-- /sidebar -->
 
 <div id="map-wrap">
   <div id="map"></div>
@@ -302,6 +332,67 @@ input.form-in:focus,select.form-sel:focus{outline:1px solid var(--accent);border
   <div class="form-actions">
     <button class="btn" onclick="cancelLabel()">Cancel</button>
     <button class="btn primary" onclick="confirmLabel()">Place</button>
+  </div>
+</div>
+</div>
+
+<!-- Import Modal -->
+<div class="modal-overlay" id="import-modal">
+<div class="modal">
+  <h2>📥 Import Data</h2>
+  <div class="sub-tabs" style="margin-bottom:12px">
+    <div class="stab active" id="itab-file" onclick="switchImportTab('file')">File</div>
+    <div class="stab" id="itab-gmaps" onclick="switchImportTab('gmaps')">Google Maps</div>
+    <div class="stab" id="itab-csv" onclick="switchImportTab('csv')">CSV</div>
+  </div>
+
+  <!-- File tab -->
+  <div id="import-tab-file">
+    <div class="drop-zone" id="drop-zone" onclick="document.getElementById('file-input').click()">
+      <div style="font-size:24px;margin-bottom:6px">📂</div>
+      <div><b>Click or drag &amp; drop</b></div>
+      <div style="margin-top:4px;font-size:10px">Supports: .kmz, .kml, .geojson, .json</div>
+      <input type="file" id="file-input" accept=".kmz,.kml,.geojson,.json" onchange="handleFileInput(this)"/>
+    </div>
+    <div class="import-preview" id="import-preview"></div>
+  </div>
+
+  <!-- Google Maps tab -->
+  <div id="import-tab-gmaps" style="display:none">
+    <div class="form-row">
+      <label>Google Maps / Earth Share URL</label>
+      <input class="form-in" id="modal-gmaps-url" placeholder="https://maps.google.com/…"/>
+      <div style="font-size:10px;color:var(--text3);margin-top:4px">
+        Works with share links from Google Maps, Google Earth, Google Street View, and most mapping apps that output lat/lng in the URL.
+      </div>
+    </div>
+    <button class="btn primary full" onclick="parseModalGoogleURL()">Extract Coordinates</button>
+    <div id="gmaps-result" style="margin-top:10px;font-size:11px;color:var(--text2)"></div>
+  </div>
+
+  <!-- CSV tab -->
+  <div id="import-tab-csv" style="display:none">
+    <div class="form-row">
+      <label>CSV — one point per line</label>
+      <textarea class="form-in" id="modal-csv" style="height:100px;resize:vertical"
+        placeholder="lat,lng,name,type&#10;6.5244,3.3792,CO-001,co&#10;6.5200,3.3850,FDH-001,cabinet&#10;6.5100,3.3700,ODP-001,odp"></textarea>
+      <div style="font-size:10px;color:var(--text3);margin-top:4px">
+        Columns: <b>lat, lng</b> (required) · <b>name</b> · <b>type</b> (co / cabinet / odp / closure / customer…)
+      </div>
+    </div>
+    <button class="btn primary full" onclick="parseModalCSV()">Preview Rows</button>
+    <div class="import-preview" id="csv-preview"></div>
+  </div>
+
+  <!-- Infra type picker (shown for file/csv points without a type) -->
+  <div id="import-type-picker" style="display:none;margin-top:12px;padding-top:12px;border-top:1px solid var(--border)">
+    <div class="sec-label">Assign infrastructure type to imported points</div>
+    <div class="import-infra-grid" id="import-infra-grid"></div>
+  </div>
+
+  <div class="form-actions">
+    <button class="btn" onclick="closeImportModal()">Cancel</button>
+    <button class="btn primary" id="import-confirm-btn" onclick="confirmImport()" style="display:none">Place on Map</button>
   </div>
 </div>
 </div>
@@ -1176,7 +1267,287 @@ function printSurvey(id){
   w.document.close(); w.print();
 }
 
-// ── TOAST ──
+// ══════════════════════════════════════════════════
+//  IMPORT ENGINE
+// ══════════════════════════════════════════════════
+const importState = { tab:'file', pending:[], assignedType:'closure' };
+
+// ── Modal open/close ──
+function openImportModal(){
+  importState.pending=[];
+  document.getElementById('import-preview').innerHTML='';
+  document.getElementById('gmaps-result').innerHTML='';
+  document.getElementById('csv-preview').innerHTML='';
+  document.getElementById('modal-gmaps-url').value='';
+  document.getElementById('modal-csv').value='';
+  document.getElementById('import-type-picker').style.display='none';
+  document.getElementById('import-confirm-btn').style.display='none';
+  switchImportTab('file');
+  document.getElementById('import-modal').classList.add('open');
+}
+function closeImportModal(){ document.getElementById('import-modal').classList.remove('open'); }
+function switchImportTab(tab){
+  importState.tab=tab;
+  ['file','gmaps','csv'].forEach(t=>{
+    document.getElementById('import-tab-'+t).style.display=t===tab?'':'none';
+    document.getElementById('itab-'+t).classList.toggle('active',t===tab);
+  });
+}
+
+// ── Drop zone ──
+function initDropZone(){
+  const dz=document.getElementById('drop-zone');
+  dz.addEventListener('dragover',e=>{e.preventDefault();dz.classList.add('drag-over');});
+  dz.addEventListener('dragleave',()=>dz.classList.remove('drag-over'));
+  dz.addEventListener('drop',e=>{
+    e.preventDefault(); dz.classList.remove('drag-over');
+    const f=e.dataTransfer.files[0]; if(f) processImportFile(f);
+  });
+  // Map-level drag & drop (outside modal)
+  const mapWrap=document.getElementById('map-wrap');
+  mapWrap.addEventListener('dragover',e=>{e.preventDefault();mapWrap.classList.add('import-drag');});
+  mapWrap.addEventListener('dragleave',()=>mapWrap.classList.remove('import-drag'));
+  mapWrap.addEventListener('drop',e=>{
+    e.preventDefault(); mapWrap.classList.remove('import-drag');
+    const f=e.dataTransfer.files[0];
+    if(f){ openImportModal(); setTimeout(()=>processImportFile(f),100); }
+  });
+}
+function handleFileInput(inp){ if(inp.files[0]) processImportFile(inp.files[0]); inp.value=''; }
+
+// ── File router ──
+async function processImportFile(file){
+  const name=file.name.toLowerCase();
+  try{
+    if(name.endsWith('.kmz')) await parseKMZ(file);
+    else if(name.endsWith('.kml')) parseKML(await file.text());
+    else if(name.endsWith('.geojson')||name.endsWith('.json')) parseGeoJSON(await file.text());
+    else{ toast('Unsupported file type'); return; }
+  }catch(e){ toast('Parse error: '+e.message); }
+}
+
+// ── KMZ parser (zip → KML) ──
+async function parseKMZ(file){
+  if(typeof JSZip==='undefined'){ toast('JSZip not loaded yet, try again'); return; }
+  const zip=await JSZip.loadAsync(file);
+  const kmlEntry=Object.values(zip.files).find(f=>f.name.endsWith('.kml')&&!f.dir);
+  if(!kmlEntry){ toast('No KML found inside KMZ'); return; }
+  parseKML(await kmlEntry.async('text'));
+}
+
+// ── KML parser ──
+function parseKML(text){
+  const doc=new DOMParser().parseFromString(text,'text/xml');
+  if(doc.querySelector('parsererror')){ toast('KML parse error'); return; }
+  const points=[], lines=[];
+  doc.querySelectorAll('Placemark').forEach(pm=>{
+    const name=(pm.querySelector('name')?.textContent||'Imported').trim();
+    const desc=(pm.querySelector('description')?.textContent||'').trim();
+    // Point
+    const ptCoords=pm.querySelector('Point coordinates');
+    if(ptCoords){
+      const parts=ptCoords.textContent.trim().split(/[\s,]+/).map(Number);
+      const lng=parts[0], lat=parts[1];
+      if(!isNaN(lat)&&!isNaN(lng)) points.push({lat,lng,name,desc});
+    }
+    // LineString / path
+    const lsCoords=pm.querySelector('LineString coordinates');
+    if(lsCoords){
+      const pts=lsCoords.textContent.trim().split(/\s+/).map(s=>{
+        const p=s.split(',').map(Number);
+        return {lat:p[1],lng:p[0]};
+      }).filter(p=>!isNaN(p.lat)&&!isNaN(p.lng));
+      if(pts.length>=2) lines.push({pts,name,desc});
+    }
+    // MultiGeometry
+    pm.querySelectorAll('coordinates').forEach(c=>{
+      // already handled above
+    });
+  });
+  showImportPreview(points, lines);
+}
+
+// ── GeoJSON parser ──
+function parseGeoJSON(text){
+  let gj;
+  try{ gj=JSON.parse(text); }catch(e){ toast('Invalid JSON'); return; }
+  const points=[], lines=[];
+  const features=gj.type==='FeatureCollection'?gj.features:gj.type==='Feature'?[gj]:[];
+  features.forEach(f=>{
+    const g=f.geometry; if(!g)return;
+    const name=f.properties?.name||f.properties?.label||f.properties?.id||'Imported';
+    const type=f.properties?.type||'';
+    if(g.type==='Point'){
+      const [lng,lat]=g.coordinates;
+      points.push({lat,lng,name,type,props:f.properties});
+    } else if(g.type==='LineString'){
+      const pts=g.coordinates.map(([lng,lat])=>({lat,lng}));
+      lines.push({pts,name,type,props:f.properties});
+    } else if(g.type==='MultiLineString'){
+      g.coordinates.forEach((seg,i)=>{
+        const pts=seg.map(([lng,lat])=>({lat,lng}));
+        lines.push({pts,name:`${name}-${i+1}`,type});
+      });
+    }
+  });
+  showImportPreview(points, lines);
+}
+
+// ── Show preview in modal ──
+function showImportPreview(points, lines){
+  importState.pending={ points, lines };
+  const preview=document.getElementById('import-preview');
+  if(!points.length&&!lines.length){
+    preview.innerHTML='<div style="color:var(--yellow);font-size:11px;padding:8px">No placemarks found in file.</div>';
+    return;
+  }
+  let html=`<div style="font-size:10px;color:var(--text3);margin:6px 0">${points.length} point(s) · ${lines.length} line(s) found</div>`;
+  points.slice(0,10).forEach(p=>{ html+=`<div class="import-row"><span class="ir-icon">📍</span><span class="ir-name">${p.name}</span><span class="ir-type">${p.lat.toFixed(4)}, ${p.lng.toFixed(4)}</span></div>`; });
+  lines.slice(0,5).forEach(l=>{ html+=`<div class="import-row"><span class="ir-icon">📏</span><span class="ir-name">${l.name}</span><span class="ir-type">${l.pts.length} waypoints</span></div>`; });
+  if(points.length>10||lines.length>5) html+=`<div style="font-size:10px;color:var(--text3);padding:4px">…and ${Math.max(0,points.length-10)+Math.max(0,lines.length-5)} more</div>`;
+  preview.innerHTML=html;
+  // show type picker if any points lack a known type
+  const needType=points.some(p=>!INFRA[p.type]);
+  buildInfraTypePicker(needType);
+  document.getElementById('import-confirm-btn').style.display='';
+}
+
+// ── Infrastructure type picker ──
+function buildInfraTypePicker(show){
+  const wrap=document.getElementById('import-type-picker');
+  if(!show){ wrap.style.display='none'; return; }
+  wrap.style.display='';
+  const grid=document.getElementById('import-infra-grid');
+  grid.innerHTML=Object.entries(INFRA).map(([id,cfg])=>
+    `<button class="tool-btn${importState.assignedType===id?' active':''}" onclick="setImportType('${id}')" id="itype-${id}">
+      <span style="color:${cfg.color}">●</span> ${cfg.abbr}<br><span style="font-size:9px;color:var(--text3)">${cfg.label}</span>
+    </button>`
+  ).join('');
+}
+function setImportType(id){
+  importState.assignedType=id;
+  document.querySelectorAll('[id^="itype-"]').forEach(b=>b.classList.remove('active'));
+  document.getElementById('itype-'+id)?.classList.add('active');
+}
+
+// ── Place imported data ──
+function confirmImport(){
+  const {points,lines}=importState.pending||{points:[],lines:[]};
+  let placed=0, routed=0;
+  // Place points
+  points.forEach((p,i)=>{
+    const type=INFRA[p.type]?p.type:importState.assignedType;
+    const cfg=INFRA[type];
+    const count=S.elements.filter(e=>e.type===type).length+1+i;
+    const label=p.name&&p.name!=='Imported'?p.name:`${cfg.abbr}-${String(count).padStart(3,'0')}`;
+    placeElem(type,L.latLng(p.lat,p.lng),label,0,p.desc||'');
+    placed++;
+  });
+  // Place lines as pending routes
+  lines.forEach(l=>{
+    const pts=l.pts.map(p=>L.latLng(p.lat,p.lng));
+    const fromEl=snapToElem(pts[0]);
+    const toEl=snapToElem(pts[pts.length-1]);
+    const dist=calcRouteDist(pts);
+    const id='r'+(++_routeId);
+    const rcfg=ROUTES[S.routeType]||ROUTES.trench;
+    const line=L.polyline(pts,{color:rcfg.color,weight:rcfg.weight,dashArray:rcfg.dash||null,opacity:.85}).addTo(MAP);
+    const label=l.name&&l.name!=='Imported'?l.name:`IMP-${String(S.routes.length+1).padStart(3,'0')}`;
+    const lbl=L.marker(pts[Math.floor(pts.length/2)],{icon:L.divIcon({className:'',html:`<div style="background:rgba(8,15,26,.85);border:1px solid ${rcfg.color};color:${rcfg.color};border-radius:3px;padding:1px 5px;font-size:9px">${label}</div>`,iconAnchor:[0,8]}),interactive:false}).addTo(MAP);
+    line.bindPopup(`<b>${label}</b><br>Imported ${rcfg.label}<br>${dist.toFixed(0)}m`);
+    S.routes.push({id,type:S.routeType,label,pts,fibers:0,grp:'none',notes:'imported',dist,fromEl,toEl,line,lblMarker:lbl,opts:{cable:CABLES[0],qty:1,duct:'none'}});
+    routed++;
+  });
+  closeImportModal();
+  updateUI();
+  fitAll();
+  toast(`Imported ${placed} pin(s), ${routed} route(s)`);
+}
+
+// ── Google Maps URL extractor ──
+function extractGoogleCoord(url){
+  // @lat,lng,zoom  (standard maps URL)
+  let m=url.match(/@(-?\d+\.?\d*),(-?\d+\.?\d*)/);
+  if(m) return {lat:parseFloat(m[1]),lng:parseFloat(m[2])};
+  // ?q=lat,lng
+  m=url.match(/[?&]q=(-?\d+\.?\d*),(-?\d+\.?\d*)/);
+  if(m) return {lat:parseFloat(m[1]),lng:parseFloat(m[2])};
+  // ?ll=lat,lng
+  m=url.match(/[?&]ll=(-?\d+\.?\d*),(-?\d+\.?\d*)/);
+  if(m) return {lat:parseFloat(m[1]),lng:parseFloat(m[2])};
+  // cbll=lat,lng  (Street View)
+  m=url.match(/cbll=(-?\d+\.?\d*),(-?\d+\.?\d*)/);
+  if(m) return {lat:parseFloat(m[1]),lng:parseFloat(m[2])};
+  // place/lat,lng
+  m=url.match(/place\/(-?\d+\.?\d*),(-?\d+\.?\d*)/);
+  if(m) return {lat:parseFloat(m[1]),lng:parseFloat(m[2])};
+  // !3d{lat}!4d{lng}  (Google Maps embed)
+  m=url.match(/!3d(-?\d+\.?\d*)!4d(-?\d+\.?\d*)/);
+  if(m) return {lat:parseFloat(m[1]),lng:parseFloat(m[2])};
+  return null;
+}
+function extractGoogleMapsCoord(){
+  const url=document.getElementById('gmaps-url').value.trim();
+  if(!url){ toast('Paste a Google Maps URL first'); return; }
+  const coord=extractGoogleCoord(url);
+  if(!coord){ toast('Could not extract coordinates from URL'); return; }
+  document.getElementById('gps-lat').value=coord.lat.toFixed(6);
+  document.getElementById('gps-lng').value=coord.lng.toFixed(6);
+  MAP.setView([coord.lat,coord.lng],17);
+  openLabelModal(L.latLng(coord.lat,coord.lng),S.infraType);
+  toast(`Coordinates extracted: ${coord.lat.toFixed(5)}, ${coord.lng.toFixed(5)}`);
+}
+// modal version
+function parseModalGoogleURL(){
+  const url=document.getElementById('modal-gmaps-url').value.trim();
+  const coord=extractGoogleCoord(url);
+  const res=document.getElementById('gmaps-result');
+  if(!coord){ res.innerHTML='<span style="color:var(--red)">Could not find coordinates in URL. Try copying the share link from Google Maps (Share → Copy link).</span>'; return; }
+  res.innerHTML=`<span style="color:var(--green)">✓ Found: <b>${coord.lat.toFixed(6)}, ${coord.lng.toFixed(6)}</b></span>`;
+  importState.pending={points:[{lat:coord.lat,lng:coord.lng,name:'',type:''}],lines:[]};
+  buildInfraTypePicker(true);
+  document.getElementById('import-confirm-btn').style.display='';
+}
+
+// ── CSV paste import ──
+function parseCSVText(text){
+  const rows=text.trim().split('\n').map(r=>r.trim()).filter(r=>r&&!r.startsWith('#'));
+  const points=[];
+  rows.forEach(row=>{
+    // skip header rows
+    if(/^lat/i.test(row)||/^latitude/i.test(row)) return;
+    const cols=row.split(',').map(s=>s.trim());
+    const lat=parseFloat(cols[0]), lng=parseFloat(cols[1]);
+    if(isNaN(lat)||isNaN(lng)) return;
+    const name=cols[2]||'';
+    const type=(cols[3]||'').toLowerCase();
+    points.push({lat,lng,name,type});
+  });
+  return points;
+}
+function importCSVPaste(){
+  const text=document.getElementById('csv-paste').value.trim();
+  if(!text){ toast('Paste CSV rows first'); return; }
+  const points=parseCSVText(text);
+  if(!points.length){ toast('No valid lat/lng rows found'); return; }
+  showImportPreview(points,[]);
+  openImportModal();
+  switchImportTab('csv');
+  document.getElementById('modal-csv').value=text;
+}
+function parseModalCSV(){
+  const text=document.getElementById('modal-csv').value.trim();
+  if(!text){ return; }
+  const points=parseCSVText(text);
+  const preview=document.getElementById('csv-preview');
+  if(!points.length){ preview.innerHTML='<div style="color:var(--red);font-size:11px">No valid rows found. Format: lat,lng,name,type</div>'; return; }
+  showImportPreview(points,[]);
+  // also update the csv-preview element
+  preview.innerHTML=document.getElementById('import-preview').innerHTML;
+}
+
+// ══════════════════════════════════════════════════
+//  TOAST ──
 function toast(msg){
   const el=document.getElementById('toast');
   el.textContent=msg; el.classList.add('show');
@@ -1192,6 +1563,7 @@ function init(){
   buildRouteBtns();
   showTab('elements');
   updateStatus();
+  initDropZone();
 }
 document.addEventListener('DOMContentLoaded',init);
 
