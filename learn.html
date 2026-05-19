@@ -1,0 +1,2255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+<title>DevPath Academy — Zero to Professional</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#04090F;--bg1:#080F1A;--bg2:#0D1828;--bg3:#152035;
+  --accent:#00D9FF;--accent2:#0099BB;--green:#22C55E;--yellow:#F59E0B;
+  --red:#EF4444;--purple:#A78BFA;--orange:#F97316;
+  --text:#C8D8E8;--text2:#7A9AB8;--border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.13);
+  --radius:10px;--font:'Segoe UI',system-ui,sans-serif;--mono:'Cascadia Code','Fira Code','Consolas',monospace;
+}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--font);font-size:14px;overflow:hidden}
+/* ── LAYOUT ── */
+#app{display:flex;height:100vh;height:100dvh}
+/* sidebar */
+#nav{width:270px;min-width:270px;background:var(--bg1);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden}
+#nav-header{padding:16px;border-bottom:1px solid var(--border);flex-shrink:0}
+#nav-header h1{font-size:15px;font-weight:700;color:var(--accent);letter-spacing:.3px}
+#nav-header p{font-size:11px;color:var(--text2);margin-top:2px}
+#xp-section{padding:12px 16px;border-bottom:1px solid var(--border);flex-shrink:0}
+#level-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+#level-badge{background:linear-gradient(135deg,var(--accent),var(--purple));color:#000;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px}
+#xp-label{font-size:10px;color:var(--text2)}
+#xp-bar-outer{background:var(--bg3);border-radius:4px;height:5px;overflow:hidden}
+#xp-bar-inner{height:100%;background:linear-gradient(90deg,var(--accent),var(--purple));border-radius:4px;transition:width .6s ease}
+#module-list{flex:1;overflow-y:auto;padding:8px 0}
+#module-list::-webkit-scrollbar{width:3px}
+#module-list::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+.mod-header{padding:8px 16px;cursor:pointer;user-select:none;display:flex;align-items:center;gap:8px;border-radius:6px;margin:0 6px}
+.mod-header:hover{background:var(--bg2)}
+.mod-header.active{background:var(--bg3)}
+.mod-icon{font-size:16px;flex-shrink:0}
+.mod-title{font-size:12px;font-weight:600;flex:1}
+.mod-progress{font-size:10px;color:var(--text2);flex-shrink:0}
+.mod-chevron{font-size:10px;color:var(--text2);transition:transform .2s;flex-shrink:0}
+.mod-header.open .mod-chevron{transform:rotate(90deg)}
+.lesson-list{overflow:hidden;transition:max-height .3s ease}
+.lesson-list.closed{max-height:0!important}
+.lesson-item{display:flex;align-items:center;gap:8px;padding:7px 16px 7px 36px;cursor:pointer;border-radius:6px;margin:0 6px;transition:background .15s}
+.lesson-item:hover{background:var(--bg2)}
+.lesson-item.active{background:var(--bg3);color:var(--accent)}
+.lesson-item.done .l-dot{background:var(--green);border-color:var(--green)}
+.lesson-item.active .l-dot{border-color:var(--accent)}
+.l-dot{width:8px;height:8px;border-radius:50%;border:1.5px solid var(--border2);flex-shrink:0;transition:all .2s}
+.l-title{font-size:11px;flex:1;line-height:1.3}
+.l-xp{font-size:9px;color:var(--text2)}
+/* ── MAIN CONTENT ── */
+#main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+#lesson-topbar{display:flex;align-items:center;gap:12px;padding:10px 20px;border-bottom:1px solid var(--border);flex-shrink:0;background:var(--bg1)}
+#breadcrumb{font-size:11px;color:var(--text2);flex:1}
+#breadcrumb span{color:var(--text)}
+#lesson-steps{display:flex;gap:6px}
+.step-dot{width:28px;height:6px;border-radius:3px;background:var(--bg3);cursor:pointer;transition:background .2s}
+.step-dot.done{background:var(--green)}
+.step-dot.active{background:var(--accent)}
+#content-area{flex:1;overflow:hidden;display:flex;flex-direction:column}
+/* ── LESSON CONTENT ── */
+#lesson-pane{flex:1;overflow-y:auto;padding:28px 32px;max-width:820px;width:100%}
+#lesson-pane::-webkit-scrollbar{width:4px}
+#lesson-pane::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+#lesson-pane h2{font-size:22px;font-weight:700;color:var(--text);margin-bottom:8px;line-height:1.3}
+#lesson-pane h3{font-size:15px;font-weight:600;color:var(--accent);margin:22px 0 8px}
+#lesson-pane p{color:var(--text);line-height:1.7;margin-bottom:12px;font-size:13.5px}
+#lesson-pane ul,#lesson-pane ol{padding-left:20px;margin-bottom:12px}
+#lesson-pane li{line-height:1.7;font-size:13.5px;color:var(--text);margin-bottom:3px}
+#lesson-pane code{font-family:var(--mono);background:var(--bg3);color:var(--accent);padding:2px 6px;border-radius:4px;font-size:12.5px}
+#lesson-pane pre{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius);padding:16px;overflow-x:auto;margin:12px 0 20px;position:relative}
+#lesson-pane pre code{background:none;padding:0;color:var(--text);font-size:12.5px;line-height:1.6}
+.ftth-callout{background:linear-gradient(135deg,rgba(0,217,255,0.06),rgba(167,139,250,0.04));border:1px solid rgba(0,217,255,0.2);border-radius:var(--radius);padding:16px 18px;margin:16px 0}
+.ftth-callout-title{font-size:11px;font-weight:700;color:var(--accent);letter-spacing:.5px;margin-bottom:8px;text-transform:uppercase}
+.ftth-callout p{margin-bottom:8px}
+.ftth-callout pre{background:var(--bg);margin:8px 0 0}
+.tip{background:rgba(34,197,94,0.06);border-left:3px solid var(--green);padding:10px 14px;border-radius:0 6px 6px 0;margin:12px 0;font-size:13px}
+.tip strong{color:var(--green)}
+.warn{background:rgba(245,158,11,0.06);border-left:3px solid var(--yellow);padding:10px 14px;border-radius:0 6px 6px 0;margin:12px 0;font-size:13px}
+.warn strong{color:var(--yellow)}
+/* ── CODE LAB ── */
+#lab-pane{display:none;flex-direction:column;height:100%;overflow:hidden}
+#lab-pane.active{display:flex}
+#lab-header{padding:12px 20px;border-bottom:1px solid var(--border);flex-shrink:0;display:flex;align-items:flex-start;gap:12px}
+#lab-instructions{flex:1}
+#lab-instructions h3{font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px}
+#lab-instructions p{font-size:12px;color:var(--text2);line-height:1.5}
+#lab-actions{display:flex;gap:6px;flex-shrink:0}
+.lab-btn{padding:6px 14px;border-radius:6px;border:none;font-size:12px;cursor:pointer;font-family:var(--font);transition:all .15s}
+#run-btn{background:var(--accent);color:#000;font-weight:600}
+#run-btn:hover{background:var(--accent2)}
+#reset-btn{background:var(--bg3);color:var(--text2);border:1px solid var(--border2)}
+#reset-btn:hover{color:var(--text)}
+#check-btn{background:var(--green);color:#000;font-weight:600}
+#check-btn:hover{background:#16a34a}
+#lab-body{flex:1;display:flex;overflow:hidden}
+#editor-wrap{flex:1;display:flex;flex-direction:column;border-right:1px solid var(--border)}
+#editor-wrap label{padding:6px 12px;font-size:10px;font-weight:600;color:var(--text2);letter-spacing:.5px;background:var(--bg2);border-bottom:1px solid var(--border)}
+#code-editor{flex:1;background:var(--bg);color:var(--text);font-family:var(--mono);font-size:13px;line-height:1.6;padding:16px;border:none;outline:none;resize:none;width:100%;tab-size:2}
+#preview-wrap{flex:1;display:flex;flex-direction:column}
+#preview-wrap label{padding:6px 12px;font-size:10px;font-weight:600;color:var(--text2);letter-spacing:.5px;background:var(--bg2);border-bottom:1px solid var(--border)}
+#preview-frame{flex:1;border:none;background:#fff}
+#console-out{flex:1;background:var(--bg);font-family:var(--mono);font-size:12px;line-height:1.6;padding:14px;overflow-y:auto;color:var(--green);white-space:pre-wrap}
+#check-result{padding:10px 20px;font-size:12px;display:none;border-top:1px solid var(--border);flex-shrink:0}
+#check-result.pass{background:rgba(34,197,94,0.08);color:var(--green)}
+#check-result.fail{background:rgba(239,68,68,0.08);color:var(--red)}
+/* ── QUIZ ── */
+#quiz-pane{display:none;flex-direction:column;height:100%;overflow:hidden}
+#quiz-pane.active{display:flex}
+#quiz-inner{flex:1;overflow-y:auto;padding:32px}
+#quiz-inner h2{font-size:18px;font-weight:700;margin-bottom:6px}
+#quiz-inner>p{font-size:13px;color:var(--text2);margin-bottom:24px}
+.quiz-q{background:var(--bg1);border:1px solid var(--border);border-radius:var(--radius);padding:18px;margin-bottom:16px}
+.quiz-q p{font-size:14px;font-weight:500;margin-bottom:14px;line-height:1.5}
+.quiz-opt{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:8px;border:1.5px solid var(--border2);margin-bottom:8px;cursor:pointer;transition:all .15s;font-size:13px}
+.quiz-opt:hover{border-color:var(--accent);background:rgba(0,217,255,0.05)}
+.quiz-opt.selected{border-color:var(--accent);background:rgba(0,217,255,0.08)}
+.quiz-opt.correct{border-color:var(--green);background:rgba(34,197,94,0.08);color:var(--green)}
+.quiz-opt.wrong{border-color:var(--red);background:rgba(239,68,68,0.08);color:var(--red)}
+.quiz-opt-letter{width:22px;height:22px;border-radius:50%;border:1.5px solid currentColor;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0}
+.quiz-explain{font-size:12px;color:var(--text2);margin-top:10px;padding:10px;background:var(--bg2);border-radius:6px;display:none;line-height:1.5}
+.quiz-explain.show{display:block}
+#quiz-submit{width:100%;padding:12px;border-radius:8px;border:none;background:var(--accent);color:#000;font-size:14px;font-weight:700;cursor:pointer;font-family:var(--font);margin-top:8px}
+#quiz-submit:disabled{opacity:.4;cursor:default}
+#quiz-result{text-align:center;padding:32px;display:none}
+#quiz-result h2{font-size:24px;margin-bottom:8px}
+#quiz-result p{color:var(--text2);margin-bottom:24px}
+.next-btn{padding:12px 32px;border-radius:8px;border:none;background:var(--green);color:#000;font-size:14px;font-weight:700;cursor:pointer;font-family:var(--font)}
+/* ── BOTTOM NAV ── */
+#lesson-nav{display:flex;align-items:center;justify-content:space-between;padding:10px 20px;border-top:1px solid var(--border);flex-shrink:0;background:var(--bg1)}
+.nav-btn{padding:8px 20px;border-radius:8px;border:none;font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font);transition:all .15s}
+#prev-btn{background:var(--bg3);color:var(--text2)}
+#prev-btn:hover{color:var(--text)}
+#next-btn{background:var(--accent);color:#000}
+#next-btn:hover{background:var(--accent2)}
+#step-label{font-size:12px;color:var(--text2)}
+/* ── WELCOME SCREEN ── */
+#welcome{padding:40px;max-width:700px}
+#welcome h1{font-size:28px;font-weight:700;background:linear-gradient(135deg,var(--accent),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:8px}
+#welcome h2{font-size:16px;font-weight:400;color:var(--text2);margin-bottom:28px}
+.welcome-cards{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:28px}
+.welcome-card{background:var(--bg1);border:1px solid var(--border);border-radius:var(--radius);padding:16px}
+.welcome-card .wc-icon{font-size:24px;margin-bottom:8px}
+.welcome-card h3{font-size:13px;font-weight:600;margin-bottom:4px}
+.welcome-card p{font-size:12px;color:var(--text2);line-height:1.5}
+.start-btn{padding:14px 36px;border-radius:10px;border:none;background:linear-gradient(135deg,var(--accent),var(--purple));color:#000;font-size:15px;font-weight:700;cursor:pointer;font-family:var(--font)}
+/* ── XP TOAST ── */
+#xp-toast{position:fixed;top:20px;right:20px;background:linear-gradient(135deg,var(--accent),var(--purple));color:#000;font-weight:700;font-size:13px;padding:10px 20px;border-radius:20px;opacity:0;transition:opacity .3s;z-index:9999;pointer-events:none}
+#xp-toast.show{opacity:1}
+/* ── MOBILE ── */
+#mob-nav-btn{display:none}
+@media(max-width:768px){
+  #nav{position:fixed;left:0;top:0;bottom:0;z-index:500;transform:translateX(-100%);transition:transform .28s}
+  #nav.open{transform:translateX(0)}
+  #mob-nav-btn{display:flex;align-items:center;justify-content:center;width:36px;height:36px;border:none;background:var(--bg3);color:var(--text);border-radius:8px;cursor:pointer;font-size:18px;flex-shrink:0}
+  #mob-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:490}
+  #mob-overlay.open{display:block}
+  #lesson-pane{padding:16px}
+  #lab-body{flex-direction:column}
+  #editor-wrap,#preview-wrap{flex:none;height:45%}
+  #editor-wrap{border-right:none;border-bottom:1px solid var(--border)}
+  .welcome-cards{grid-template-columns:1fr}
+  #welcome{padding:20px}
+}
+</style>
+</head>
+<body>
+<div id="mob-overlay" onclick="closeMobNav()"></div>
+<div id="xp-toast"></div>
+
+<div id="app">
+<!-- ── SIDEBAR NAV ── -->
+<div id="nav">
+  <div id="nav-header">
+    <h1>DevPath Academy</h1>
+    <p>Zero → Professional Developer</p>
+  </div>
+  <div id="xp-section">
+    <div id="level-row">
+      <div id="level-badge">Level 1</div>
+      <div id="xp-label">0 / 500 XP</div>
+    </div>
+    <div id="xp-bar-outer"><div id="xp-bar-inner" style="width:0%"></div></div>
+  </div>
+  <div id="module-list"></div>
+</div>
+
+<!-- ── MAIN ── -->
+<div id="main">
+  <div id="lesson-topbar">
+    <button id="mob-nav-btn" onclick="openMobNav()">☰</button>
+    <div id="breadcrumb">Select a lesson to begin</div>
+    <div id="lesson-steps"></div>
+  </div>
+
+  <div id="content-area">
+    <!-- Step 1: Read -->
+    <div id="lesson-pane">
+      <div id="welcome">
+        <h1>Welcome to DevPath Academy</h1>
+        <h2>Built around real apps you helped create — learn by reading code that actually works.</h2>
+        <div class="welcome-cards">
+          <div class="welcome-card"><div class="wc-icon">🌐</div><h3>Web Foundations</h3><p>HTML, CSS, JavaScript — the building blocks behind every website and app.</p></div>
+          <div class="welcome-card"><div class="wc-icon">⚡</div><h3>JavaScript Core</h3><p>Functions, objects, DOM, events — how the FTTH app responds to your every click.</p></div>
+          <div class="welcome-card"><div class="wc-icon">📡</div><h3>FTTH App Decoded</h3><p>Read real production code. Understand exactly how the map app you built works.</p></div>
+          <div class="welcome-card"><div class="wc-icon">🐍</div><h3>Python & Beyond</h3><p>Python basics, Git, GitHub Actions, clean code — the full professional toolkit.</p></div>
+        </div>
+        <button class="start-btn" onclick="startCourse()">Start Learning →</button>
+      </div>
+    </div>
+
+    <!-- Step 2: Practice -->
+    <div id="lab-pane">
+      <div id="lab-header">
+        <div id="lab-instructions">
+          <h3 id="lab-title">Exercise</h3>
+          <p id="lab-desc"></p>
+        </div>
+        <div id="lab-actions">
+          <button class="lab-btn" id="reset-btn" onclick="resetEditor()">Reset</button>
+          <button class="lab-btn" id="run-btn" onclick="runCode()">▶ Run</button>
+          <button class="lab-btn" id="check-btn" onclick="checkCode()">✓ Check</button>
+        </div>
+      </div>
+      <div id="lab-body">
+        <div id="editor-wrap">
+          <label id="editor-lang-label">HTML / CSS / JS</label>
+          <textarea id="code-editor" spellcheck="false" autocorrect="off" autocapitalize="off"></textarea>
+        </div>
+        <div id="preview-wrap">
+          <label id="preview-label">Preview</label>
+          <iframe id="preview-frame" sandbox="allow-scripts"></iframe>
+          <div id="console-out" style="display:none"></div>
+        </div>
+      </div>
+      <div id="check-result"></div>
+    </div>
+
+    <!-- Step 3: Quiz -->
+    <div id="quiz-pane">
+      <div id="quiz-inner">
+        <h2>Knowledge Check</h2>
+        <p>Answer all questions to earn your XP and unlock the next lesson.</p>
+        <div id="quiz-questions"></div>
+        <button id="quiz-submit" onclick="submitQuiz()" disabled>Submit Answers</button>
+      </div>
+      <div id="quiz-result">
+        <h2 id="quiz-result-emoji">🎉</h2>
+        <h2 id="quiz-result-title"></h2>
+        <p id="quiz-result-msg"></p>
+        <button class="next-btn" onclick="nextLesson()">Continue →</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="lesson-nav">
+    <button class="nav-btn" id="prev-btn" onclick="navigate(-1)">← Previous</button>
+    <span id="step-label">Choose a lesson</span>
+    <button class="nav-btn" id="next-btn" onclick="navigate(1)">Next →</button>
+  </div>
+</div>
+</div>
+
+<script>
+'use strict';
+
+// ── CURRICULUM DATA ──
+const MODULES = [
+{id:'web',title:'Web Foundations',icon:'🌐',color:'#3B82F6',lessons:[
+{id:'how-web-works',title:'How the Web Works',xp:100,duration:'10 min',
+content:`<h2>How the Web Works</h2>
+<p>Every app you use — including the FTTH Planner you helped build — follows the same three-step cycle: a <strong>browser</strong> requests a file, a <strong>server</strong> sends it back, and the browser <strong>renders</strong> it on screen.</p>
+<h3>The Three Languages of the Web</h3>
+<ul>
+<li><strong>HTML</strong> — the skeleton. Defines what's on the page (headings, buttons, inputs).</li>
+<li><strong>CSS</strong> — the skin. Controls colours, layout, fonts, animations.</li>
+<li><strong>JavaScript</strong> — the muscles. Makes things interactive, fetches data, updates the screen.</li>
+</ul>
+<div class="ftth-callout"><div class="ftth-callout-title">📡 In the FTTH App</div>
+<p>The entire FTTH Planner — map, sidebar, GPS tools, all 2,400+ lines — lives in a single file called <code>index.html</code>. When you open it in a browser, all three languages run together instantly. No server needed.</p></div>
+<h3>What Happens When You Open a Web Page</h3>
+<ol>
+<li>You type a URL or open a file</li>
+<li>The browser reads the HTML top-to-bottom</li>
+<li>It finds CSS links → downloads and applies styles</li>
+<li>It finds script tags → downloads and runs JavaScript</li>
+<li>The page appears and becomes interactive</li>
+</ol>
+<div class="tip"><strong>Pro tip:</strong> Press <code>F12</code> in any browser to open DevTools — you can inspect the HTML, CSS, and JavaScript of any website, including your FTTH app.</div>`,
+exercise:{lang:'html',title:'Your First Web Page',
+desc:'Create a page about fiber optics with a heading, a paragraph, and a list of 3 cable types.',
+starter:`<!DOCTYPE html>
+<html>
+  <head>
+    <title>My Fiber Page</title>
+  </head>
+  <body>
+    <!-- Write your content here -->
+
+  </body>
+</html>`,
+solution:`<!DOCTYPE html>
+<html>
+  <head><title>My Fiber Page</title></head>
+  <body>
+    <h1>Fiber Optic Cables</h1>
+    <p>Fiber optic cables transmit data as pulses of light.</p>
+    <ul>
+      <li>Single-mode (SMF)</li>
+      <li>Multi-mode (MMF)</li>
+      <li>Aerial self-supporting</li>
+    </ul>
+  </body>
+</html>`,
+checks:[
+  {fn:c=>/<h1>/i.test(c), label:'Add an <h1> heading'},
+  {fn:c=>/<p>/i.test(c), label:'Add a <p> paragraph'},
+  {fn:c=>/<li>/i.test(c), label:'Add at least one list item (<li>)'}
+]},
+quiz:[
+{q:'What does HTML stand for?',opts:['HyperText Markup Language','High Tech Modern Language','Home Tool Markup Layout','HyperLink Text Module'],ans:0,explain:'HTML = HyperText Markup Language. "HyperText" means text with links that jump between documents.'},
+{q:'Which language controls the colours and layout of a web page?',opts:['HTML','JavaScript','CSS','Python'],ans:2,explain:'CSS (Cascading Style Sheets) handles all visual styling — colours, fonts, spacing, and layout.'}
+]},
+
+{id:'html-structure',title:'HTML: Building Structure',xp:120,duration:'15 min',
+content:`<h2>HTML: Building Structure</h2>
+<p>HTML is made of <strong>elements</strong>. Each element is a pair of tags that wraps content:</p>
+<pre><code>&lt;tagname&gt;content goes here&lt;/tagname&gt;</code></pre>
+<h3>The Most Important Tags</h3>
+<ul>
+<li><code>&lt;div&gt;</code> — a generic container (used everywhere in the FTTH app)</li>
+<li><code>&lt;h1&gt;</code>–<code>&lt;h6&gt;</code> — headings (h1 = biggest)</li>
+<li><code>&lt;p&gt;</code> — paragraph text</li>
+<li><code>&lt;button&gt;</code> — clickable button</li>
+<li><code>&lt;input&gt;</code> — text/number input field</li>
+<li><code>&lt;select&gt;</code> — dropdown menu</li>
+</ul>
+<h3>Attributes</h3>
+<p>Attributes go inside the opening tag and give extra information:</p>
+<pre><code>&lt;button id="locate-btn" class="map-btn" onclick="locateUser()"&gt;
+  Find Me
+&lt;/button&gt;</code></pre>
+<ul>
+<li><code>id</code> — unique name, used by JavaScript to find the element</li>
+<li><code>class</code> — group name, used by CSS to apply styles</li>
+<li><code>onclick</code> — JavaScript to run when clicked</li>
+</ul>
+<div class="ftth-callout"><div class="ftth-callout-title">📡 In the FTTH App</div>
+<p>The FTTH sidebar is built from nested divs. Here's a simplified version:</p>
+<pre><code>&lt;div id="sidebar"&gt;
+  &lt;div id="sidebar-header"&gt;
+    &lt;h1&gt;FTTH GIS Planner&lt;/h1&gt;
+  &lt;/div&gt;
+  &lt;div id="sidebar-body"&gt;
+    &lt;button class="btn primary" onclick="setTool('place')"&gt;
+      Place Node
+    &lt;/button&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</code></pre></div>
+<div class="warn"><strong>Common mistake:</strong> Always close your tags. <code>&lt;div&gt;</code> must have a matching <code>&lt;/div&gt;</code>. Forgetting this breaks the entire layout.</div>`,
+exercise:{lang:'html',title:'Build a Control Panel',
+desc:'Build an HTML panel with a title, two buttons ("Place Node" and "Draw Route"), and a text input for coordinates.',
+starter:`<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body { background: #0D1828; color: #C8D8E8; font-family: sans-serif; padding: 20px; }
+    button { margin: 4px; padding: 8px 16px; cursor: pointer; }
+    input { padding: 8px; margin: 4px; }
+  </style>
+</head>
+<body>
+  <!-- Build your control panel here -->
+
+</body>
+</html>`,
+solution:`<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body { background: #0D1828; color: #C8D8E8; font-family: sans-serif; padding: 20px; }
+    button { margin: 4px; padding: 8px 16px; cursor: pointer; background: #00D9FF; border: none; border-radius: 6px; }
+    input { padding: 8px; margin: 4px; background: #152035; color: white; border: 1px solid #333; border-radius: 6px; }
+    h2 { color: #00D9FF; }
+  </style>
+</head>
+<body>
+  <h2>Control Panel</h2>
+  <button onclick="alert('Place Node!')">Place Node</button>
+  <button onclick="alert('Draw Route!')">Draw Route</button>
+  <br>
+  <input type="text" placeholder="Enter coordinates...">
+</body>
+</html>`,
+checks:[
+  {fn:c=>/<h[1-6]/i.test(c), label:'Add a heading (h1–h6)'},
+  {fn:c=>(c.match(/<button/gi)||[]).length>=2, label:'Add two <button> elements'},
+  {fn:c=>/<input/i.test(c), label:'Add an <input> element'}
+]},
+quiz:[
+{q:'What attribute gives an HTML element a unique name so JavaScript can find it?',opts:['class','name','id','ref'],ans:2,explain:'The id attribute is unique per page. JavaScript uses document.getElementById("myId") to find it.'},
+{q:'Which tag creates a clickable button?',opts:['<click>','<btn>','<button>','<action>'],ans:2,explain:'<button> is the correct HTML tag for a clickable button.'}
+]},
+
+{id:'css-styling',title:'CSS: Making it Beautiful',xp:150,duration:'20 min',
+content:`<h2>CSS: Making it Beautiful</h2>
+<p>CSS (Cascading Style Sheets) describes how HTML elements look. You write a <strong>selector</strong> (which element to style) and <strong>declarations</strong> (what to change):</p>
+<pre><code>selector {
+  property: value;
+  property: value;
+}</code></pre>
+<h3>Selectors</h3>
+<ul>
+<li><code>div</code> — targets all &lt;div&gt; elements</li>
+<li><code>.btn</code> — targets elements with class="btn" (dot prefix)</li>
+<li><code>#sidebar</code> — targets the element with id="sidebar" (hash prefix)</li>
+</ul>
+<h3>CSS Variables</h3>
+<p>You can define reusable values using <code>--variable-name</code> syntax. This is exactly how the FTTH app's dark theme works:</p>
+<div class="ftth-callout"><div class="ftth-callout-title">📡 In the FTTH App</div>
+<p>Every colour in the app is a CSS variable defined once at the top:</p>
+<pre><code>:root {
+  --bg:     #04090F;   /* deep navy black */
+  --accent: #00D9FF;   /* cyan glow */
+  --green:  #22C55E;
+  --text:   #C8D8E8;
+}
+
+/* Then used everywhere: */
+#sidebar { background: var(--bg1); }
+.btn     { color: var(--accent); }</code></pre>
+<p>Change <code>--accent</code> once → the whole app changes colour. That's the power of variables.</p></div>
+<h3>Key Properties to Know</h3>
+<ul>
+<li><code>color</code> — text colour</li>
+<li><code>background</code> — background colour or gradient</li>
+<li><code>padding</code> — space inside an element</li>
+<li><code>margin</code> — space outside an element</li>
+<li><code>border-radius</code> — rounded corners</li>
+<li><code>font-size</code>, <code>font-weight</code> — text size and boldness</li>
+</ul>`,
+exercise:{lang:'html',title:'Style a Node Card',
+desc:'Style the infrastructure card below to match the FTTH app\'s dark theme. Use CSS variables, rounded corners, and a cyan accent colour.',
+starter:`<!DOCTYPE html>
+<html>
+<head>
+<style>
+  :root {
+    --bg: #04090F;
+    --bg2: #0D1828;
+    /* Add more variables here */
+  }
+  body { background: var(--bg); padding: 30px; font-family: sans-serif; }
+
+  /* Style the .card class below */
+  .card {
+
+  }
+  .card h3 { }
+  .card p  { }
+</style>
+</head>
+<body>
+  <div class="card">
+    <h3>Central Office</h3>
+    <p>OLT · GPON starting point</p>
+    <p>Loss: 0 dB</p>
+  </div>
+</body>
+</html>`,
+solution:`<!DOCTYPE html>
+<html>
+<head>
+<style>
+  :root {
+    --bg: #04090F; --bg2: #0D1828; --accent: #00D9FF;
+    --text: #C8D8E8; --text2: #7A9AB8; --border: rgba(255,255,255,0.1);
+  }
+  body { background: var(--bg); padding: 30px; font-family: sans-serif; }
+  .card {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 12px; padding: 20px; max-width: 240px;
+    border-top: 3px solid var(--accent);
+  }
+  .card h3 { color: var(--accent); margin-bottom: 8px; font-size: 16px; }
+  .card p  { color: var(--text2); font-size: 13px; margin-bottom: 4px; }
+</style>
+</head>
+<body>
+  <div class="card">
+    <h3>Central Office</h3>
+    <p>OLT · GPON starting point</p>
+    <p>Loss: 0 dB</p>
+  </div>
+</body>
+</html>`,
+checks:[
+  {fn:c=>/var\(--/.test(c), label:'Use at least one CSS variable with var()'},
+  {fn:c=>/border-radius/.test(c), label:'Add border-radius for rounded corners'},
+  {fn:c=>/color/.test(c), label:'Set a text color'}
+]},
+quiz:[
+{q:'How do you target an element with class="btn" in CSS?',opts:['.btn { }','#btn { }','btn { }','*btn { }'],ans:0,explain:'A dot (.) prefix targets class names. So .btn selects all elements that have class="btn".'},
+{q:'What CSS property adds space INSIDE an element, between its content and its border?',opts:['margin','spacing','padding','gap'],ans:2,explain:'padding adds space inside the element. margin adds space outside, pushing other elements away.'}
+]},
+
+{id:'css-layout',title:'CSS Layout: Flexbox',xp:150,duration:'20 min',
+content:`<h2>CSS Layout: Flexbox</h2>
+<p>Flexbox is the layout system used for almost everything in the FTTH app. Add <code>display: flex</code> to a container and its children line up in a row (or column).</p>
+<pre><code>.container {
+  display: flex;
+  flex-direction: row;      /* row (default) or column */
+  justify-content: center;  /* horizontal alignment */
+  align-items: center;      /* vertical alignment */
+  gap: 12px;                /* space between children */
+}</code></pre>
+<h3>The Key Properties</h3>
+<ul>
+<li><code>flex-direction: row</code> — children sit side by side</li>
+<li><code>flex-direction: column</code> — children stack vertically</li>
+<li><code>justify-content: space-between</code> — push children to opposite ends</li>
+<li><code>align-items: center</code> — centre children on the cross axis</li>
+<li><code>flex: 1</code> on a child — makes it grow to fill available space</li>
+</ul>
+<div class="ftth-callout"><div class="ftth-callout-title">📡 In the FTTH App</div>
+<p>The entire app layout is three flex containers nested inside each other:</p>
+<pre><code>/* Outer: sidebar + map + panel side by side */
+#app { display: flex; flex-direction: row; height: 100vh; }
+
+/* Sidebar: header + body stacked vertically */
+#sidebar { display: flex; flex-direction: column; width: 260px; }
+
+/* Each toolbar button row */
+.tool-row { display: flex; gap: 6px; flex-wrap: wrap; }</code></pre></div>
+<div class="tip"><strong>Pro tip:</strong> Open DevTools (F12) → click any element → look at the Styles panel. You'll see every flex property applied to the FTTH app in real time.</div>`,
+exercise:{lang:'html',title:'Build the App Layout',
+desc:'Recreate the FTTH app\'s basic layout: a dark sidebar on the left and a main content area that fills the rest.',
+starter:`<!DOCTYPE html>
+<html>
+<head>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #04090F; color: #C8D8E8; font-family: sans-serif; height: 100vh; }
+
+  /* Make #app a flex row that fills the screen */
+  #app { }
+
+  /* Sidebar: fixed width, dark bg, full height */
+  #sidebar { }
+
+  /* Main: fills remaining space */
+  #main { }
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="sidebar">
+    <p style="padding:16px">Sidebar</p>
+  </div>
+  <div id="main">
+    <p style="padding:16px">Main content area</p>
+  </div>
+</div>
+</body>
+</html>`,
+solution:`<!DOCTYPE html>
+<html>
+<head>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #04090F; color: #C8D8E8; font-family: sans-serif; height: 100vh; }
+  #app { display: flex; flex-direction: row; height: 100%; }
+  #sidebar { width: 260px; background: #080F1A; border-right: 1px solid rgba(255,255,255,0.1); padding: 16px; }
+  #main { flex: 1; padding: 16px; }
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="sidebar"><p>Sidebar</p></div>
+  <div id="main"><p>Main content area</p></div>
+</div>
+</body>
+</html>`,
+checks:[
+  {fn:c=>/display\s*:\s*flex/.test(c), label:'Set display: flex on the container'},
+  {fn:c=>/width\s*:\s*\d/.test(c), label:'Give the sidebar a fixed width'},
+  {fn:c=>/flex\s*:\s*1/.test(c), label:'Set flex: 1 on the main area'}
+]},
+quiz:[
+{q:'Which CSS property turns an element into a flex container?',opts:['layout: flex','display: flex','position: flex','flex: on'],ans:1,explain:'display: flex on a parent element activates Flexbox, making its direct children flex items.'},
+{q:'You want two flex children to sit side by side. Which flex-direction do you use?',opts:['column','vertical','row','horizontal'],ans:2,explain:'flex-direction: row (the default) places children in a horizontal row, side by side.'}
+]},
+
+{id:'js-first-steps',title:'JavaScript: First Steps',xp:150,duration:'20 min',
+content:`<h2>JavaScript: First Steps</h2>
+<p>JavaScript (JS) makes pages interactive. It runs in the browser and can read, change, and react to anything on the page.</p>
+<h3>Variables</h3>
+<p>Variables store data. Use <code>const</code> for values that don't change, <code>let</code> for values that do:</p>
+<pre><code>const SNAP_DIST = 45;        // metres — never changes
+const APP_NAME  = "FTTH GIS Planner";
+
+let drawing = false;         // changes as user draws routes
+let totalXP  = 0;            // changes as lessons complete</code></pre>
+<h3>Data Types</h3>
+<ul>
+<li><code>"hello"</code> — string (text, in quotes)</li>
+<li><code>42</code> / <code>3.14</code> — number</li>
+<li><code>true</code> / <code>false</code> — boolean</li>
+<li><code>null</code> — intentionally empty</li>
+</ul>
+<h3>Template Literals</h3>
+<p>Embed variables inside strings using backticks and <code>\${}</code>:</p>
+<pre><code>const acc = 4.2;
+const msg = \`GPS accuracy: ±\${acc} m\`;
+// → "GPS accuracy: ±4.2 m"</code></pre>
+<div class="ftth-callout"><div class="ftth-callout-title">📡 In the FTTH App</div>
+<p>The FTTH app defines all its constants at the top of the script:</p>
+<pre><code>const GPON_MIN_RX  = -28;   // dBm threshold
+const FIBER_ATTEN  = 0.35;  // dB per km
+const SNAP_DIST    = 45;    // snap radius in metres
+const FILL_SINGLE  = 53;    // % max duct fill (1 cable)
+const FILL_MULTIPLE= 40;    // % max duct fill (2+ cables)</code></pre></div>`,
+exercise:{lang:'js',title:'Cable Spec Calculator',
+desc:'Declare variables for a fiber cable spec and log a summary string to the console.',
+starter:`// Declare these variables:
+// - cableName  (string): "12F Loose Tube"
+// - fiberCount (number): 12
+// - outerDiam  (number): 8.5  (mm)
+// - isAerial   (boolean): false
+
+// Then log a summary using a template literal:
+// "Cable: 12F Loose Tube | 12 fibres | OD: 8.5mm | Aerial: false"
+
+
+
+`,
+solution:`const cableName  = "12F Loose Tube";
+const fiberCount = 12;
+const outerDiam  = 8.5;
+const isAerial   = false;
+
+console.log(\`Cable: \${cableName} | \${fiberCount} fibres | OD: \${outerDiam}mm | Aerial: \${isAerial}\`);`,
+checks:[
+  {fn:c=>/const|let/.test(c), label:'Declare variables with const or let'},
+  {fn:c=>/`/.test(c), label:'Use a template literal (backticks)'},
+  {fn:c=>/console\.log/.test(c), label:'Call console.log()'}
+]},
+quiz:[
+{q:'Which keyword declares a variable whose value will never change?',opts:['let','var','const','fixed'],ans:2,explain:'const declares a constant — the value cannot be reassigned. Use let when the value needs to change.'},
+{q:'What is the output of: console.log(`Loss: ${0.35 * 10} dB`)?',opts:['Loss: 0.35 * 10 dB','Loss: 3.5 dB','Loss: ${0.35 * 10} dB','Error'],ans:1,explain:'Template literals evaluate expressions inside ${}. So 0.35 * 10 = 3.5, giving "Loss: 3.5 dB".'}
+]}
+]},
+
+{id:'js',title:'JavaScript Core',icon:'⚡',color:'#F59E0B',lessons:[
+{id:'functions',title:'Functions',xp:150,duration:'20 min',
+content:`<h2>Functions</h2>
+<p>A function is a reusable block of code. You define it once and call it as many times as you need. Functions are the most important building block in JavaScript.</p>
+<pre><code>// Define
+function greet(name) {
+  return "Hello, " + name + "!";
+}
+
+// Call
+greet("Samuel");  // → "Hello, Samuel!"</code></pre>
+<h3>Arrow Functions</h3>
+<p>A shorter syntax for simple functions:</p>
+<pre><code>// Traditional
+function add(a, b) { return a + b; }
+
+// Arrow
+const add = (a, b) => a + b;</code></pre>
+<h3>Parameters & Return</h3>
+<ul>
+<li><strong>Parameters</strong> are the inputs listed in the parentheses</li>
+<li><strong>Return</strong> sends a value back to the caller</li>
+<li>Without <code>return</code>, a function returns <code>undefined</code></li>
+</ul>
+<div class="ftth-callout"><div class="ftth-callout-title">📡 In the FTTH App</div>
+<p>Every major action is a function. Here are some real ones:</p>
+<pre><code>// Show a toast notification
+function toast(msg, dur=3000) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), dur);
+}
+
+// Calculate distance between two GPS points
+function haversine(ll1, ll2) {
+  const R = 6371000; // Earth radius in metres
+  // ... math ...
+  return distanceInMetres;
+}</code></pre></div>`,
+exercise:{lang:'js',title:'Duct Fill Calculator',
+desc:'Write a function duckFill(cableOD, ductID) that returns the fill percentage. Formula: (cableOD² / ductID²) × 100. Then test it.',
+starter:`// Write a function: ductFill(cableOD, ductID)
+// Returns: (cableOD² / ductID²) * 100
+// Round to 1 decimal place using .toFixed(1)
+
+function ductFill(cableOD, ductID) {
+  // your code here
+}
+
+// Test it — a 10mm cable in a 25mm duct:
+console.log(ductFill(10, 25));   // should print: 16.0
+console.log(ductFill(20, 25));   // should print: 64.0
+
+// Is it within the 53% single-cable limit?
+const fill = ductFill(10, 25);
+console.log(\`Fill: \${fill}% — \${fill <= 53 ? "PASS" : "FAIL"}\`);`,
+solution:`function ductFill(cableOD, ductID) {
+  return ((cableOD * cableOD) / (ductID * ductID) * 100).toFixed(1);
+}
+console.log(ductFill(10, 25));
+console.log(ductFill(20, 25));
+const fill = ductFill(10, 25);
+console.log(\`Fill: \${fill}% — \${fill <= 53 ? "PASS" : "FAIL"}\`);`,
+checks:[
+  {fn:c=>/function ductFill|const ductFill\s*=/.test(c), label:'Define a function called ductFill'},
+  {fn:c=>/return/.test(c), label:'Use return to send back the result'},
+  {fn:c=>/console\.log/.test(c), label:'Test the function with console.log'}
+]},
+quiz:[
+{q:'What keyword sends a value back from a function to its caller?',opts:['send','output','return','give'],ans:2,explain:'return exits the function and passes a value back. Without return, the function returns undefined.'},
+{q:'What is the output of: const double = x => x * 2; console.log(double(7));',opts:['14','7','double(7)','Error'],ans:0,explain:'Arrow function: x => x * 2 takes x and returns x*2. double(7) → 7*2 = 14.'}
+]},
+
+{id:'objects-arrays',title:'Objects & Arrays',xp:150,duration:'20 min',
+content:`<h2>Objects & Arrays</h2>
+<p>Objects and arrays are how JavaScript stores structured data — like the cable library, element list, and infrastructure config in the FTTH app.</p>
+<h3>Objects</h3>
+<p>An object groups related data using key-value pairs:</p>
+<pre><code>const cable = {
+  name: "12F Loose Tube",
+  fibers: 12,
+  outerDiam: 8.5,
+  isAerial: false
+};
+
+// Access values:
+console.log(cable.name);       // "12F Loose Tube"
+console.log(cable["fibers"]);  // 12
+
+// Modify:
+cable.outerDiam = 9.0;</code></pre>
+<h3>Arrays</h3>
+<p>An array is an ordered list of items:</p>
+<pre><code>const routes = ["Trench", "Conduit", "Aerial"];
+
+routes[0];          // "Trench" (index starts at 0)
+routes.length;      // 3
+routes.push("HDD"); // add to end
+routes.forEach(r => console.log(r)); // loop all</code></pre>
+<div class="ftth-callout"><div class="ftth-callout-title">📡 In the FTTH App</div>
+<pre><code>// The entire infrastructure config is one big object:
+const INFRA = {
+  co:       { label:'Central Office', color:'#F59E0B', lossAdd:0 },
+  cabinet:  { label:'Cabinet / FDH',  color:'#3B82F6', lossAdd:7.2 },
+  odp:      { label:'ODP / FAT',      color:'#8B5CF6', lossAdd:10.5 },
+  customer: { label:'Customer / ONT', color:'#06B6D4', lossAdd:0.5 }
+};
+
+// The placed elements list is an array:
+const S = {
+  elements: [],   // grows as you place nodes
+  routes:   []    // grows as you draw routes
+};</code></pre></div>`,
+exercise:{lang:'js',title:'Build a Cable Library',
+desc:'Create an array of cable objects and loop through them to print each cable\'s name and fiber count.',
+starter:`// Create an array called 'cables' with 3 cable objects.
+// Each object should have: name, fibers, outerDiamMm
+
+const cables = [
+  // add 3 cables here
+];
+
+// Loop through cables and log each one like:
+// "1. 6F Drop Cable — 6 fibres, OD: 5.5mm"
+
+cables.forEach((cable, index) => {
+  // your log here
+});`,
+solution:`const cables = [
+  { name: "6F Drop Cable",     fibers: 6,   outerDiamMm: 5.5 },
+  { name: "12F Loose Tube",    fibers: 12,  outerDiamMm: 8.5 },
+  { name: "48F Standard LT",   fibers: 48,  outerDiamMm: 14.0 }
+];
+cables.forEach((cable, index) => {
+  console.log(\`\${index+1}. \${cable.name} — \${cable.fibers} fibres, OD: \${cable.outerDiamMm}mm\`);
+});`,
+checks:[
+  {fn:c=>/\[[\s\S]*\{/.test(c), label:'Create an array containing objects'},
+  {fn:c=>/forEach|for\s*\(/.test(c), label:'Loop through the array'},
+  {fn:c=>/console\.log/.test(c), label:'Log each cable'}
+]},
+quiz:[
+{q:'How do you access the "name" property of an object called "cable"?',opts:['cable[name]','cable->name','cable.name','get(cable.name)'],ans:2,explain:'Dot notation (cable.name) is the standard way. Bracket notation (cable["name"]) also works.'},
+{q:'An array called "items" has 4 elements. What is items[0]?',opts:['The last item','undefined','The first item','The number 0'],ans:2,explain:'Arrays are zero-indexed — the first element is always at index 0.'}
+]},
+
+{id:'control-flow',title:'Control Flow',xp:150,duration:'20 min',
+content:`<h2>Control Flow</h2>
+<p>Control flow lets your code make decisions and repeat actions.</p>
+<h3>If / Else</h3>
+<pre><code>const accuracy = 4.2; // metres
+
+if (accuracy <= 5) {
+  console.log("Excellent GPS fix!");
+} else if (accuracy <= 15) {
+  console.log("Acceptable fix");
+} else {
+  console.log("Poor signal — move to open sky");
+}</code></pre>
+<h3>Ternary Operator</h3>
+<p>A one-liner if/else — used constantly in the FTTH app:</p>
+<pre><code>// condition ? valueIfTrue : valueIfFalse
+const label = fill <= 53 ? "PASS ✓" : "FAIL ✗";
+const icon  = isAerial   ? "🗼" : "🔌";</code></pre>
+<h3>Loops</h3>
+<pre><code>// forEach — best for arrays
+routes.forEach(route => {
+  console.log(route.label);
+});
+
+// map — transform each item into something new
+const names = cables.map(c => c.name);
+// → ["6F Drop", "12F LT", ...]
+
+// filter — keep only matching items
+const aerial = cables.filter(c => c.isAerial === true);</code></pre>
+<div class="ftth-callout"><div class="ftth-callout-title">📡 In the FTTH App</div>
+<pre><code>// GPS accuracy filter in locateUser():
+if (acc > LOCATE_REJECT_ACC) return;  // skip bad fix
+
+// Ternary for pass/fail in duct fill:
+const status = fill <= FILL_SINGLE ? "✓ PASS" : "✗ FAIL";
+
+// Filter elements by type:
+const customers = S.elements.filter(e => e.type === 'customer');</code></pre></div>`,
+exercise:{lang:'js',title:'Loss Budget Checker',
+desc:'Write a function that checks if a PON link\'s total loss is within the GPON limit (-28 dBm budget means max 28 dB loss from a 0 dBm transmitter).',
+starter:`const GPON_BUDGET = 28;  // dB max loss allowed
+
+// Write: checkLoss(fiberKm, splitterCount)
+// fiberKm * 0.35 = fiber loss (dB)
+// splitterCount * 10.5 = splitter loss (dB)
+// Total = fiber + splitter
+// Return "PASS" if total <= GPON_BUDGET, else "FAIL: X.X dB over"
+
+function checkLoss(fiberKm, splitterCount) {
+
+}
+
+// Tests:
+console.log(checkLoss(5, 2));   // 5*0.35 + 2*10.5 = 1.75+21 = 22.75 → PASS
+console.log(checkLoss(10, 3));  // 3.5 + 31.5 = 35 → FAIL`,
+solution:`const GPON_BUDGET = 28;
+function checkLoss(fiberKm, splitterCount) {
+  const fiberLoss    = fiberKm * 0.35;
+  const splitterLoss = splitterCount * 10.5;
+  const total = fiberLoss + splitterLoss;
+  if (total <= GPON_BUDGET) {
+    return \`PASS (total: \${total.toFixed(2)} dB)\`;
+  } else {
+    return \`FAIL: \${(total - GPON_BUDGET).toFixed(2)} dB over budget\`;
+  }
+}
+console.log(checkLoss(5, 2));
+console.log(checkLoss(10, 3));`,
+checks:[
+  {fn:c=>/if\s*\(/.test(c), label:'Use an if statement'},
+  {fn:c=>/return/.test(c), label:'Return a result from the function'},
+  {fn:c=>/\*\s*0\.35/.test(c), label:'Apply the 0.35 dB/km fiber attenuation'}
+]},
+quiz:[
+{q:'What does the filter() method do to an array?',opts:['Sorts items alphabetically','Removes all items','Returns a new array with only items that pass a test','Changes each item to a new value'],ans:2,explain:'filter() keeps only items where the callback returns true. It returns a new array and does not change the original.'},
+{q:'What is the result of: 10 > 5 ? "big" : "small"',opts:['"small"','"big"','true','Error'],ans:1,explain:'The ternary operator evaluates the condition (10 > 5 = true), so it returns the first value: "big".'}
+]},
+
+{id:'dom',title:'DOM Manipulation',xp:200,duration:'25 min',
+content:`<h2>DOM Manipulation</h2>
+<p>The DOM (Document Object Model) is JavaScript's view of the HTML page. You can read, change, add, or remove any element using JS.</p>
+<h3>Finding Elements</h3>
+<pre><code>// By id — returns one element
+const btn = document.getElementById('locate-btn');
+
+// By CSS selector — returns first match
+const panel = document.querySelector('#panel');
+
+// By CSS selector — returns all matches
+const tabs = document.querySelectorAll('.ptab');</code></pre>
+<h3>Changing Elements</h3>
+<pre><code>// Change text content
+document.getElementById('status-bar').textContent = 'Drawing route…';
+
+// Change HTML inside an element
+panel.innerHTML = '<p>No elements placed yet.</p>';
+
+// Change CSS
+btn.style.color = '#00D9FF';
+btn.classList.add('active');
+btn.classList.remove('active');
+btn.classList.toggle('active');</code></pre>
+<div class="ftth-callout"><div class="ftth-callout-title">📡 In the FTTH App</div>
+<p>The entire info panel is redrawn using DOM manipulation every time something changes:</p>
+<pre><code>function updateStatus() {
+  const sb = document.getElementById('status-bar');
+  if (S.drawing) {
+    sb.textContent = \`Drawing \${S.toolKind} — \${S.pts.length} pts\`;
+  } else {
+    sb.textContent = 'Click map to place infrastructure';
+  }
+}
+
+// Build the element list in HTML dynamically:
+function renderElements() {
+  const body = document.getElementById('panel-body');
+  body.innerHTML = S.elements.map(e =>
+    \`<div class="elem-item">\${e.label}</div>\`
+  ).join('');
+}</code></pre></div>`,
+exercise:{lang:'html',title:'Live Element Counter',
+desc:'Build a page with a button that adds items to a list and shows a live count.',
+starter:`<!DOCTYPE html>
+<html>
+<head>
+<style>
+  body { background:#04090F; color:#C8D8E8; font-family:sans-serif; padding:24px; }
+  button { background:#00D9FF; color:#000; border:none; padding:10px 20px; border-radius:8px; cursor:pointer; font-weight:bold; }
+  #count { font-size:32px; font-weight:bold; color:#00D9FF; margin:16px 0; }
+  #list  { list-style:none; padding:0; }
+  #list li { padding:8px; background:#0D1828; border-radius:6px; margin:4px 0; }
+</style>
+</head>
+<body>
+  <h2>Infrastructure Placed</h2>
+  <div id="count">0</div>
+  <button onclick="addNode()">+ Place Node</button>
+  <ul id="list"></ul>
+
+  <script>
+    let nodeCount = 0;
+    const types = ['CO','Cabinet','ODP','Closure','Customer'];
+
+    function addNode() {
+      // 1. Increment nodeCount
+      // 2. Pick a random type from the types array
+      // 3. Add a <li> to #list with the type name
+      // 4. Update #count with the new total
+    }
+  <\/script>
+</body>
+</html>`,
+solution:`<!DOCTYPE html>
+<html>
+<head>
+<style>
+  body { background:#04090F; color:#C8D8E8; font-family:sans-serif; padding:24px; }
+  button { background:#00D9FF; color:#000; border:none; padding:10px 20px; border-radius:8px; cursor:pointer; font-weight:bold; }
+  #count { font-size:32px; font-weight:bold; color:#00D9FF; margin:16px 0; }
+  #list  { list-style:none; padding:0; }
+  #list li { padding:8px; background:#0D1828; border-radius:6px; margin:4px 0; }
+</style>
+</head>
+<body>
+  <h2>Infrastructure Placed</h2>
+  <div id="count">0</div>
+  <button onclick="addNode()">+ Place Node</button>
+  <ul id="list"></ul>
+  <script>
+    let nodeCount = 0;
+    const types = ['CO','Cabinet','ODP','Closure','Customer'];
+    function addNode() {
+      nodeCount++;
+      const type = types[Math.floor(Math.random() * types.length)];
+      const li = document.createElement('li');
+      li.textContent = nodeCount + '. ' + type;
+      document.getElementById('list').appendChild(li);
+      document.getElementById('count').textContent = nodeCount;
+    }
+  <\/script>
+</body>
+</html>`,
+checks:[
+  {fn:c=>/getElementById|querySelector/.test(c), label:'Use getElementById or querySelector'},
+  {fn:c=>/innerHTML|textContent|createElement/.test(c), label:'Update element content'},
+  {fn:c=>/function addNode/.test(c), label:'Define the addNode function'}
+]},
+quiz:[
+{q:'Which method finds a single HTML element by its id attribute?',opts:['document.find()','document.getElement()','document.getElementById()','document.select()'],ans:2,explain:'document.getElementById("myId") returns the one element with that exact id.'},
+{q:'What does classList.toggle("active") do?',opts:['Always adds the class','Always removes the class','Adds the class if absent, removes it if present','Renames the class'],ans:2,explain:'toggle() checks: if the class is there, remove it; if it\'s not, add it. Perfect for on/off states.'}
+]},
+
+{id:'events',title:'Events & Interaction',xp:200,duration:'25 min',
+content:`<h2>Events & Interaction</h2>
+<p>Events are things that happen in the browser — a click, a key press, a form input. JavaScript can listen for any event and run code when it fires.</p>
+<pre><code>const btn = document.getElementById('my-btn');
+
+btn.addEventListener('click', function(event) {
+  console.log('Button clicked!');
+  console.log(event.target); // the element that was clicked
+});</code></pre>
+<h3>Common Events</h3>
+<ul>
+<li><code>'click'</code> — mouse/touch tap</li>
+<li><code>'input'</code> — user types in an input field</li>
+<li><code>'keydown'</code> — keyboard key pressed</li>
+<li><code>'change'</code> — select/checkbox changed</li>
+<li><code>'mousemove'</code> — mouse moves over element</li>
+</ul>
+<h3>event.preventDefault()</h3>
+<p>Stops the browser's default behaviour (e.g. stop a form from submitting, stop a link from navigating).</p>
+<div class="ftth-callout"><div class="ftth-callout-title">📡 In the FTTH App</div>
+<pre><code>// The map click event — everything starts here
+MAP.on('click', function(e) {
+  if (S.tool === 'place') {
+    openLabelModal(e.latlng, S.infraType);
+  } else if (S.tool === 'route' && S.drawing) {
+    S.pts.push(e.latlng);
+    drawTempLine();
+  }
+});
+
+// Keyboard shortcut to finish a route
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && S.drawing) finishDraw();
+  if (e.key === 'Escape') cancelDraw();
+});</code></pre></div>`,
+exercise:{lang:'html',title:'Keyboard Tool Switcher',
+desc:'Build a tool selector where pressing 1, 2, or 3 on the keyboard highlights the matching tool button.',
+starter:`<!DOCTYPE html>
+<html>
+<head>
+<style>
+  body { background:#04090F; color:#C8D8E8; font-family:sans-serif; padding:24px; }
+  .tool { display:inline-block; padding:12px 24px; margin:6px; border:2px solid #1E3A5F;
+          border-radius:10px; cursor:pointer; font-size:14px; transition:all .2s; }
+  .tool.active { border-color:#00D9FF; background:rgba(0,217,255,0.1); color:#00D9FF; }
+  #hint { margin-top:16px; color:#7A9AB8; font-size:13px; }
+</style>
+</head>
+<body>
+  <h2>Tool Selector</h2>
+  <div class="tool" id="tool-1">1. Place Node</div>
+  <div class="tool" id="tool-2">2. Draw Route</div>
+  <div class="tool" id="tool-3">3. Select</div>
+  <div id="hint">Press 1, 2, or 3 on your keyboard</div>
+
+  <script>
+    // Listen for keydown events on the document
+    // When key is '1', '2', or '3':
+    //   - Remove 'active' class from all .tool elements
+    //   - Add 'active' class to the matching tool
+    //   - Update #hint text to show which tool is active
+
+  <\/script>
+</body>
+</html>`,
+solution:`<!DOCTYPE html>
+<html>
+<head>
+<style>
+  body { background:#04090F; color:#C8D8E8; font-family:sans-serif; padding:24px; }
+  .tool { display:inline-block; padding:12px 24px; margin:6px; border:2px solid #1E3A5F;
+          border-radius:10px; cursor:pointer; font-size:14px; transition:all .2s; }
+  .tool.active { border-color:#00D9FF; background:rgba(0,217,255,0.1); color:#00D9FF; }
+  #hint { margin-top:16px; color:#7A9AB8; font-size:13px; }
+</style>
+</head>
+<body>
+  <h2>Tool Selector</h2>
+  <div class="tool" id="tool-1">1. Place Node</div>
+  <div class="tool" id="tool-2">2. Draw Route</div>
+  <div class="tool" id="tool-3">3. Select</div>
+  <div id="hint">Press 1, 2, or 3 on your keyboard</div>
+  <script>
+    const tools = ['Place Node','Draw Route','Select'];
+    document.addEventListener('keydown', e => {
+      const n = parseInt(e.key);
+      if (n >= 1 && n <= 3) {
+        document.querySelectorAll('.tool').forEach(t => t.classList.remove('active'));
+        document.getElementById('tool-'+n).classList.add('active');
+        document.getElementById('hint').textContent = 'Active: ' + tools[n-1];
+      }
+    });
+  <\/script>
+</body>
+</html>`,
+checks:[
+  {fn:c=>/addEventListener/.test(c), label:'Use addEventListener'},
+  {fn:c=>/keydown/.test(c), label:'Listen for the keydown event'},
+  {fn:c=>/classList\.(add|remove|toggle)/.test(c), label:'Toggle the active class'}
+]},
+quiz:[
+{q:'Which method attaches a JavaScript function to an HTML event?',opts:['element.on()','element.listen()','element.addEventListener()','element.attach()'],ans:2,explain:'addEventListener(eventName, callback) is the correct, modern way to handle events in JavaScript.'},
+{q:'Inside an event callback, what does event.target refer to?',opts:['The document','The event type as a string','The HTML element that triggered the event','The function itself'],ans:2,explain:'event.target is the actual element the user interacted with — the button they clicked, the key they pressed, etc.'}
+]}
+]},
+
+{id:'ftth',title:'FTTH App Decoded',icon:'📡',color:'#8B5CF6',lessons:[
+{id:'reading-code',title:'Reading Real Code',xp:200,duration:'30 min',
+content:`<h2>Reading Real Code</h2>
+<p>One of the most important skills a developer has is reading code they didn't write. The FTTH app has 2,400+ lines — let's learn how to navigate it confidently.</p>
+<h3>Step 1: Find the Entry Point</h3>
+<p>Every app starts somewhere. In the FTTH app, look at the very bottom of the script for:</p>
+<pre><code>document.addEventListener('DOMContentLoaded', init);
+// or just:
+init();</code></pre>
+<p>This calls <code>init()</code> when the page loads. That's your starting point.</p>
+<h3>Step 2: Follow the Call Chain</h3>
+<p>When a user clicks the map, trace what happens:</p>
+<pre><code>User clicks map
+  → MAP.on('click', onMapClick)     // event fires
+  → onMapClick(e)                    // handler runs
+  → if tool is 'place':
+      openLabelModal(e.latlng)       // show name dialog
+      → user clicks OK
+      → placeElem(type, ll, label)   // create marker
+      → updateUI()                   // refresh panel</code></pre>
+<h3>Step 3: Read the State Object First</h3>
+<p>In complex apps, the state object tells you what data the app tracks. In the FTTH app:</p>
+<pre><code>const S = {
+  tool: 'place',       // what mode is active
+  drawing: false,      // are we drawing a route?
+  elements: [],        // all placed nodes
+  routes: [],          // all drawn routes
+  selElem: null        // currently selected element
+};</code></pre>
+<div class="tip"><strong>Pro tip:</strong> Open the FTTH app, press F12, go to Console, type <code>S</code> and press Enter. You'll see the entire live state of the app.</div>`,
+exercise:{lang:'js',title:'Trace a Function',
+desc:'Read the simplified placeElem function below and answer: add a console.log that prints what type of element was placed and its label.',
+starter:`// Simplified version of placeElem from the FTTH app
+const S = { elements: [] };
+
+function placeElem(type, lat, lng, label) {
+  const id = 'elem-' + Date.now();
+  const element = { id, type, lat, lng, label };
+  S.elements.push(element);
+
+  // ADD: console.log showing type and label
+  // Format: "Placed: Cabinet — FDH-001"
+
+  return id;
+}
+
+// Test it:
+placeElem('cabinet', 6.5244, 3.3792, 'FDH-001');
+placeElem('customer', 6.5250, 3.3800, 'ONT-001');
+
+// Check the result:
+console.log('Total elements:', S.elements.length);`,
+solution:`const S = { elements: [] };
+function placeElem(type, lat, lng, label) {
+  const id = 'elem-' + Date.now();
+  const element = { id, type, lat, lng, label };
+  S.elements.push(element);
+  console.log(\`Placed: \${type} — \${label}\`);
+  return id;
+}
+placeElem('cabinet', 6.5244, 3.3792, 'FDH-001');
+placeElem('customer', 6.5250, 3.3800, 'ONT-001');
+console.log('Total elements:', S.elements.length);`,
+checks:[
+  {fn:c=>/console\.log.*type|console\.log.*label/.test(c), label:'Log the element type and label'},
+  {fn:c=>/placeElem\(/.test(c), label:'Call placeElem() to test it'}
+]},
+quiz:[
+{q:'What is the best first step when exploring a large, unfamiliar codebase?',opts:['Read every line from top to bottom','Find the entry point (init function or DOMContentLoaded)','Delete code you don\'t understand','Rewrite it from scratch'],ans:1,explain:'Finding the entry point lets you trace execution flow — you follow the code as the browser does, from start to finish.'},
+{q:'In the FTTH app, what does S.elements contain?',opts:['The CSS styles','All placed infrastructure nodes','The map tile URLs','The user\'s GPS history'],ans:1,explain:'S is the central state object. S.elements is an array of all nodes the user has placed on the map.'}
+]},
+
+{id:'libraries',title:'Using Libraries (Leaflet)',xp:200,duration:'25 min',
+content:`<h2>Using Libraries</h2>
+<p>A <strong>library</strong> is code someone else wrote that you include in your project. Instead of building a map from scratch (thousands of hours of work), you include <strong>Leaflet.js</strong> and use it in a few lines.</p>
+<h3>Including a Library via CDN</h3>
+<pre><code>&lt;!-- Add to &lt;head&gt; --&gt;
+&lt;link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/&gt;
+&lt;script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"&gt;&lt;/script&gt;</code></pre>
+<p>CDN = Content Delivery Network. The browser downloads the library from a fast server. You get access to everything it provides instantly.</p>
+<h3>Using Leaflet</h3>
+<pre><code>// Create a map inside a div with id="map"
+const map = L.map('map').setView([6.5244, 3.3792], 13);
+
+// Add a tile layer (the map images)
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+
+// Add a marker
+L.marker([6.5244, 3.3792])
+  .addTo(map)
+  .bindPopup('Lagos, Nigeria');
+
+// Add a line (fiber route)
+L.polyline([[6.52, 3.37], [6.53, 3.38]], {color:'orange'}).addTo(map);</code></pre>
+<div class="ftth-callout"><div class="ftth-callout-title">📡 In the FTTH App</div>
+<p>Every element, route, and marker in the FTTH app is a Leaflet object. When you place a "Cabinet" node, the app calls:</p>
+<pre><code>const marker = L.marker(latlng, {
+  icon: L.divIcon({
+    className: '',
+    html: \`&lt;div style="background:#3B82F6;..."&gt;FDH&lt;/div&gt;\`
+  })
+}).addTo(MAP);</code></pre></div>`,
+exercise:{lang:'html',title:'Build a Mini Map',
+desc:'Create a Leaflet map centred on Lagos, Nigeria. Add one marker with a popup saying "My Office".',
+starter:`<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8"/>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"><\/script>
+  <style>
+    body { margin: 0; }
+    #map { height: 100vh; }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+  <script>
+    // 1. Create a map centred on Lagos: [6.5244, 3.3792], zoom 13
+    // 2. Add the OpenStreetMap tile layer
+    // 3. Add a marker at Lagos with popup "My Office"
+
+  <\/script>
+</body>
+</html>`,
+solution:`<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8"/>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"><\/script>
+  <style> body { margin:0; } #map { height:100vh; } </style>
+</head>
+<body>
+  <div id="map"></div>
+  <script>
+    const map = L.map('map').setView([6.5244, 3.3792], 13);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+    L.marker([6.5244, 3.3792]).addTo(map).bindPopup('My Office');
+  <\/script>
+</body>
+</html>`,
+checks:[
+  {fn:c=>/L\.map/.test(c), label:'Create a Leaflet map with L.map()'},
+  {fn:c=>/tileLayer/.test(c), label:'Add a tile layer'},
+  {fn:c=>/L\.marker/.test(c), label:'Add a marker with L.marker()'}
+]},
+quiz:[
+{q:'What is a CDN?',opts:['A type of fiber cable','A Content Delivery Network for fast file hosting','A CSS design notation','A code development network'],ans:1,explain:'CDN stands for Content Delivery Network — servers around the world that host files (libraries, fonts, images) and serve them quickly to users near them.'},
+{q:'In Leaflet, what does .addTo(map) do?',opts:['Creates the map','Saves the map to disk','Adds the layer or marker to the visible map','Deletes the map'],ans:2,explain:'.addTo(map) is how you make a Leaflet marker, polyline, or tile layer actually appear on the map.'}
+]}
+]},
+
+{id:'python',title:'Python Basics',icon:'🐍',color:'#22C55E',lessons:[
+{id:'python-intro',title:'Python: First Steps',xp:150,duration:'20 min',
+content:`<h2>Python: First Steps</h2>
+<p>Python is the most popular language for data processing, automation, machine learning, and backend web development. Its syntax is clean and reads almost like English.</p>
+<h3>Python vs JavaScript</h3>
+<ul>
+<li>Python uses <strong>indentation</strong> (spaces) to define code blocks — no curly braces <code>{}</code></li>
+<li>Python uses <code>print()</code> instead of <code>console.log()</code></li>
+<li>Python uses <code>def</code> to define functions instead of <code>function</code></li>
+<li>Python uses <code>True</code>/<code>False</code> (capital T/F)</li>
+</ul>
+<pre><code># This is a Python comment (# instead of //)
+
+name = "Samuel"          # no let/const needed
+fiber_count = 48         # snake_case for variables
+is_aerial = True
+
+# f-string (like JS template literals)
+print(f"Cable: {fiber_count}F, Aerial: {is_aerial}")
+
+# Function
+def duct_fill(cable_od, duct_id):
+    fill = (cable_od ** 2 / duct_id ** 2) * 100
+    return round(fill, 1)
+
+result = duct_fill(10, 25)
+print(f"Fill: {result}%")  # Fill: 16.0%</code></pre>
+<div class="ftth-callout"><div class="ftth-callout-title">📡 FTTH Connection</div>
+<p>The FTTH app's GeoJSON export can be read and processed in Python. A fiber network planner might use Python to analyse exported data, run batch calculations, or feed data into a database.</p></div>
+<div class="tip"><strong>Run Python free online:</strong> Go to <a href="https://replit.com" target="_blank" style="color:var(--accent)">replit.com</a>, create a new Python Repl, and paste any code to run it instantly.</div>`,
+exercise:{lang:'js',title:'Convert JS → Python (mentally)',
+desc:'The function below is JavaScript. Rewrite it as Python in the comments, then verify your understanding by answering the quiz.',
+starter:`// JavaScript version (this runs here):
+function ponBudget(distanceKm, splitters) {
+  const fiberLoss    = distanceKm * 0.35;
+  const splitterLoss = splitters  * 10.5;
+  const total = fiberLoss + splitterLoss;
+  const pass  = total <= 28;
+  return { total: total.toFixed(2), pass };
+}
+
+const result = ponBudget(8, 2);
+console.log(\`Total loss: \${result.total} dB\`);
+console.log(\`Pass: \${result.pass}\`);
+
+/*
+Write the Python equivalent in comments:
+
+def pon_budget(distance_km, splitters):
+    ...fill this in...
+
+result = pon_budget(8, 2)
+print(...)
+*/`,
+solution:`function ponBudget(distanceKm, splitters) {
+  const fiberLoss    = distanceKm * 0.35;
+  const splitterLoss = splitters  * 10.5;
+  const total = fiberLoss + splitterLoss;
+  const pass  = total <= 28;
+  return { total: total.toFixed(2), pass };
+}
+const result = ponBudget(8, 2);
+console.log(\`Total loss: \${result.total} dB\`);
+console.log(\`Pass: \${result.pass}\`);
+/*
+def pon_budget(distance_km, splitters):
+    fiber_loss    = distance_km * 0.35
+    splitter_loss = splitters * 10.5
+    total = fiber_loss + splitter_loss
+    return {"total": round(total, 2), "pass": total <= 28}
+
+result = pon_budget(8, 2)
+print(f"Total loss: {result['total']} dB")
+print(f"Pass: {result['pass']}")
+*/`,
+checks:[
+  {fn:c=>/def pon_budget|pon_budget/.test(c), label:'Write the Python function name in a comment'},
+  {fn:c=>/console\.log/.test(c), label:'Run the JavaScript version'}
+]},
+quiz:[
+{q:'How do you define a function in Python?',opts:['function myFunc():','def myFunc():','func myFunc():','define myFunc():'],ans:1,explain:'In Python, def keyword defines a function. Note the colon (:) at the end and the indented body.'},
+{q:'What is the Python equivalent of JavaScript\'s console.log()?',opts:['console.log()','echo()','print()','output()'],ans:2,explain:'print() is Python\'s built-in output function. It works like console.log() — it prints a value to the terminal.'}
+]},
+
+{id:'python-data',title:'Python Data & Control Flow',xp:150,duration:'20 min',
+content:`<h2>Python Data & Control Flow</h2>
+<h3>Lists and Dictionaries</h3>
+<pre><code># List (like JS array)
+cables = ["6F Drop", "12F LT", "48F Standard"]
+cables[0]       # "6F Drop"
+cables.append("96F") # add to end
+len(cables)     # 4
+
+# Dictionary (like JS object)
+cable = {
+    "name": "12F Loose Tube",
+    "fibers": 12,
+    "od_mm": 8.5
+}
+cable["name"]   # "12F Loose Tube"
+cable["fibers"] = 24  # update</code></pre>
+<h3>Control Flow</h3>
+<pre><code># if / elif / else
+accuracy = 4.2
+if accuracy <= 5:
+    print("Excellent fix")
+elif accuracy <= 15:
+    print("Acceptable")
+else:
+    print("Poor signal")
+
+# for loop
+for cable in cables:
+    print(f"  - {cable}")
+
+# List comprehension (powerful shortcut)
+fiber_counts = [12, 24, 48, 96]
+high_count = [f for f in fiber_counts if f >= 48]
+# → [48, 96]</code></pre>
+<div class="ftth-callout"><div class="ftth-callout-title">📡 FTTH Connection</div>
+<pre><code># Process a GeoJSON export from the FTTH app in Python:
+import json
+
+with open("ftth_export.geojson") as f:
+    data = json.load(f)
+
+elements = data["features"]
+customers = [e for e in elements
+             if e["properties"]["type"] == "customer"]
+print(f"Total customers: {len(customers)}")</code></pre></div>`,
+exercise:{lang:'js',title:'Python Logic in JS',
+desc:'Implement the Python list comprehension logic in JavaScript: filter cables with 48+ fibers and log each one.',
+starter:`// Cable library (same data as Python example)
+const cables = [
+  { name: "6F Drop Cable",   fibers: 6  },
+  { name: "12F Loose Tube",  fibers: 12 },
+  { name: "48F Standard LT", fibers: 48 },
+  { name: "96F Ribbon",      fibers: 96 },
+  { name: "288F Standard",   fibers: 288}
+];
+
+// Use .filter() to get cables with fibers >= 48
+// Then use .forEach() to log each one
+// Expected output:
+// High-capacity: 48F Standard LT (48 fibres)
+// High-capacity: 96F Ribbon (96 fibres)
+// High-capacity: 288F Standard (288 fibres)
+
+`,
+solution:`const cables = [
+  { name: "6F Drop Cable",   fibers: 6  },
+  { name: "12F Loose Tube",  fibers: 12 },
+  { name: "48F Standard LT", fibers: 48 },
+  { name: "96F Ribbon",      fibers: 96 },
+  { name: "288F Standard",   fibers: 288}
+];
+cables
+  .filter(c => c.fibers >= 48)
+  .forEach(c => console.log(\`High-capacity: \${c.name} (\${c.fibers} fibres)\`));`,
+checks:[
+  {fn:c=>/\.filter\(/.test(c), label:'Use .filter() to select high-count cables'},
+  {fn:c=>/fibers\s*>=\s*48/.test(c), label:'Filter condition: fibers >= 48'},
+  {fn:c=>/forEach|\.map\(/.test(c), label:'Loop through the results'}
+]},
+quiz:[
+{q:'What is the Python equivalent of JavaScript\'s Array.filter()?',opts:['list.filter()','[x for x in list if condition]','list.find()','list.select()'],ans:1,explain:'Python list comprehensions with a condition work like filter(): [x for x in items if x > 5] keeps only items greater than 5.'},
+{q:'How do you get the number of items in a Python list called "nodes"?',opts:['nodes.length','nodes.count()','len(nodes)','size(nodes)'],ans:2,explain:'In Python, len() is a built-in function: len(nodes). In JavaScript it\'s a property: nodes.length.'}
+]}
+]},
+
+{id:'professional',title:'Professional Workflow',icon:'🛠️',color:'#F97316',lessons:[
+{id:'git',title:'Git & Version Control',xp:200,duration:'25 min',
+content:`<h2>Git & Version Control</h2>
+<p>Git is the tool every professional developer uses to track changes, collaborate, and never lose work. You've been using it throughout the FTTH project — now let's understand how it works.</p>
+<h3>Core Concepts</h3>
+<ul>
+<li><strong>Repository (repo)</strong> — a project folder tracked by Git</li>
+<li><strong>Commit</strong> — a saved snapshot of your code at a point in time</li>
+<li><strong>Branch</strong> — a parallel version of your code for a new feature</li>
+<li><strong>Push</strong> — upload your commits to GitHub</li>
+<li><strong>Pull</strong> — download changes from GitHub</li>
+</ul>
+<h3>The 3-Step Commit Workflow</h3>
+<pre><code># 1. See what changed
+git status
+
+# 2. Stage the files you want to save
+git add index.html
+git add .          # stages ALL changed files
+
+# 3. Save a snapshot with a message
+git commit -m "Add GPS locate button to floating dock"
+
+# 4. Upload to GitHub
+git push origin master</code></pre>
+<div class="ftth-callout"><div class="ftth-callout-title">📡 In the FTTH App</div>
+<p>Every feature in the FTTH app was committed with a descriptive message:</p>
+<pre><code>deaa5b2  Initial commit -- FTTH GIS Planner
+d2c935d  Fix mobile viewport for iPhone
+e3aff45  Replace mobile header buttons with floating draggable dock
+ea78123  Improve GPS location accuracy with multi-sample weighted averaging</code></pre>
+<p>Run <code>git log --oneline</code> in the ftth-app folder to see the full history.</p></div>
+<h3>Why Commit Messages Matter</h3>
+<p>A good message explains <em>why</em> the change was made, not just what changed. "Fix mobile viewport for iPhone" tells a teammate exactly what problem was solved.</p>`,
+exercise:{lang:'js',title:'Plan Your Commits',
+desc:'You\'re adding a "Dark Mode Toggle" feature. Plan 3 logical commits by writing them as console.log statements showing the commit message order.',
+starter:`// Plan 3 git commits for adding a Dark Mode Toggle feature.
+// Think: what would you build first, second, third?
+// Log them in order:
+
+console.log("Commit 1: ...");
+console.log("Commit 2: ...");
+console.log("Commit 3: ...");`,
+solution:`console.log("Commit 1: Add CSS variables for light theme colours");
+console.log("Commit 2: Add dark mode toggle button to mobile dock");
+console.log("Commit 3: Wire toggle to switch body class and save preference to localStorage");`,
+checks:[
+  {fn:c=>(c.match(/console\.log/g)||[]).length>=3, label:'Plan at least 3 commits'},
+  {fn:c=>/Commit 1|commit 1|first/.test(c), label:'Order the commits logically'}
+]},
+quiz:[
+{q:'What does "git add ." do?',opts:['Creates a new branch','Stages all changed files for the next commit','Pushes to GitHub','Deletes untracked files'],ans:1,explain:'git add . stages all modified and new files in the current directory, making them ready to include in the next commit.'},
+{q:'What is a git commit?',opts:['A message sent to GitHub','A saved snapshot of your code at a specific point in time','A type of branch','A request to merge code'],ans:1,explain:'A commit is a permanent snapshot in your project\'s history. You can always go back to any commit if something breaks.'}
+]},
+
+{id:'debugging',title:'Debugging Like a Pro',xp:200,duration:'25 min',
+content:`<h2>Debugging Like a Pro</h2>
+<p>Bugs are inevitable. Every developer — beginner and senior — writes code that breaks. The skill is finding and fixing bugs quickly.</p>
+<h3>The Browser DevTools</h3>
+<p>Press <strong>F12</strong> in any browser. This is your most powerful tool:</p>
+<ul>
+<li><strong>Console</strong> — see errors, run JS commands, inspect variables</li>
+<li><strong>Elements</strong> — inspect and live-edit HTML/CSS</li>
+<li><strong>Sources</strong> — set breakpoints and step through code line by line</li>
+<li><strong>Network</strong> — see every HTTP request (tile downloads, API calls)</li>
+</ul>
+<h3>console.log Strategy</h3>
+<pre><code>function ductFill(cableOD, ductID) {
+  console.log('ductFill called with:', cableOD, ductID); // ← check inputs
+  const fill = (cableOD * cableOD) / (ductID * ductID) * 100;
+  console.log('calculated fill:', fill); // ← check intermediate values
+  return fill.toFixed(1);
+}</code></pre>
+<h3>Reading Error Messages</h3>
+<p>JavaScript errors always tell you what went wrong and where:</p>
+<pre><code>TypeError: Cannot read properties of null (reading 'textContent')
+  at updateStatus (index.html:1234)</code></pre>
+<ul>
+<li><strong>TypeError</strong> — the type of value was wrong (null instead of element)</li>
+<li><strong>index.html:1234</strong> — the exact line number</li>
+<li>The fix: check if the element exists before reading it</li>
+</ul>
+<div class="ftth-callout"><div class="ftth-callout-title">📡 In the FTTH App</div>
+<p>Open the FTTH app and press F12. In the Console, type:</p>
+<pre><code>S.elements       // see all placed nodes
+S.routes         // see all drawn routes
+MAP.getZoom()    // current zoom level
+MAP.getCenter()  // current map centre</code></pre></div>`,
+exercise:{lang:'js',title:'Find the Bug',
+desc:'This function has 3 bugs. Find and fix all of them.',
+starter:`// This function should calculate total fiber length across all routes.
+// It has 3 bugs — find and fix them all.
+
+const routes = [
+  { label: 'Route A', lengthKm: 2.5, cables: 2 },
+  { label: 'Route B', lengthKm: 1.8, cables: 3 },
+  { label: 'Route C', lengthKm: 3.2, cables: 1 }
+];
+
+function totalFiber(routes) {
+  let total = 0;
+  for (let i = 0; i <= routes.length; i++) {  // Bug 1
+    const route = routes[i]
+    total = total + route.lengthKm * route.cabels;  // Bug 2 and Bug 3
+  }
+  return total.toFixed(2);
+}
+
+console.log(totalFiber(routes)); // Should print: 18.10`,
+solution:`const routes = [
+  { label: 'Route A', lengthKm: 2.5, cables: 2 },
+  { label: 'Route B', lengthKm: 1.8, cables: 3 },
+  { label: 'Route C', lengthKm: 3.2, cables: 1 }
+];
+function totalFiber(routes) {
+  let total = 0;
+  for (let i = 0; i < routes.length; i++) {  // Fix 1: <= → <
+    const route = routes[i];
+    total = total + route.lengthKm * route.cables;  // Fix 2: cabels → cables, Fix 3: was +=
+  }
+  return total.toFixed(2);
+}
+console.log(totalFiber(routes));`,
+checks:[
+  {fn:c=>/i\s*<\s*routes\.length/.test(c), label:'Fix Bug 1: loop condition (< not <=)'},
+  {fn:c=>/route\.cables/.test(c), label:'Fix Bug 2: typo "cabels" → "cables"'},
+  {fn:c=>/console\.log\(totalFiber/.test(c), label:'Test the fixed function'}
+]},
+quiz:[
+{q:'What keyboard shortcut opens Browser DevTools?',opts:['Ctrl+D','F12','Ctrl+F5','Alt+T'],ans:1,explain:'F12 opens DevTools in Chrome, Edge, and Firefox. You can also right-click any element and select "Inspect".'},
+{q:'A TypeError says "Cannot read properties of null". What does this mean?',opts:['A number was used where a string was expected','You tried to access a property on null (element not found)','The function returned the wrong type','The variable name is wrong'],ans:1,explain:'This error means getElementById() or querySelector() returned null — the element with that id or class doesn\'t exist in the HTML at the time the code ran.'}
+]}
+]},
+
+{id:'next',title:'Going Further',icon:'🚀',color:'#EC4899',lessons:[
+{id:'frameworks',title:'Frontend Frameworks',xp:250,duration:'30 min',
+content:`<h2>Frontend Frameworks</h2>
+<p>You now know vanilla JavaScript — the raw language. Frameworks are tools built on top of JavaScript that make building large, complex apps faster and more organised.</p>
+<h3>Why Frameworks Exist</h3>
+<p>Imagine building the FTTH app without manually calling <code>updateUI()</code> every time something changes. Frameworks do this automatically — when your data changes, the UI updates itself.</p>
+<h3>React (Most Popular)</h3>
+<pre><code>// React: a "component" is a reusable piece of UI
+function NodeCard({ type, label, loss }) {
+  return (
+    &lt;div className="card"&gt;
+      &lt;h3&gt;{label}&lt;/h3&gt;
+      &lt;p&gt;Loss: {loss} dB&lt;/p&gt;
+    &lt;/div&gt;
+  );
+}
+
+// Use it anywhere:
+&lt;NodeCard type="cabinet" label="FDH-001" loss={7.2} /&gt;</code></pre>
+<h3>The Key Idea: Components</h3>
+<p>Instead of one giant HTML file, React apps are built from small, reusable components — like LEGO bricks. Each component manages its own data (state) and HTML (JSX).</p>
+<h3>When to Use a Framework vs Vanilla JS</h3>
+<ul>
+<li><strong>Vanilla JS</strong> — small apps, single-page tools, offline-first apps like the FTTH Planner</li>
+<li><strong>React/Vue</strong> — large apps, teams, complex state, frequent UI updates</li>
+</ul>
+<div class="tip"><strong>Your path:</strong> You already understand the concepts React uses (state, events, DOM updates). Learning React now will be faster because you built the same things manually first.</div>`,
+exercise:{lang:'html',title:'Component Thinking',
+desc:'Build a reusable "NodeCard" using just HTML/CSS/JS functions — the same idea as React components, without the framework.',
+starter:`<!DOCTYPE html>
+<html>
+<head>
+<style>
+  body { background:#04090F; color:#C8D8E8; font-family:sans-serif; padding:24px; display:flex; gap:12px; flex-wrap:wrap; }
+  .card { background:#0D1828; border:1px solid rgba(255,255,255,0.1); border-radius:12px; padding:16px; width:160px; }
+  .card h3 { font-size:13px; margin-bottom:6px; }
+  .card .loss { font-size:11px; color:#7A9AB8; }
+  .card .dot  { width:10px; height:10px; border-radius:50%; margin-bottom:8px; }
+</style>
+</head>
+<body>
+  <script>
+    // Write a NodeCard(type, label, color, loss) function
+    // that returns an HTML string for a card.
+    // Then call it 3 times and add the cards to document.body.
+
+    const nodes = [
+      { type:'co',      label:'CO-001',  color:'#F59E0B', loss:0   },
+      { type:'cabinet', label:'FDH-001', color:'#3B82F6', loss:7.2 },
+      { type:'customer',label:'ONT-001', color:'#06B6D4', loss:0.5 }
+    ];
+
+    function NodeCard(type, label, color, loss) {
+      // Return an HTML string here
+      return '';
+    }
+
+    nodes.forEach(n => {
+      document.body.innerHTML += NodeCard(n.type, n.label, n.color, n.loss);
+    });
+  <\/script>
+</body>
+</html>`,
+solution:`<!DOCTYPE html>
+<html>
+<head>
+<style>
+  body { background:#04090F; color:#C8D8E8; font-family:sans-serif; padding:24px; display:flex; gap:12px; flex-wrap:wrap; }
+  .card { background:#0D1828; border:1px solid rgba(255,255,255,0.1); border-radius:12px; padding:16px; width:160px; }
+  .card h3 { font-size:13px; margin-bottom:6px; }
+  .card .loss { font-size:11px; color:#7A9AB8; }
+  .card .dot  { width:10px; height:10px; border-radius:50%; margin-bottom:8px; }
+</style>
+</head>
+<body>
+  <script>
+    const nodes = [
+      { type:'co',       label:'CO-001',  color:'#F59E0B', loss:0   },
+      { type:'cabinet',  label:'FDH-001', color:'#3B82F6', loss:7.2 },
+      { type:'customer', label:'ONT-001', color:'#06B6D4', loss:0.5 }
+    ];
+    function NodeCard(type, label, color, loss) {
+      return \`<div class="card">
+        <div class="dot" style="background:\${color}"></div>
+        <h3>\${label}</h3>
+        <div class="loss">Loss: \${loss} dB</div>
+      </div>\`;
+    }
+    nodes.forEach(n => {
+      document.body.innerHTML += NodeCard(n.type, n.label, n.color, n.loss);
+    });
+  <\/script>
+</body>
+</html>`,
+checks:[
+  {fn:c=>/function NodeCard/.test(c), label:'Define the NodeCard function'},
+  {fn:c=>/return\s*`/.test(c), label:'Return an HTML template literal'},
+  {fn:c=>/forEach/.test(c), label:'Render all 3 nodes in a loop'}
+]},
+quiz:[
+{q:'What is the main advantage of frontend frameworks like React?',opts:['They make the page load faster','The UI automatically updates when data changes','They replace the need to learn JavaScript','They only work with Python backends'],ans:1,explain:'Frameworks handle the DOM update cycle automatically. When your data (state) changes, the UI re-renders — you don\'t have to manually call updateUI() like in vanilla JS.'},
+{q:'What is a React "component"?',opts:['A CSS animation','A server-side function','A reusable piece of UI that manages its own data and markup','A type of database'],ans:2,explain:'A React component is a self-contained function that returns JSX (HTML-like markup) and manages its own state. Components are the building blocks of React apps.'}
+]},
+
+{id:'career',title:'Your Developer Path',xp:300,duration:'20 min',
+content:`<h2>Your Developer Path</h2>
+<p>You've completed the core curriculum. Here's an honest map of where you are and where to go next.</p>
+<h3>What You Now Know</h3>
+<ul>
+<li>✅ HTML structure and semantics</li>
+<li>✅ CSS styling and Flexbox layout</li>
+<li>✅ JavaScript fundamentals (variables, functions, objects, DOM, events)</li>
+<li>✅ Reading and navigating real production code</li>
+<li>✅ Using third-party libraries (Leaflet)</li>
+<li>✅ Python basics</li>
+<li>✅ Git and GitHub</li>
+<li>✅ Debugging techniques</li>
+</ul>
+<h3>Developer Job Types</h3>
+<ul>
+<li><strong>Frontend Developer</strong> — HTML, CSS, JS, React. Builds what users see.</li>
+<li><strong>Backend Developer</strong> — Node.js, Python, databases. Builds servers and APIs.</li>
+<li><strong>Full-Stack Developer</strong> — does both. Where most generalists end up.</li>
+<li><strong>GIS/Mapping Developer</strong> — Leaflet, QGIS, spatial databases. Your FTTH work is directly relevant here.</li>
+</ul>
+<h3>Your Next 6 Months</h3>
+<ol>
+<li><strong>Month 1-2:</strong> Build 3 small projects from scratch (a calculator, a to-do app, a weather app)</li>
+<li><strong>Month 3-4:</strong> Learn React (official docs + freeCodeCamp)</li>
+<li><strong>Month 5:</strong> Learn Node.js + Express (build a simple API)</li>
+<li><strong>Month 6:</strong> Build one complete portfolio project that solves a real problem you care about</li>
+</ol>
+<h3>Free Learning Resources</h3>
+<ul>
+<li><strong>MDN Web Docs</strong> — the definitive JS and HTML reference</li>
+<li><strong>freeCodeCamp.org</strong> — free, structured curriculum with certificates</li>
+<li><strong>The Odin Project</strong> — project-based, takes you from zero to employed</li>
+<li><strong>javascript.info</strong> — the best deep-dive JavaScript resource</li>
+</ul>
+<div class="tip"><strong>Most important:</strong> Build things. Reading and watching tutorials only takes you so far. Every hour building a real project teaches you more than 5 hours of watching videos.</div>`,
+exercise:{lang:'js',title:'Set Your Goals',
+desc:'Write your 3-month learning plan as JavaScript comments and console.log statements.',
+starter:`// Complete this learning plan — make it YOUR actual goals
+
+const myPlan = {
+  currentLevel: "Beginner with HTML and Python basics",
+
+  month1Goals: [
+    // List 3 things you want to build or learn this month
+  ],
+
+  month2Goals: [
+    // What comes next?
+  ],
+
+  month3Goals: [
+    // What will you have built by month 3?
+  ],
+
+  portfolioProject: "" // Your big idea
+};
+
+console.log("My developer plan:", JSON.stringify(myPlan, null, 2));`,
+solution:`const myPlan = {
+  currentLevel: "Beginner with HTML and Python basics",
+  month1Goals: [
+    "Build a fiber cable calculator web app",
+    "Complete JavaScript arrays and objects exercises",
+    "Make 10 git commits on a real project"
+  ],
+  month2Goals: [
+    "Learn React basics — components and state",
+    "Build a to-do app in React",
+    "Deploy a project to GitHub Pages"
+  ],
+  month3Goals: [
+    "Build a full FTTH quote generator with a React frontend",
+    "Learn Node.js and build one REST API",
+    "Share portfolio on LinkedIn"
+  ],
+  portfolioProject: "FTTH Network Cost Estimator with map, cable library, and PDF export"
+};
+console.log("My developer plan:", JSON.stringify(myPlan, null, 2));`,
+checks:[
+  {fn:c=>/month1Goals|month2Goals/.test(c), label:'Fill in your monthly goals'},
+  {fn:c=>/portfolioProject/.test(c), label:'Define your portfolio project idea'},
+  {fn:c=>/console\.log/.test(c), label:'Log your full plan'}
+]},
+quiz:[
+{q:'Which resource is the official, most authoritative reference for HTML, CSS and JavaScript?',opts:['W3Schools','Stack Overflow','MDN Web Docs (developer.mozilla.org)','YouTube'],ans:2,explain:'MDN (Mozilla Developer Network) is maintained by browser vendors and is the gold-standard reference for all web technologies.'},
+{q:'What is the single most effective way to improve as a developer?',opts:['Watch more tutorials','Memorise syntax','Build real projects that solve real problems','Read textbooks'],ans:2,explain:'Building real things forces you to encounter real problems and solve them — that\'s where actual learning happens. Tutorials and reading support building, but can\'t replace it.'}
+]}
+]}
+]; // end MODULES
+
+// ── STATE ──
+let progress = JSON.parse(localStorage.getItem('devpath_progress') || '{}');
+// progress shape: { "web.how-web-works": { step:0|1|2, xpEarned:0, quizPassed:false } }
+
+let currentModIdx = 0;
+let currentLesIdx = 0;
+let currentStep   = 0; // 0=read, 1=practice, 2=quiz
+let currentStarter = '';
+let quizAnswers   = {};
+
+// ── HELPERS ──
+function getLessonKey(mod, les) { return mod.id + '.' + les.id; }
+function getLessonState(mod, les) {
+  return progress[getLessonKey(mod, les)] || { step: 0, xpEarned: 0, quizPassed: false };
+}
+function totalXP() {
+  return Object.values(progress).reduce((s, v) => s + (v.xpEarned || 0), 0);
+}
+function completedLessons() {
+  return Object.values(progress).filter(v => v.quizPassed).length;
+}
+
+// ── XP / LEVEL UI ──
+function updateXPBar() {
+  const xp    = totalXP();
+  const level = Math.floor(xp / 500) + 1;
+  const inLvl = xp % 500;
+  document.getElementById('level-badge').textContent = 'Level ' + level;
+  document.getElementById('xp-label').textContent    = xp + ' / ' + (level * 500) + ' XP';
+  document.getElementById('xp-bar-inner').style.width = (inLvl / 500 * 100) + '%';
+}
+
+function showXPToast(amount) {
+  const el = document.getElementById('xp-toast');
+  el.textContent = '+' + amount + ' XP';
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 2000);
+}
+
+// ── MODULE LIST ──
+function buildModuleList() {
+  const container = document.getElementById('module-list');
+  container.innerHTML = '';
+  MODULES.forEach((mod, mi) => {
+    const totalLes = mod.lessons.length;
+    const doneLes  = mod.lessons.filter(l => getLessonState(mod, l).quizPassed).length;
+
+    const modEl = document.createElement('div');
+    modEl.innerHTML = `
+      <div class="mod-header ${mi === currentModIdx ? 'active open' : ''}" data-mi="${mi}">
+        <span class="mod-icon">${mod.icon}</span>
+        <span class="mod-title">${mod.title}</span>
+        <span class="mod-progress">${doneLes}/${totalLes}</span>
+        <span class="mod-chevron">›</span>
+      </div>
+      <div class="lesson-list ${mi === currentModIdx ? '' : 'closed'}" id="lesson-list-${mi}" style="max-height:${mi===currentModIdx?totalLes*52+'px':'0'}">
+        ${mod.lessons.map((les, li) => {
+          const state = getLessonState(mod, les);
+          const active = mi === currentModIdx && li === currentLesIdx;
+          const done   = state.quizPassed;
+          return `<div class="lesson-item ${active?'active':''} ${done?'done':''}" data-mi="${mi}" data-li="${li}">
+            <div class="l-dot"></div>
+            <span class="l-title">${les.title}</span>
+            <span class="l-xp">${les.xp}xp</span>
+          </div>`;
+        }).join('')}
+      </div>`;
+    container.appendChild(modEl);
+  });
+
+  // Module header click → expand/collapse
+  container.querySelectorAll('.mod-header').forEach(h => {
+    h.addEventListener('click', () => {
+      const mi2 = parseInt(h.dataset.mi);
+      const list = document.getElementById('lesson-list-' + mi2);
+      const isOpen = !list.classList.contains('closed');
+      // collapse all
+      container.querySelectorAll('.lesson-list').forEach(l => { l.classList.add('closed'); l.style.maxHeight = '0'; });
+      container.querySelectorAll('.mod-header').forEach(h2 => h2.classList.remove('open'));
+      if (!isOpen) {
+        list.classList.remove('closed');
+        list.style.maxHeight = MODULES[mi2].lessons.length * 52 + 'px';
+        h.classList.add('open');
+      }
+    });
+  });
+
+  // Lesson click → open lesson
+  container.querySelectorAll('.lesson-item').forEach(item => {
+    item.addEventListener('click', () => {
+      const mi2 = parseInt(item.dataset.mi);
+      const li2 = parseInt(item.dataset.li);
+      openLesson(mi2, li2);
+      closeMobNav();
+    });
+  });
+}
+
+// ── OPEN A LESSON ──
+function openLesson(mi, li) {
+  currentModIdx = mi;
+  currentLesIdx = li;
+  const mod = MODULES[mi];
+  const les = mod.lessons[li];
+  const state = getLessonState(mod, les);
+  currentStep = state.quizPassed ? 2 : Math.min(state.step || 0, 2);
+  renderLesson();
+  buildModuleList();
+}
+
+function renderLesson() {
+  const mod = MODULES[currentModIdx];
+  const les = mod.lessons[currentLesIdx];
+
+  // Breadcrumb
+  document.getElementById('breadcrumb').innerHTML =
+    `<span>${mod.icon} ${mod.title}</span> › <span>${les.title}</span>`;
+
+  // Step dots
+  const stepsEl = document.getElementById('lesson-steps');
+  stepsEl.innerHTML = ['Read','Practice','Quiz'].map((s, i) =>
+    `<div class="step-dot ${i < currentStep ? 'done' : i === currentStep ? 'active' : ''}" title="${s}" onclick="gotoStep(${i})"></div>`
+  ).join('');
+
+  // Step label
+  document.getElementById('step-label').textContent =
+    ['Step 1 of 3: Read', 'Step 2 of 3: Practice', 'Step 3 of 3: Quiz'][currentStep];
+
+  // Show correct pane
+  document.getElementById('lesson-pane').style.display = currentStep === 0 ? '' : 'none';
+  const labPane   = document.getElementById('lab-pane');
+  const quizPane  = document.getElementById('quiz-pane');
+  labPane.classList.toggle('active',  currentStep === 1);
+  quizPane.classList.toggle('active', currentStep === 2);
+
+  if (currentStep === 0) renderReadPane(les);
+  if (currentStep === 1) renderLabPane(les);
+  if (currentStep === 2) renderQuizPane(les);
+
+  // Nav buttons
+  const prevBtn = document.getElementById('prev-btn');
+  const nextBtn = document.getElementById('next-btn');
+  prevBtn.style.display = (currentModIdx === 0 && currentLesIdx === 0 && currentStep === 0) ? 'none' : '';
+  nextBtn.textContent = currentStep < 2 ? 'Next →' : 'Finish Lesson →';
+}
+
+// ── READ PANE ──
+function renderReadPane(les) {
+  const pane = document.getElementById('lesson-pane');
+  pane.innerHTML = `<div style="max-width:820px">${les.content}</div>`;
+  // Syntax highlight <code> blocks with simple colour pass
+  pane.querySelectorAll('pre code').forEach(el => {
+    el.innerHTML = syntaxColour(el.textContent);
+  });
+}
+
+// Very simple syntax colouring (no library dependency)
+function syntaxColour(code) {
+  const esc = code.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  return esc
+    .replace(/(\/\/[^\n]*)/g,             '<span style="color:#6B8CAB">$1</span>')
+    .replace(/(#[^\n]*)/g,                '<span style="color:#6B8CAB">$1</span>')
+    .replace(/\b(const|let|var|function|return|if|else|for|while|def|class|import|from|in|of|async|await|new|this)\b/g,
+                                          '<span style="color:#C084FC">$1</span>')
+    .replace(/\b(true|false|null|undefined|True|False|None)\b/g,
+                                          '<span style="color:#F97316">$1</span>')
+    .replace(/("(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'|`(?:[^`\\]|\\.)*`)/g,
+                                          '<span style="color:#86EFAC">$1</span>')
+    .replace(/\b(\d+\.?\d*)\b/g,          '<span style="color:#F59E0B">$1</span>');
+}
+
+// ── LAB PANE ──
+function renderLabPane(les) {
+  const ex = les.exercise;
+  document.getElementById('lab-title').textContent       = ex.title;
+  document.getElementById('lab-desc').textContent        = ex.desc;
+  document.getElementById('editor-lang-label').textContent =
+    ex.lang === 'html' ? 'HTML / CSS / JS' : ex.lang === 'js' ? 'JavaScript' : 'Python';
+
+  const isJS   = ex.lang === 'js';
+  const isPy   = ex.lang === 'python';
+  const isHTML = ex.lang === 'html';
+
+  document.getElementById('preview-frame').style.display  = isHTML ? '' : 'none';
+  document.getElementById('console-out').style.display    = (isJS || isPy) ? '' : 'none';
+  document.getElementById('preview-label').textContent    =
+    isHTML ? 'Live Preview' : 'Console Output';
+
+  currentStarter = ex.starter;
+  const editor   = document.getElementById('code-editor');
+  // Restore any saved draft
+  const savedDraft = localStorage.getItem('devpath_draft_' + getLessonKey(MODULES[currentModIdx], les));
+  editor.value   = savedDraft || ex.starter;
+
+  document.getElementById('check-result').style.display = 'none';
+  document.getElementById('console-out').textContent    = '';
+
+  // Auto-run HTML exercises for live preview
+  if (isHTML) runCode();
+}
+
+// Run the code
+function runCode() {
+  const les  = MODULES[currentModIdx].lessons[currentLesIdx];
+  const ex   = les.exercise;
+  const code = document.getElementById('code-editor').value;
+
+  // Save draft
+  localStorage.setItem('devpath_draft_' + getLessonKey(MODULES[currentModIdx], les), code);
+
+  if (ex.lang === 'html') {
+    const frame = document.getElementById('preview-frame');
+    frame.srcdoc = code;
+    return;
+  }
+
+  if (ex.lang === 'js') {
+    const out = document.getElementById('console-out');
+    out.textContent = '';
+    // Run in sandboxed iframe, intercept console.log
+    const html = `<script>
+      const _logs = [];
+      const _orig = console.log;
+      console.log = (...a) => {
+        _logs.push(a.map(x => typeof x === 'object' ? JSON.stringify(x, null, 2) : String(x)).join(' '));
+        _orig(...a);
+      };
+      try { ${code} }
+      catch(e) { _logs.push('Error: ' + e.message); }
+      parent.postMessage({ type:'devpath_log', logs: _logs }, '*');
+    <\/script>`;
+    const frame = document.getElementById('preview-frame');
+    frame.style.display = 'none';
+    frame.srcdoc = html;
+    return;
+  }
+
+  if (ex.lang === 'python') {
+    document.getElementById('console-out').textContent =
+      '⚠ Python can\'t run in the browser directly.\nCopy your code to replit.com/languages/python3 to run it.';
+  }
+}
+
+// Listen for console output from sandbox iframe
+window.addEventListener('message', e => {
+  if (e.data && e.data.type === 'devpath_log') {
+    const out = document.getElementById('console-out');
+    out.textContent = e.data.logs.join('\n') || '(no output)';
+  }
+});
+
+// Reset editor to starter
+function resetEditor() {
+  const les = MODULES[currentModIdx].lessons[currentLesIdx];
+  document.getElementById('code-editor').value = currentStarter;
+  document.getElementById('check-result').style.display = 'none';
+  document.getElementById('console-out').textContent    = '';
+  localStorage.removeItem('devpath_draft_' + getLessonKey(MODULES[currentModIdx], les));
+  if (les.exercise.lang === 'html') runCode();
+}
+
+// Check exercise against criteria
+function checkCode() {
+  const les  = MODULES[currentModIdx].lessons[currentLesIdx];
+  const ex   = les.exercise;
+  const code = document.getElementById('code-editor').value;
+  const res  = document.getElementById('check-result');
+
+  // Run it first
+  runCode();
+
+  const checks = ex.checks || [];
+  const passed = checks.filter(c => { try { return c.fn(code); } catch { return false; }});
+  const failed = checks.filter(c => { try { return !c.fn(code); } catch { return true; }});
+
+  res.style.display = '';
+  if (failed.length === 0) {
+    res.className    = 'pass';
+    res.textContent  = '✓ All checks passed! Click "Next →" to continue.';
+    // Mark exercise done in state
+    const key   = getLessonKey(MODULES[currentModIdx], les);
+    progress[key] = Object.assign(getLessonState(MODULES[currentModIdx], les), { step: Math.max(1, getLessonState(MODULES[currentModIdx], les).step) });
+    saveProgress();
+  } else {
+    res.className   = 'fail';
+    res.textContent = '✗ Not quite. Still need: ' + failed.map(c => c.label).join(' · ');
+  }
+}
+
+// Tab key in editor inserts 2 spaces
+document.getElementById('code-editor').addEventListener('keydown', e => {
+  if (e.key === 'Tab') {
+    e.preventDefault();
+    const ta  = e.target;
+    const s   = ta.selectionStart;
+    ta.value  = ta.value.substring(0, s) + '  ' + ta.value.substring(ta.selectionEnd);
+    ta.selectionStart = ta.selectionEnd = s + 2;
+    // Trigger live preview update for HTML exercises
+    const les = MODULES[currentModIdx].lessons[currentLesIdx];
+    if (les.exercise.lang === 'html') runCode();
+  }
+});
+
+// Live update HTML preview as user types
+document.getElementById('code-editor').addEventListener('input', () => {
+  const les = MODULES[currentModIdx].lessons[currentLesIdx];
+  if (les.exercise.lang === 'html') runCode();
+});
+
+// ── QUIZ PANE ──
+function renderQuizPane(les) {
+  quizAnswers = {};
+  const qs    = les.quiz || [];
+  const state = getLessonState(MODULES[currentModIdx], les);
+
+  if (state.quizPassed) {
+    // Already passed — show result screen immediately
+    showQuizResult(les, true);
+    return;
+  }
+
+  const container = document.getElementById('quiz-questions');
+  container.innerHTML = qs.map((q, qi) => `
+    <div class="quiz-q" id="qq-${qi}">
+      <p><strong>Q${qi+1}.</strong> ${q.q}</p>
+      ${q.opts.map((opt, oi) => `
+        <div class="quiz-opt" data-qi="${qi}" data-oi="${oi}" onclick="selectOpt(${qi},${oi})">
+          <span class="quiz-opt-letter">${'ABCD'[oi]}</span>
+          ${opt}
+        </div>`).join('')}
+      <div class="quiz-explain" id="explain-${qi}">${q.explain}</div>
+    </div>`).join('');
+
+  document.getElementById('quiz-result').style.display   = 'none';
+  document.getElementById('quiz-inner').style.display    = '';
+  document.getElementById('quiz-submit').disabled        = true;
+}
+
+function selectOpt(qi, oi) {
+  const state = getLessonState(MODULES[currentModIdx], MODULES[currentModIdx].lessons[currentLesIdx]);
+  if (state.quizPassed) return;
+
+  // Deselect others in same question
+  document.querySelectorAll(`.quiz-opt[data-qi="${qi}"]`).forEach(el => el.classList.remove('selected'));
+  document.querySelector(`.quiz-opt[data-qi="${qi}"][data-oi="${oi}"]`).classList.add('selected');
+  quizAnswers[qi] = oi;
+
+  const les = MODULES[currentModIdx].lessons[currentLesIdx];
+  const allAnswered = (les.quiz || []).every((_, qi2) => quizAnswers[qi2] !== undefined);
+  document.getElementById('quiz-submit').disabled = !allAnswered;
+}
+
+function submitQuiz() {
+  const les  = MODULES[currentModIdx].lessons[currentLesIdx];
+  const qs   = les.quiz || [];
+  let correct = 0;
+
+  qs.forEach((q, qi) => {
+    const chosen = quizAnswers[qi];
+    const opts   = document.querySelectorAll(`.quiz-opt[data-qi="${qi}"]`);
+    opts.forEach(opt => {
+      const oi = parseInt(opt.dataset.oi);
+      if (oi === q.ans)     opt.classList.add('correct');
+      else if (oi === chosen && oi !== q.ans) opt.classList.add('wrong');
+    });
+    document.getElementById('explain-' + qi).classList.add('show');
+    if (chosen === q.ans) correct++;
+  });
+
+  document.getElementById('quiz-submit').disabled = true;
+
+  const passed = correct === qs.length;
+  setTimeout(() => showQuizResult(les, passed, correct, qs.length), 1200);
+}
+
+function showQuizResult(les, passed, correct, total) {
+  document.getElementById('quiz-inner').style.display  = 'none';
+  document.getElementById('quiz-result').style.display = '';
+
+  if (passed) {
+    document.getElementById('quiz-result-emoji').textContent = '🎉';
+    document.getElementById('quiz-result-title').textContent = 'Lesson Complete!';
+    document.getElementById('quiz-result-msg').textContent   =
+      `You answered all questions correctly and earned ${les.xp} XP.`;
+
+    // Award XP if not already done
+    const key   = getLessonKey(MODULES[currentModIdx], les);
+    const state = getLessonState(MODULES[currentModIdx], les);
+    if (!state.quizPassed) {
+      progress[key] = { step: 2, xpEarned: les.xp, quizPassed: true };
+      saveProgress();
+      updateXPBar();
+      showXPToast(les.xp);
+      buildModuleList();
+    }
+  } else {
+    document.getElementById('quiz-result-emoji').textContent = '📚';
+    document.getElementById('quiz-result-title').textContent = `${correct} of ${total} correct`;
+    document.getElementById('quiz-result-msg').textContent   =
+      'Review the explanations above, then re-read the lesson to try again.';
+    document.querySelector('#quiz-result .next-btn').textContent = 'Retry Quiz';
+    document.querySelector('#quiz-result .next-btn').onclick     = () => {
+      document.querySelector('#quiz-result .next-btn').textContent = 'Continue →';
+      document.querySelector('#quiz-result .next-btn').onclick     = nextLesson;
+      renderQuizPane(les);
+      document.getElementById('quiz-result').style.display  = 'none';
+      document.getElementById('quiz-inner').style.display   = '';
+    };
+    return;
+  }
+}
+
+function nextLesson() {
+  const mod = MODULES[currentModIdx];
+  if (currentLesIdx < mod.lessons.length - 1) {
+    openLesson(currentModIdx, currentLesIdx + 1);
+  } else if (currentModIdx < MODULES.length - 1) {
+    openLesson(currentModIdx + 1, 0);
+  }
+}
+
+// ── STEP NAVIGATION ──
+function gotoStep(step) {
+  const les   = MODULES[currentModIdx].lessons[currentLesIdx];
+  const state = getLessonState(MODULES[currentModIdx], les);
+  if (step > 1 && !state.quizPassed && step > (state.step || 0) + 1) return; // can't skip ahead
+  currentStep = step;
+  // Save step progress
+  const key = getLessonKey(MODULES[currentModIdx], les);
+  progress[key] = Object.assign(state, { step: Math.max(state.step || 0, step) });
+  saveProgress();
+  renderLesson();
+}
+
+function navigate(dir) {
+  if (dir === 1) {
+    // Forward
+    if (currentStep < 2) {
+      gotoStep(currentStep + 1);
+    } else {
+      nextLesson();
+    }
+  } else {
+    // Back
+    if (currentStep > 0) {
+      currentStep--;
+      renderLesson();
+    } else if (currentLesIdx > 0) {
+      openLesson(currentModIdx, currentLesIdx - 1);
+      currentStep = 2;
+      renderLesson();
+    } else if (currentModIdx > 0) {
+      const prevMod = MODULES[currentModIdx - 1];
+      openLesson(currentModIdx - 1, prevMod.lessons.length - 1);
+      currentStep = 2;
+      renderLesson();
+    }
+  }
+}
+
+// ── PERSIST ──
+function saveProgress() {
+  localStorage.setItem('devpath_progress', JSON.stringify(progress));
+}
+
+// ── WELCOME → START ──
+function startCourse() {
+  openLesson(0, 0);
+}
+
+// ── MOBILE NAV ──
+function openMobNav() {
+  document.getElementById('nav').classList.add('open');
+  document.getElementById('mob-overlay').classList.add('open');
+}
+function closeMobNav() {
+  document.getElementById('nav').classList.remove('open');
+  document.getElementById('mob-overlay').classList.remove('open');
+}
+
+// ── INIT ──
+function init() {
+  buildModuleList();
+  updateXPBar();
+
+  // Auto-open first incomplete lesson (or first lesson)
+  let found = false;
+  for (let mi = 0; mi < MODULES.length && !found; mi++) {
+    for (let li = 0; li < MODULES[mi].lessons.length && !found; li++) {
+      const state = getLessonState(MODULES[mi], MODULES[mi].lessons[li]);
+      if (!state.quizPassed) {
+        // Show welcome on very first visit
+        if (mi === 0 && li === 0 && !state.step) break;
+        openLesson(mi, li);
+        found = true;
+      }
+    }
+  }
+}
+
+init();
+</script>
+</body>
+</html>
