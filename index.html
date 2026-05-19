@@ -315,6 +315,17 @@ button,.btn,.tool-btn,.rb,.ptab,.stab,.map-btn,.elem-item,.survey-check,.mhdr-bt
 ::-webkit-scrollbar{width:4px;height:4px}
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+/* ── AERIAL TOOLS ── */
+.aerial-result-grid{display:flex;flex-direction:column;gap:1px;background:var(--bg2);border:1px solid var(--border2);border-radius:6px;overflow:hidden;margin:8px 0}
+.arow{display:flex;justify-content:space-between;align-items:center;padding:5px 9px;font-size:11px;background:var(--bg1)}
+.arow span:first-child{color:var(--text2)}
+.arow span:last-child{font-weight:600;color:var(--text)}
+.arow.pass span:last-child{color:var(--green)}
+.arow.warn span:last-child{color:var(--yellow)}
+.arow.fail span:last-child{color:var(--red)}
+.arow.head{background:var(--bg3);font-size:10px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.4px}
+.closure-box{background:var(--bg2);border:1px solid var(--border2);border-radius:6px;padding:9px;font-size:11px;line-height:1.8;margin-top:6px}
+.closure-box strong{color:var(--accent)}
 </style>
 </head>
 <body>
@@ -434,6 +445,47 @@ button,.btn,.tool-btn,.rb,.ptab,.stab,.map-btn,.elem-item,.survey-check,.mhdr-bt
         </div>
       </div>
     </div>
+    <!-- ── AERIAL ENGINEERING ── -->
+    <div class="sb-section">
+      <div class="sb-section-title">⚡ Aerial Engineering</div>
+      <div class="sb-content">
+        <div class="sec-label">Cable / Support Type</div>
+        <select id="aerial-spec-sel" class="form-sel" style="width:100%;margin-bottom:8px" onchange="calcAerialSag()">
+          <option value="">— select type —</option>
+          <option value="Figure-8 (7/1.0 Messenger)">Figure-8  7/1.0 Messenger</option>
+          <option value="Figure-8 (7/2.0 Messenger)">Figure-8  7/2.0 Messenger</option>
+          <option value="G.652D PE Lashed Aerial">G.652D PE Jacket — Lashed</option>
+          <option value="ADSS AT-50">ADSS AT-50 (≤50 m span)</option>
+          <option value="ADSS AT-80">ADSS AT-80 (≤80 m span)</option>
+          <option value="ADSS AT-100">ADSS AT-100 (≤100 m span)</option>
+          <option value="ADSS AT-150">ADSS AT-150 (≤150 m span)</option>
+        </select>
+        <div style="display:flex;gap:5px;margin-bottom:4px">
+          <div style="flex:1">
+            <div class="sec-label">Span (m)</div>
+            <input class="gps-input" id="aerial-span" type="number" min="5" max="250" step="1"
+              placeholder="e.g. 50" oninput="calcAerialSag()" style="width:100%"/>
+          </div>
+          <div style="width:72px">
+            <div class="sec-label">Attach ht (m)</div>
+            <input class="gps-input" id="aerial-ht" type="number" min="3" max="20" step="0.5"
+              value="7.5" oninput="calcAerialSag()" style="width:100%"/>
+          </div>
+        </div>
+        <div id="aerial-sag-result"></div>
+
+        <div class="sec-label" style="margin-top:10px">Closure / Joint Spacing</div>
+        <div style="display:flex;gap:5px;margin-bottom:4px">
+          <input class="gps-input" id="aerial-route-km" type="number" min="0.1" max="200" step="0.1"
+            placeholder="Route length (km)" style="flex:1"/>
+          <input class="gps-input" id="aerial-cores" type="number" min="1" max="864" step="1"
+            placeholder="Cores" style="width:58px"/>
+        </div>
+        <button class="btn full" onclick="calcClosureSpacing()">Calculate Closures</button>
+        <div id="aerial-closure-result"></div>
+      </div>
+    </div>
+
     <div class="sb-section">
       <div class="sb-section-title">Project</div>
       <div class="sb-content">
@@ -638,6 +690,21 @@ const INFRA = {
   edfa:       {label:'EDFA Amplifier',   abbr:'EDFA', color:'#84CC16', lossAdd:-24,  latUs:0},
   dwdm:       {label:'DWDM Mux/Demux',   abbr:'WDM',  color:'#F43F5E', lossAdd:3,    latUs:5},
   otn:        {label:'OTN Switch/Regen', abbr:'OTN',  color:'#8B5CF6', lossAdd:0,    latUs:100},
+  pole:       {label:'Utility Pole',     abbr:'POLE', color:'#92400E', lossAdd:0,    latUs:0},
+};
+
+// ── AERIAL ENGINEERING SPECS ──
+// sagPct = design sag as % of span (parabolic approx, typical values per IEC 60794 / ITU-T L.26)
+// maxSpanM = rated max span for this cable class
+// closureKm = recommended inline closure interval (km)
+const AERIAL_SPECS = {
+  'Figure-8 (7/1.0 Messenger)': {weightGm:115, breakN:5500,  maxSpanM:60,  sagPct:1.5, closureKm:2},
+  'Figure-8 (7/2.0 Messenger)': {weightGm:195, breakN:9000,  maxSpanM:80,  sagPct:1.5, closureKm:2},
+  'G.652D PE Lashed Aerial':     {weightGm:105, breakN:4500,  maxSpanM:55,  sagPct:1.5, closureKm:2},
+  'ADSS AT-50':                  {weightGm:100, breakN:8000,  maxSpanM:50,  sagPct:1.0, closureKm:2},
+  'ADSS AT-80':                  {weightGm:125, breakN:12000, maxSpanM:80,  sagPct:1.2, closureKm:2},
+  'ADSS AT-100':                 {weightGm:140, breakN:15000, maxSpanM:100, sagPct:1.3, closureKm:4},
+  'ADSS AT-150':                 {weightGm:175, breakN:22000, maxSpanM:150, sagPct:1.5, closureKm:4},
 };
 const ROUTES = {
   trench:    {label:'Trench (Direct Bury)', color:'#F97316', dash:'8,5',  weight:3},
@@ -681,12 +748,25 @@ const DWDM_CH = [
   {ch:'C15',nm:1550.92,freq:193.3},{ch:'C16',nm:1552.52,freq:193.1},
 ];
 const CABLES = [
-  {name:'1F Bare Buffer',      fibers:1,   od:1.8},  {name:'2F Micro Blown',     fibers:2,   od:2.0},
-  {name:'4F Micro Blown',      fibers:4,   od:3.2},  {name:'6F Micro Blown',     fibers:6,   od:3.6},
-  {name:'8F Micro Blown',      fibers:8,   od:4.0},  {name:'12F Micro Blown',    fibers:12,  od:4.8},
-  {name:'12F Figure-8 Aerial', fibers:12,  od:10.5}, {name:'24F Micro Blown',    fibers:24,  od:6.0},
-  {name:'24F Figure-8 Aerial', fibers:24,  od:12.0}, {name:'24F Loose Tube',     fibers:24,  od:10.8},
-  {name:'48F Loose Tube',      fibers:48,  od:14.0}, {name:'48F Figure-8 Aerial',fibers:48,  od:15.0},
+  // ── Micro-duct blown ──
+  {name:'1F Bare Buffer',           fibers:1,   od:1.8},  {name:'2F Micro Blown',          fibers:2,   od:2.0},
+  {name:'4F Micro Blown',           fibers:4,   od:3.2},  {name:'6F Micro Blown',          fibers:6,   od:3.6},
+  {name:'8F Micro Blown',           fibers:8,   od:4.0},  {name:'12F Micro Blown',         fibers:12,  od:4.8},
+  {name:'24F Micro Blown',          fibers:24,  od:6.0},
+  // ── G.652D PE Jacket (outdoor / direct-burial / aerial-lashed) ──
+  {name:'4F G.652D PE Jacket',      fibers:4,   od:7.0},  {name:'6F G.652D PE Jacket',     fibers:6,   od:7.8},
+  {name:'8F G.652D PE Jacket',      fibers:8,   od:9.0},  {name:'12F G.652D PE Jacket',    fibers:12,  od:10.5},
+  {name:'24F G.652D PE Jacket',     fibers:24,  od:13.0},
+  // ── Figure-8 self-supporting aerial ──
+  {name:'12F Figure-8 Aerial',      fibers:12,  od:10.5}, {name:'24F Figure-8 Aerial',     fibers:24,  od:12.0},
+  {name:'48F Figure-8 Aerial',      fibers:48,  od:15.0},
+  // ── ADSS (All-Dielectric Self-Supporting) ──
+  {name:'12F ADSS AT-50',           fibers:12,  od:11.0}, {name:'24F ADSS AT-50',          fibers:24,  od:12.5},
+  {name:'24F ADSS AT-80',           fibers:24,  od:13.5}, {name:'48F ADSS AT-80',          fibers:48,  od:15.0},
+  {name:'48F ADSS AT-100',          fibers:48,  od:15.5}, {name:'96F ADSS AT-100',         fibers:96,  od:18.0},
+  {name:'96F ADSS AT-150',          fibers:96,  od:19.5}, {name:'144F ADSS AT-150',        fibers:144, od:21.0},
+  // ── Loose tube ──
+  {name:'24F Loose Tube',           fibers:24,  od:10.8}, {name:'48F Loose Tube',          fibers:48,  od:14.0},
   {name:'72F Loose Tube',      fibers:72,  od:16.5}, {name:'96F Standard LT',    fibers:96,  od:18.0},
   {name:'96F Armoured',        fibers:96,  od:20.0}, {name:'144F Loose Tube',    fibers:144, od:20.5},
   {name:'144F Ribbon',         fibers:144, od:17.0}, {name:'144F Armoured',      fibers:144, od:22.0},
@@ -1675,14 +1755,16 @@ const T = {
   posMarker: null,    // pulsing dot
   accCircle: null,    // accuracy ring
   startTime: null,
+  lastRecordedTs: null, // timestamp of last accepted point (for time-gap override)
   timerInterval: null,
   totalDist: 0,
   lastPt: null,
   selectedInfraType: 'closure', // default for mid-trace markers
 };
 
-const TRACE_MIN_DIST = 2;    // metres — ignore jitter below this
-const TRACE_MAX_ACC  = 20;   // metres — skip poor-accuracy fixes (tightened from 50)
+const TRACE_MIN_DIST    = 2;   // metres — ignore GPS jitter below this
+const TRACE_MAX_ACC     = 35;  // metres — normal accuracy gate (vehicle GPS ≈ 15–30 m)
+const TRACE_TIME_GAP_MS = 15000; // ms  — if >15 s since last point, relax to 70 m gate
 const TRACE_ROUTE_COLOR = '#00D9FF';
 
 function toggleLiveTrace(){
@@ -1711,23 +1793,29 @@ function startLiveTrace(){
   T.timerInterval = setInterval(updateTraceTimer, 1000);
 
   // Start watching
+  T.lastRecordedTs = null;
   T.watchId = navigator.geolocation.watchPosition(
     onTracePosition,
     err => { toast('GPS error: ' + err.message); stopLiveTrace(false); },
-    { enableHighAccuracy: true, maximumAge: 1000, timeout: 10000 }
+    { enableHighAccuracy: true, maximumAge: 0, timeout: 30000 }
   );
-  toast('Live trace started — walk the route');
+  toast('Live trace started — moving or standing');
 }
 
 function onTracePosition(pos){
   const { latitude: lat, longitude: lng, accuracy: acc } = pos.coords;
+  const now = Date.now();
 
-  // Update accuracy/status display
+  // Always update live display regardless of accuracy
   document.getElementById('ts-acc').textContent = `±${Math.round(acc)}m`;
   document.getElementById('gps-status').textContent = `Tracing ±${Math.round(acc)}m`;
 
-  // Skip poor fixes
-  if(acc > TRACE_MAX_ACC) return;
+  // Accuracy gate — with time-gap override:
+  // If >15 s since last recorded point (e.g. all fixes were poor during highway stretch),
+  // relax the gate to 70 m so we record something rather than a straight jump to destination.
+  const timeSinceLast = T.lastRecordedTs ? (now - T.lastRecordedTs) : Infinity;
+  const gate = timeSinceLast > TRACE_TIME_GAP_MS ? 70 : TRACE_MAX_ACC;
+  if(acc > gate) return;
 
   const ll = L.latLng(lat, lng);
 
@@ -1738,8 +1826,9 @@ function onTracePosition(pos){
     T.totalDist += d;
   }
 
+  T.lastRecordedTs = now;
   T.pts.push(ll);
-  T.rawPts.push({ lat, lng, acc, ts: Date.now() });
+  T.rawPts.push({ lat, lng, acc, ts: now });
   T.lastPt = ll;
 
   // Extend polyline
@@ -2325,6 +2414,98 @@ function initFloatDock(){
   dock.addEventListener('touchend',  e=>e.stopPropagation(),{passive:true});
   dock.addEventListener('touchmove', e=>e.stopPropagation(),{passive:true});
   dock.addEventListener('pointerdown',e=>e.stopPropagation());
+}
+
+// ── AERIAL SAG CALCULATOR ──
+function calcAerialSag(){
+  const specName = document.getElementById('aerial-spec-sel').value;
+  const span     = parseFloat(document.getElementById('aerial-span').value);
+  const attachHt = parseFloat(document.getElementById('aerial-ht').value) || 7.5;
+  const out      = document.getElementById('aerial-sag-result');
+
+  if(!specName || !span || span < 5){ out.innerHTML=''; return; }
+
+  const sp  = AERIAL_SPECS[specName];
+  // Parabolic sag: D = w·L² / 8T  where T = breakN/2.5 (40% CBL safety factor)
+  const wNm    = (sp.weightGm / 1000) * 9.81; // N/m
+  const T_des  = sp.breakN / 2.5;              // design tension (N)
+  const sagM   = (wNm * span * span) / (8 * T_des);
+  // Also show rule-of-thumb % sag for comparison
+  const sagPct = (sagM / span * 100);
+  const clearM = attachHt - sagM;
+  const spanOk = span <= sp.maxSpanM;
+  const clrOk  = clearM >= 5.5;
+
+  out.innerHTML = `
+  <div class="aerial-result-grid">
+    <div class="arow head"><span>Sag Analysis — ${span} m span</span></div>
+    <div class="arow ${spanOk?'pass':'fail'}">
+      <span>Span vs rated max</span>
+      <span>${span} / ${sp.maxSpanM} m ${spanOk?'✓':'✗ EXCEEDS'}</span>
+    </div>
+    <div class="arow">
+      <span>Design sag (40% CBL)</span>
+      <span>${sagM.toFixed(2)} m (${sagPct.toFixed(1)}%)</span>
+    </div>
+    <div class="arow">
+      <span>Design tension</span>
+      <span>${Math.round(T_des)} N (${(T_des/9.81).toFixed(1)} kg)</span>
+    </div>
+    <div class="arow">
+      <span>Cable weight</span>
+      <span>${sp.weightGm} g/m · ${wNm.toFixed(2)} N/m</span>
+    </div>
+    <div class="arow ${clrOk?'pass':'fail'}">
+      <span>Ground clearance</span>
+      <span>${clearM.toFixed(2)} m ${clrOk?'✓ ≥5.5 m':'✗ <5.5 m MIN'}</span>
+    </div>
+    <div class="arow ${spanOk&&clrOk?'pass':'warn'}">
+      <span>Overall</span>
+      <span>${spanOk&&clrOk?'✅ Within limits':'⚠ Review required'}</span>
+    </div>
+  </div>
+  <div style="font-size:10px;color:var(--text2);margin-top:4px">
+    Formula: D = w·L² / 8T · IEC 60794-3 · attach ht ${attachHt} m
+  </div>`;
+}
+
+// ── CLOSURE / JOINT SPACING ──
+function calcClosureSpacing(){
+  const specName = document.getElementById('aerial-spec-sel').value;
+  const routeKm  = parseFloat(document.getElementById('aerial-route-km').value);
+  const cores    = parseInt(document.getElementById('aerial-cores').value) || 0;
+  const out      = document.getElementById('aerial-closure-result');
+
+  if(!routeKm || routeKm <= 0){ out.innerHTML='<div style="font-size:11px;color:var(--text2);margin-top:4px">Enter route length to calculate.</div>'; return; }
+
+  // Closure interval: from AERIAL_SPECS if known, else default 2 km
+  const intervalKm = (specName && AERIAL_SPECS[specName]) ? AERIAL_SPECS[specName].closureKm : 2;
+  // Cable drum is typically 2 km → splice at every drum end
+  const drumKm     = 2;
+  const inlineSplices = Math.max(0, Math.ceil(routeKm / drumKm) - 1);
+  // Closures at engineering-recommended intervals
+  const recClosures   = Math.max(0, Math.ceil(routeKm / intervalKm) - 1);
+  // Poles needed at standard 50 m span
+  const polesNeeded   = Math.ceil(routeKm * 1000 / 50) - 1;
+
+  // Closure type recommendation based on core count
+  let closureType = 'Inline dome closure (≤24 cores)';
+  if(cores > 24  && cores <= 96 ) closureType = 'Inline tray closure, 2-tray (24–96 cores)';
+  if(cores > 96  && cores <= 288) closureType = 'Aerial butt closure, 4-tray (97–288 cores)';
+  if(cores > 288)                  closureType = 'Large aerial butt closure ≥4-tray (>288 cores)';
+
+  out.innerHTML = `
+  <div class="closure-box">
+    <div>Route: <strong>${routeKm} km</strong>${cores?` · <strong>${cores}</strong> cores`:''}</div>
+    <div>Drum splice interval: <strong>${drumKm} km</strong></div>
+    <div>Inline splices (drum ends): <strong>${inlineSplices}</strong></div>
+    <div>Engineering interval: <strong>${intervalKm} km</strong> → <strong>${recClosures}</strong> closures</div>
+    <div>Poles @ 50 m span: <strong>≈${polesNeeded}</strong></div>
+    ${cores?`<div>Closure type: <strong>${closureType}</strong></div>`:''}
+    <div style="margin-top:4px;color:var(--text2);font-size:10px">
+      + 1 closure at every branch/split point regardless of distance
+    </div>
+  </div>`;
 }
 
 function init(){
