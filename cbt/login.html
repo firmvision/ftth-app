@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Babcock CBT — Login</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#1a1a2e 0%,#16213e 50%,#0f3460 100%)}
+.card{background:#fff;border-radius:16px;padding:48px 40px;width:100%;max-width:420px;box-shadow:0 25px 60px rgba(0,0,0,.4)}
+.logo{text-align:center;margin-bottom:32px}
+.logo img{width:80px;height:80px;border-radius:12px;object-fit:cover}
+.logo h1{margin-top:12px;font-size:22px;font-weight:700;color:#1a1a2e}
+.logo p{color:#64748b;font-size:13px;margin-top:4px}
+.tabs{display:flex;border-radius:8px;overflow:hidden;border:1px solid #e2e8f0;margin-bottom:28px}
+.tab{flex:1;padding:10px;text-align:center;cursor:pointer;font-size:14px;font-weight:500;color:#64748b;background:#f8fafc;transition:.2s}
+.tab.active{background:#1a1a2e;color:#fff}
+label{display:block;font-size:13px;font-weight:600;color:#374151;margin-bottom:6px}
+input{width:100%;border:1.5px solid #e2e8f0;border-radius:8px;padding:11px 14px;font-size:15px;outline:none;transition:.2s;color:#1a1a2e}
+input:focus{border-color:#0f3460;box-shadow:0 0 0 3px rgba(15,52,96,.12)}
+.field{margin-bottom:20px}
+.btn{width:100%;padding:13px;border:none;border-radius:8px;font-size:16px;font-weight:600;cursor:pointer;background:#0f3460;color:#fff;transition:.2s;letter-spacing:.3px}
+.btn:hover{background:#16213e}
+.btn:active{transform:scale(.98)}
+.btn:disabled{opacity:.6;cursor:not-allowed}
+.error{background:#fef2f2;border:1px solid #fecaca;color:#dc2626;border-radius:8px;padding:12px;font-size:13px;margin-bottom:18px;display:none}
+.spinner{display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;margin-right:8px;vertical-align:middle}
+@keyframes spin{to{transform:rotate(360deg)}}
+.footer{text-align:center;margin-top:24px;font-size:12px;color:#94a3b8}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="logo">
+    <div style="width:80px;height:80px;border-radius:12px;background:linear-gradient(135deg,#1a1a2e,#0f3460);display:flex;align-items:center;justify-content:center;margin:0 auto">
+      <svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect x="6" y="8" width="32" height="28" rx="3" fill="rgba(255,255,255,.15)" stroke="#fff" stroke-width="1.5"/><rect x="12" y="14" width="20" height="3" rx="1.5" fill="#fff"/><rect x="12" y="20" width="14" height="3" rx="1.5" fill="rgba(255,255,255,.7)"/><rect x="12" y="26" width="8" height="3" rx="1.5" fill="rgba(255,255,255,.5)"/><circle cx="36" cy="34" r="8" fill="#22c55e"/><path d="M32.5 34l2.5 2.5 4-4" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <h1>Babcock CBT</h1>
+    <p>Computer-Based Testing Platform</p>
+  </div>
+
+  <div class="tabs">
+    <div class="tab active" onclick="setMode('student')">Student</div>
+    <div class="tab" onclick="setMode('admin')">Admin / Teacher</div>
+  </div>
+
+  <div id="error" class="error"></div>
+
+  <form onsubmit="doLogin(event)">
+    <div class="field">
+      <label id="unLabel">Student Username / Reg No.</label>
+      <input id="username" type="text" autocomplete="username" required placeholder="e.g. BU2024001">
+    </div>
+    <div class="field">
+      <label>Password</label>
+      <input id="password" type="password" autocomplete="current-password" required placeholder="Enter your password">
+    </div>
+    <button class="btn" id="loginBtn" type="submit">Sign In</button>
+  </form>
+  <div class="footer">Babcock University High School &copy; 2025</div>
+</div>
+
+<script>
+const API = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+  ? 'http://localhost:8000'
+  : window.location.origin;
+
+let mode = 'student';
+
+function setMode(m) {
+  mode = m;
+  document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active', (i===0&&m==='student')||(i===1&&m==='admin')));
+  document.getElementById('unLabel').textContent = m === 'student' ? 'Student Username / Reg No.' : 'Admin Username';
+}
+
+async function doLogin(e) {
+  e.preventDefault();
+  const btn = document.getElementById('loginBtn');
+  const errEl = document.getElementById('error');
+  errEl.style.display = 'none';
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>Signing in…';
+
+  const username = document.getElementById('username').value.trim();
+  const password = document.getElementById('password').value;
+
+  try {
+    const res = await fetch(`${API}/api/auth/login`, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({username, password}),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.detail || 'Login failed');
+
+    localStorage.setItem('cbt_token', data.access_token);
+    localStorage.setItem('cbt_role', data.role);
+    localStorage.setItem('cbt_name', data.full_name);
+    localStorage.setItem('cbt_user_id', data.user_id);
+
+    if (data.role === 'student') {
+      window.location.href = 'student.html';
+    } else {
+      window.location.href = 'admin.html';
+    }
+  } catch (err) {
+    errEl.textContent = err.message;
+    errEl.style.display = 'block';
+    btn.disabled = false;
+    btn.textContent = 'Sign In';
+  }
+}
+</script>
+</body>
+</html>

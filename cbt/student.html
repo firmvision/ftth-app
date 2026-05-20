@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Babcock CBT — Student Portal</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:#f1f5f9;min-height:100vh;-webkit-user-select:none;user-select:none}
+/* ── Header ── */
+.header{background:linear-gradient(135deg,#1a1a2e,#0f3460);color:#fff;padding:0 24px;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.header h1{font-size:18px;font-weight:700}
+.header-right{display:flex;align-items:center;gap:16px;font-size:14px}
+.logout-btn{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);color:#fff;padding:6px 14px;border-radius:6px;cursor:pointer;font-size:13px}
+
+/* ── Dashboard (exam list) ── */
+#dashboard{max-width:800px;margin:40px auto;padding:0 16px}
+.dash-title{font-size:24px;font-weight:700;color:#1a1a2e;margin-bottom:8px}
+.dash-sub{color:#64748b;font-size:15px;margin-bottom:28px}
+.exam-card{background:#fff;border-radius:12px;padding:24px;margin-bottom:16px;box-shadow:0 2px 8px rgba(0,0,0,.06);border:1.5px solid #e2e8f0;cursor:pointer;transition:.2s}
+.exam-card:hover{border-color:#0f3460;box-shadow:0 4px 16px rgba(15,52,96,.15)}
+.exam-card h3{font-size:18px;color:#1a1a2e;margin-bottom:6px}
+.exam-meta{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:14px}
+.badge{background:#e0f2fe;color:#0369a1;font-size:12px;font-weight:600;padding:4px 10px;border-radius:20px}
+.badge.green{background:#dcfce7;color:#15803d}
+.badge.amber{background:#fef9c3;color:#854d0e}
+.badge.red{background:#fee2e2;color:#b91c1c}
+.start-btn{background:#0f3460;color:#fff;border:none;padding:10px 24px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer}
+.start-btn:hover{background:#16213e}
+.start-btn:disabled{opacity:.5;cursor:not-allowed}
+.resume-btn{background:#15803d;color:#fff;border:none;padding:10px 24px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer}
+.empty{text-align:center;padding:60px 20px;color:#94a3b8}
+
+/* ── Exam view ── */
+#exam-view{display:none;flex-direction:row;height:calc(100vh - 60px);overflow:hidden}
+
+/* Timer bar */
+#timer-bar{position:fixed;top:60px;left:0;right:0;z-index:90;background:#1a1a2e;color:#fff;display:flex;align-items:center;justify-content:space-between;padding:8px 20px;font-size:14px}
+#timer-display{font-size:18px;font-weight:700;font-variant-numeric:tabular-nums;color:#22c55e}
+#timer-display.warn{color:#f59e0b}
+#timer-display.danger{color:#ef4444;animation:pulse 1s infinite}
+#violation-badge{background:#dc2626;color:#fff;font-size:12px;font-weight:700;padding:4px 12px;border-radius:20px}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+
+/* Question panel */
+#q-panel{width:260px;min-width:220px;background:#fff;border-right:1px solid #e2e8f0;overflow-y:auto;padding:16px;margin-top:44px}
+#q-panel h3{font-size:13px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px}
+.q-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.q-num{border:1.5px solid #e2e8f0;border-radius:6px;aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;cursor:pointer;color:#374151;transition:.15s}
+.q-num:hover{border-color:#0f3460;color:#0f3460}
+.q-num.answered{background:#0f3460;border-color:#0f3460;color:#fff}
+.q-num.current{border-color:#f59e0b;color:#f59e0b}
+.q-num.flagged{border-color:#dc2626;background:#fee2e2;color:#b91c1c}
+.q-legend{margin-top:16px;font-size:12px;color:#64748b;display:flex;flex-direction:column;gap:6px}
+.q-legend span{display:flex;align-items:center;gap:6px}
+.dot{width:10px;height:10px;border-radius:2px;flex-shrink:0}
+
+/* Main question area */
+#q-main{flex:1;overflow-y:auto;margin-top:44px;padding:28px}
+.q-card{background:#fff;border-radius:12px;padding:28px;max-width:740px;margin:0 auto;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.q-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px}
+.q-label{font-size:13px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.5px}
+.q-pts{font-size:13px;color:#94a3b8;font-weight:600}
+.q-text{font-size:17px;color:#1a1a2e;line-height:1.65;margin-bottom:24px}
+.options{display:flex;flex-direction:column;gap:10px}
+.option{border:1.5px solid #e2e8f0;border-radius:10px;padding:14px 16px;cursor:pointer;display:flex;align-items:center;gap:12px;font-size:15px;color:#374151;transition:.15s}
+.option:hover{border-color:#0f3460;background:#f8fafc}
+.option.selected{border-color:#0f3460;background:#eff6ff;color:#1a1a2e;font-weight:500}
+.option input{pointer-events:none}
+.essay-box{width:100%;min-height:160px;border:1.5px solid #e2e8f0;border-radius:10px;padding:14px;font-size:15px;font-family:inherit;resize:vertical;outline:none;color:#1a1a2e;transition:.2s}
+.essay-box:focus{border-color:#0f3460;box-shadow:0 0 0 3px rgba(15,52,96,.1)}
+.tf-row{display:flex;gap:12px}
+.tf-btn{flex:1;padding:14px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:16px;font-weight:600;cursor:pointer;text-align:center;transition:.15s;background:#fff;color:#374151}
+.tf-btn:hover{border-color:#0f3460}
+.tf-btn.selected-t{border-color:#15803d;background:#dcfce7;color:#15803d}
+.tf-btn.selected-f{border-color:#dc2626;background:#fee2e2;color:#dc2626}
+.q-actions{display:flex;gap:10px;margin-top:24px;justify-content:space-between}
+.nav-btn{padding:10px 22px;border-radius:8px;font-size:14px;font-weight:600;border:1.5px solid #e2e8f0;background:#fff;cursor:pointer;color:#374151;transition:.15s}
+.nav-btn:hover{border-color:#0f3460;color:#0f3460}
+.nav-btn:disabled{opacity:.4;cursor:not-allowed}
+.flag-btn{padding:10px 16px;border-radius:8px;font-size:13px;border:1.5px solid #e2e8f0;background:#fff;cursor:pointer;color:#64748b;transition:.15s}
+.flag-btn.flagged{border-color:#dc2626;background:#fee2e2;color:#dc2626}
+.submit-all-btn{padding:10px 22px;border-radius:8px;font-size:14px;font-weight:700;border:none;background:#0f3460;color:#fff;cursor:pointer;transition:.15s}
+.submit-all-btn:hover{background:#16213e}
+
+/* ── Overlays ── */
+.overlay{position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.7);backdrop-filter:blur(4px)}
+.overlay-card{background:#fff;border-radius:16px;padding:36px;max-width:440px;width:90%;text-align:center}
+.overlay-card h2{font-size:22px;font-weight:700;margin-bottom:12px;color:#1a1a2e}
+.overlay-card p{color:#64748b;font-size:15px;line-height:1.6;margin-bottom:24px}
+.overlay-btn{padding:12px 32px;border-radius:8px;font-size:15px;font-weight:600;border:none;cursor:pointer;transition:.15s}
+.overlay-btn.primary{background:#0f3460;color:#fff}
+.overlay-btn.primary:hover{background:#16213e}
+.overlay-btn.danger{background:#dc2626;color:#fff;margin-left:10px}
+.overlay-btn.secondary{background:#e2e8f0;color:#374151;margin-right:10px}
+.result-score{font-size:56px;font-weight:800;color:#0f3460;margin:16px 0}
+.result-pct{font-size:18px;color:#64748b;margin-bottom:8px}
+.result-status{font-size:15px;font-weight:600;padding:6px 16px;border-radius:20px;display:inline-block;margin-bottom:20px}
+.result-pass{background:#dcfce7;color:#15803d}
+.result-fail{background:#fee2e2;color:#dc2626}
+
+/* Violation warning */
+#v-warning{position:fixed;top:0;left:0;right:0;z-index:300;background:#dc2626;color:#fff;padding:12px 20px;text-align:center;font-weight:700;font-size:14px;display:none}
+
+.spinner{display:inline-block;width:18px;height:18px;border:2px solid rgba(15,52,96,.2);border-top-color:#0f3460;border-radius:50%;animation:spin .6s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* Responsive */
+@media(max-width:640px){
+  #q-panel{display:none}
+  #q-main{padding:16px}
+  .q-card{padding:20px}
+}
+</style>
+</head>
+<body>
+
+<!-- Violation warning bar -->
+<div id="v-warning"></div>
+
+<!-- Header -->
+<div class="header">
+  <h1 id="headerTitle">Babcock CBT</h1>
+  <div class="header-right">
+    <span id="headerName"></span>
+    <button class="logout-btn" onclick="logout()">Log out</button>
+  </div>
+</div>
+
+<!-- Dashboard -->
+<div id="dashboard">
+  <div class="dash-title">Welcome, <span id="studentName"></span></div>
+  <div class="dash-sub">Select an exam below to begin.</div>
+  <div id="examList"><div class="empty"><div class="spinner"></div><br>Loading exams…</div></div>
+</div>
+
+<!-- Exam view -->
+<div id="exam-view">
+  <div id="timer-bar">
+    <div>
+      <span id="examTitleBar" style="font-weight:700;margin-right:16px"></span>
+      Time remaining: <span id="timer-display">--:--</span>
+    </div>
+    <div style="display:flex;gap:12px;align-items:center">
+      <span id="violation-badge" style="display:none">⚠ 0 violations</span>
+      <button class="submit-all-btn" onclick="confirmSubmit()">Submit Exam</button>
+    </div>
+  </div>
+
+  <div id="q-panel">
+    <h3>Questions</h3>
+    <div class="q-grid" id="qGrid"></div>
+    <div class="q-legend">
+      <span><div class="dot" style="background:#0f3460"></div> Answered</span>
+      <span><div class="dot" style="background:#fff;border:1.5px solid #e2e8f0"></div> Unanswered</span>
+      <span><div class="dot" style="background:#fee2e2;border:1.5px solid #dc2626"></div> Flagged</span>
+    </div>
+  </div>
+
+  <div id="q-main">
+    <div class="q-card" id="qCard">
+      <div style="text-align:center;padding:40px"><div class="spinner"></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- Overlays -->
+<div id="overlay-fullscreen" class="overlay" style="display:none">
+  <div class="overlay-card">
+    <h2>⚠ Fullscreen Required</h2>
+    <p>This exam must be taken in fullscreen mode. Please click the button below to enter fullscreen and continue your exam.</p>
+    <button class="overlay-btn primary" onclick="enterFullscreen()">Enter Fullscreen</button>
+  </div>
+</div>
+
+<div id="overlay-confirm-submit" class="overlay" style="display:none">
+  <div class="overlay-card">
+    <h2>Submit Exam?</h2>
+    <p id="confirmSubmitMsg">Are you sure you want to submit? You cannot change your answers after submission.</p>
+    <div>
+      <button class="overlay-btn secondary" onclick="hideOverlay('overlay-confirm-submit')">Cancel</button>
+      <button class="overlay-btn danger" onclick="doSubmit()">Yes, Submit</button>
+    </div>
+  </div>
+</div>
+
+<div id="overlay-result" class="overlay" style="display:none">
+  <div class="overlay-card">
+    <h2>Exam Submitted!</h2>
+    <div class="result-score" id="resultScore">—</div>
+    <div class="result-pct" id="resultPct"></div>
+    <div id="resultStatus"></div>
+    <p id="resultMsg" style="margin-top:12px"></p>
+    <button class="overlay-btn primary" onclick="goToDashboard()" style="margin-top:8px">Back to Dashboard</button>
+  </div>
+</div>
+
+<div id="overlay-violation" class="overlay" style="display:none">
+  <div class="overlay-card">
+    <h2 style="color:#dc2626">Security Violation</h2>
+    <p id="violationMsg">A security violation was detected. Please return to fullscreen to continue your exam.</p>
+    <div id="violationCount" style="font-size:13px;color:#94a3b8;margin-bottom:16px"></div>
+    <button class="overlay-btn primary" onclick="resumeFromViolation()">Return to Exam</button>
+  </div>
+</div>
+
+<div id="overlay-auto-submit" class="overlay" style="display:none">
+  <div class="overlay-card">
+    <h2>Exam Ended</h2>
+    <p id="autoSubmitMsg">Your exam has been automatically submitted.</p>
+    <button class="overlay-btn primary" onclick="goToDashboard()">Back to Dashboard</button>
+  </div>
+</div>
+
+<script>
+// ── Config ──────────────────────────────────────────────────────────────────
+const API = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+  ? 'http://localhost:8000' : window.location.origin;
+
+const token = localStorage.getItem('cbt_token');
+const role  = localStorage.getItem('cbt_role');
+const name  = localStorage.getItem('cbt_name');
+
+if (!token || role !== 'student') { window.location.href = 'login.html'; }
+
+// ── State ────────────────────────────────────────────────────────────────────
+let session = null;      // session object from server
+let questions = [];      // ordered question list
+let currentQ = 0;        // index
+let savedAnswers = {};   // { question_id: { selected_option_ids, text_answer } }
+let flagged = new Set();
+let timerInterval = null;
+let heartbeatInterval = null;
+let remainingSeconds = 0;
+let examActive = false;
+let currentToken = null;
+
+// ── Init ─────────────────────────────────────────────────────────────────────
+document.getElementById('studentName').textContent = name;
+document.getElementById('headerName').textContent = name;
+loadDashboard();
+
+// ── Disable right-click & copy ───────────────────────────────────────────────
+document.addEventListener('contextmenu', e => {
+  if (examActive) { e.preventDefault(); reportViolation('right_click'); }
+});
+document.addEventListener('copy', e => {
+  if (examActive) { e.preventDefault(); reportViolation('copy_attempt'); }
+});
+document.addEventListener('keydown', e => {
+  if (!examActive) return;
+  // block PrintScreen, F12, Ctrl+U, Ctrl+Shift+I, Ctrl+P
+  if (e.key === 'PrintScreen' || e.key === 'F12' ||
+      (e.ctrlKey && ['u','U','p','P'].includes(e.key)) ||
+      (e.ctrlKey && e.shiftKey && ['i','I','j','J','c','C'].includes(e.key))) {
+    e.preventDefault();
+    reportViolation('dev_tools');
+  }
+});
+
+// ── Tab / visibility detection ────────────────────────────────────────────────
+document.addEventListener('visibilitychange', () => {
+  if (!examActive) return;
+  if (document.hidden) {
+    reportViolation('tab_switch').then(() => {
+      showViolationWarning('Tab switch detected! Returning to another tab is not allowed.', false);
+    });
+  }
+});
+window.addEventListener('blur', () => {
+  if (examActive) {
+    reportViolation('window_blur');
+    showViolationWarning('Window focus lost! Keep the exam window active.', false);
+  }
+});
+
+// ── Fullscreen detection ──────────────────────────────────────────────────────
+document.addEventListener('fullscreenchange', () => {
+  if (!examActive) return;
+  if (!document.fullscreenElement) {
+    reportViolation('fullscreen_exit').then(res => {
+      if (res && res.auto_submitted) return;
+      showOverlay('overlay-violation');
+      document.getElementById('violationMsg').textContent =
+        'You exited fullscreen! You must stay in fullscreen during the exam.';
+      document.getElementById('violationCount').textContent =
+        `Violations: ${res ? res.violation_count : '?'} / ${session.max_violations}`;
+    });
+  }
+});
+
+// ── Dashboard ─────────────────────────────────────────────────────────────────
+async function loadDashboard() {
+  try {
+    const res = await apiFetch('/api/student/exams');
+    const exams = await res.json();
+    renderExamList(exams);
+  } catch(e) {
+    document.getElementById('examList').innerHTML =
+      '<div class="empty">Failed to load exams. Please refresh.</div>';
+  }
+}
+
+function renderExamList(exams) {
+  const el = document.getElementById('examList');
+  if (!exams.length) {
+    el.innerHTML = '<div class="empty">No exams available at this time.</div>';
+    return;
+  }
+  el.innerHTML = exams.map(e => {
+    const done = e.session_status && ['submitted','auto_submitted','timed_out'].includes(e.session_status);
+    const inProg = e.session_status === 'in_progress';
+    const statusBadge = done
+      ? `<span class="badge green">Completed</span>`
+      : inProg ? `<span class="badge amber">In Progress</span>`
+               : `<span class="badge">Not Started</span>`;
+    const btn = done
+      ? `<button class="start-btn" disabled>Completed</button>`
+      : inProg
+        ? `<button class="resume-btn" onclick="startExam(${e.id})">Resume Exam</button>`
+        : `<button class="start-btn" onclick="startExam(${e.id})">Start Exam</button>`;
+    return `
+      <div class="exam-card">
+        <h3>${esc(e.title)}</h3>
+        <div class="exam-meta">
+          ${e.subject_name ? `<span class="badge">${esc(e.subject_name)}</span>` : ''}
+          <span class="badge">${e.duration_minutes} mins</span>
+          <span class="badge">${e.question_count} questions</span>
+          ${statusBadge}
+        </div>
+        ${e.instructions ? `<p style="font-size:13px;color:#64748b;margin-bottom:14px">${esc(e.instructions)}</p>` : ''}
+        ${btn}
+      </div>`;
+  }).join('');
+}
+
+// ── Start / Resume Exam ───────────────────────────────────────────────────────
+async function startExam(examId) {
+  try {
+    const res = await apiFetch(`/api/student/exams/${examId}/start`, { method: 'POST' });
+    if (!res.ok) { const d=await res.json(); alert(d.detail||'Could not start exam'); return; }
+    const data = await res.json();
+    loadExamSession(data);
+  } catch(e) { alert('Network error. Please try again.'); }
+}
+
+function loadExamSession(data) {
+  session = data;
+  currentToken = data.token;
+  questions = data.questions || [];
+  savedAnswers = {};
+  for (const [qid, ans] of Object.entries(data.saved_answers || {})) {
+    savedAnswers[parseInt(qid)] = ans;
+  }
+  remainingSeconds = data.remaining_seconds;
+  currentQ = 0;
+
+  document.getElementById('examTitleBar').textContent = data.exam_title;
+  document.getElementById('headerTitle').textContent = 'CBT — ' + data.exam_title;
+
+  document.getElementById('dashboard').style.display = 'none';
+  document.getElementById('exam-view').style.display = 'flex';
+
+  buildQGrid();
+  renderQuestion(0);
+  startTimer();
+  startHeartbeat();
+
+  examActive = true;
+  enterFullscreen();
+}
+
+// ── Question rendering ────────────────────────────────────────────────────────
+function renderQuestion(index) {
+  currentQ = index;
+  const q = questions[index];
+  if (!q) return;
+
+  const ans = savedAnswers[q.id] || {};
+  const selectedIds = ans.selected_option_ids || [];
+  const textAnswer = ans.text_answer || '';
+  const isFlagged = flagged.has(q.id);
+
+  let optionsHtml = '';
+  if (q.type === 'true_false') {
+    const tSel = selectedIds.includes('TRUE') ? 'selected-t' : '';
+    const fSel = selectedIds.includes('FALSE') ? 'selected-f' : '';
+    optionsHtml = `<div class="tf-row">
+      <button class="tf-btn ${tSel}" onclick="selectTF(${q.id},'TRUE')">✓ True</button>
+      <button class="tf-btn ${fSel}" onclick="selectTF(${q.id},'FALSE')">✗ False</button>
+    </div>`;
+  } else if (q.type === 'essay') {
+    optionsHtml = `<textarea class="essay-box" id="essayBox-${q.id}" placeholder="Type your answer here…" oninput="autoSaveEssay(${q.id})">${esc(textAnswer)}</textarea>`;
+  } else {
+    const inputType = q.type === 'multi_select' ? 'checkbox' : 'radio';
+    optionsHtml = `<div class="options">` + (q.options || []).map(opt => {
+      const sel = selectedIds.includes(opt.id) ? 'selected' : '';
+      return `<label class="option ${sel}" onclick="selectOption(${q.id},${opt.id},'${q.type}')">
+        <input type="${inputType}" ${selectedIds.includes(opt.id) ? 'checked' : ''} style="width:16px;height:16px;accent-color:#0f3460">
+        <span>${esc(opt.text)}</span>
+      </label>`;
+    }).join('') + `</div>`;
+  }
+
+  document.getElementById('qCard').innerHTML = `
+    <div class="q-header">
+      <span class="q-label">Question ${index+1} of ${questions.length}</span>
+      <span class="q-pts">${q.points} pt${q.points!==1?'s':''}</span>
+    </div>
+    <div class="q-text">${esc(q.text)}</div>
+    ${q.type === 'multi_select' ? '<p style="font-size:13px;color:#64748b;margin-bottom:12px;margin-top:-12px">Select all that apply</p>' : ''}
+    ${optionsHtml}
+    <div class="q-actions">
+      <div style="display:flex;gap:8px">
+        <button class="nav-btn" onclick="goQ(${index-1})" ${index===0?'disabled':''}>← Prev</button>
+        <button class="nav-btn" onclick="goQ(${index+1})" ${index===questions.length-1?'disabled':''}>Next →</button>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <button class="flag-btn ${isFlagged?'flagged':''}" onclick="toggleFlag(${q.id})">${isFlagged?'🚩 Flagged':'🏳 Flag'}</button>
+      </div>
+    </div>`;
+
+  updateQGrid();
+}
+
+function goQ(index) {
+  if (index < 0 || index >= questions.length) return;
+  autoSaveCurrentEssay();
+  renderQuestion(index);
+}
+
+function selectOption(qid, optId, type) {
+  const ans = savedAnswers[qid] || {};
+  let sel = ans.selected_option_ids ? [...ans.selected_option_ids] : [];
+  if (type === 'mcq' || type === 'true_false') {
+    sel = sel[0] === optId ? [] : [optId];
+  } else {
+    if (sel.includes(optId)) sel = sel.filter(x => x !== optId);
+    else sel.push(optId);
+  }
+  savedAnswers[qid] = { ...ans, selected_option_ids: sel };
+  sendAnswer(qid);
+  renderQuestion(currentQ);
+}
+
+function selectTF(qid, value) {
+  const prev = (savedAnswers[qid]?.selected_option_ids || [])[0];
+  savedAnswers[qid] = { selected_option_ids: prev === value ? [] : [value] };
+  sendAnswer(qid);
+  renderQuestion(currentQ);
+}
+
+function autoSaveEssay(qid) {
+  const box = document.getElementById(`essayBox-${qid}`);
+  if (!box) return;
+  savedAnswers[qid] = { ...(savedAnswers[qid]||{}), text_answer: box.value };
+}
+
+function autoSaveCurrentEssay() {
+  const q = questions[currentQ];
+  if (q && q.type === 'essay') autoSaveEssay(q.id);
+  const q2 = questions[currentQ];
+  if (q2 && savedAnswers[q2.id]) sendAnswer(q2.id);
+}
+
+async function sendAnswer(qid) {
+  const ans = savedAnswers[qid] || {};
+  try {
+    await apiFetch(`/api/student/sessions/${currentToken}/answer`, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        question_id: qid,
+        selected_option_ids: ans.selected_option_ids || null,
+        text_answer: ans.text_answer || null,
+      }),
+    });
+  } catch(e) { /* silent — will retry on next save */ }
+}
+
+function toggleFlag(qid) {
+  if (flagged.has(qid)) flagged.delete(qid);
+  else flagged.add(qid);
+  renderQuestion(currentQ);
+}
+
+// ── Q-Grid ────────────────────────────────────────────────────────────────────
+function buildQGrid() {
+  const grid = document.getElementById('qGrid');
+  grid.innerHTML = questions.map((q, i) => `
+    <div class="q-num" id="qn-${i}" onclick="goQ(${i})">${i+1}</div>
+  `).join('');
+}
+
+function updateQGrid() {
+  questions.forEach((q, i) => {
+    const el = document.getElementById(`qn-${i}`);
+    if (!el) return;
+    const isAnswered = !!(savedAnswers[q.id]?.selected_option_ids?.length || savedAnswers[q.id]?.text_answer?.trim());
+    el.className = 'q-num' +
+      (i === currentQ ? ' current' : '') +
+      (flagged.has(q.id) ? ' flagged' : '') +
+      (isAnswered && i !== currentQ ? ' answered' : '');
+  });
+}
+
+// ── Timer ─────────────────────────────────────────────────────────────────────
+function startTimer() {
+  if (timerInterval) clearInterval(timerInterval);
+  timerInterval = setInterval(() => {
+    remainingSeconds = Math.max(0, remainingSeconds - 1);
+    updateTimerDisplay();
+    if (remainingSeconds === 0) {
+      clearInterval(timerInterval);
+      handleTimeout();
+    }
+  }, 1000);
+  updateTimerDisplay();
+}
+
+function updateTimerDisplay() {
+  const m = Math.floor(remainingSeconds / 60);
+  const s = remainingSeconds % 60;
+  const el = document.getElementById('timer-display');
+  el.textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  el.className = 'timer-display';
+  if (remainingSeconds <= 300) el.className += ' danger';
+  else if (remainingSeconds <= 600) el.className += ' warn';
+}
+
+function startHeartbeat() {
+  if (heartbeatInterval) clearInterval(heartbeatInterval);
+  heartbeatInterval = setInterval(async () => {
+    try {
+      const res = await apiFetch(`/api/student/sessions/${currentToken}/heartbeat`, { method: 'POST' });
+      const data = await res.json();
+      if (data.status === 'timed_out' || data.status === 'auto_submitted') {
+        clearInterval(heartbeatInterval);
+        clearInterval(timerInterval);
+        showAutoSubmit('Your exam time has expired and has been automatically submitted.');
+        return;
+      }
+      // Sync remaining time with server
+      if (data.remaining_seconds && Math.abs(data.remaining_seconds - remainingSeconds) > 10) {
+        remainingSeconds = data.remaining_seconds;
+      }
+    } catch(e) { /* network blip — ignore */ }
+  }, 30000); // every 30s
+}
+
+async function handleTimeout() {
+  autoSaveCurrentEssay();
+  examActive = false;
+  clearInterval(heartbeatInterval);
+  showAutoSubmit('Time is up! Your exam has been automatically submitted.');
+}
+
+// ── Submit ────────────────────────────────────────────────────────────────────
+function confirmSubmit() {
+  autoSaveCurrentEssay();
+  const answered = questions.filter(q =>
+    savedAnswers[q.id]?.selected_option_ids?.length || savedAnswers[q.id]?.text_answer?.trim()
+  ).length;
+  const unanswered = questions.length - answered;
+  document.getElementById('confirmSubmitMsg').textContent =
+    `You have answered ${answered} of ${questions.length} question${questions.length!==1?'s':''}.` +
+    (unanswered > 0 ? ` ${unanswered} question${unanswered!==1?'s':''} left unanswered. ` : ' ') +
+    'Submit now?';
+  showOverlay('overlay-confirm-submit');
+}
+
+async function doSubmit() {
+  hideOverlay('overlay-confirm-submit');
+  examActive = false;
+  clearInterval(timerInterval);
+  clearInterval(heartbeatInterval);
+  exitFullscreen();
+
+  try {
+    const res = await apiFetch(`/api/student/sessions/${currentToken}/submit`, { method: 'POST' });
+    const data = await res.json();
+    showResult(data);
+  } catch(e) { alert('Submit failed. Please try again.'); examActive = true; }
+}
+
+function showResult(data) {
+  document.getElementById('resultScore').textContent = `${data.score} / ${data.total_points}`;
+  document.getElementById('resultPct').textContent = `${data.percentage}%`;
+  const pass = data.percentage >= (session.pass_score || 50);
+  document.getElementById('resultStatus').innerHTML =
+    `<span class="result-status ${pass?'result-pass':'result-fail'}">${pass?'PASS':'FAIL'}</span>`;
+  document.getElementById('resultMsg').textContent = pass
+    ? 'Congratulations! You passed this exam.'
+    : 'You did not reach the pass mark. Please check with your teacher for next steps.';
+  showOverlay('overlay-result');
+}
+
+function showAutoSubmit(msg) {
+  examActive = false;
+  exitFullscreen();
+  document.getElementById('autoSubmitMsg').textContent = msg;
+  showOverlay('overlay-auto-submit');
+}
+
+// ── Violations ────────────────────────────────────────────────────────────────
+async function reportViolation(type) {
+  if (!currentToken) return null;
+  try {
+    const res = await apiFetch(`/api/student/sessions/${currentToken}/violation`, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ type }),
+    });
+    const data = await res.json();
+    updateViolationBadge(data.violation_count);
+    if (data.auto_submitted) {
+      examActive = false;
+      clearInterval(timerInterval);
+      clearInterval(heartbeatInterval);
+      exitFullscreen();
+      showAutoSubmit('Too many violations! Your exam has been automatically submitted.');
+    }
+    return data;
+  } catch(e) { return null; }
+}
+
+function updateViolationBadge(count) {
+  const el = document.getElementById('violation-badge');
+  if (!count) return;
+  el.style.display = 'inline';
+  el.textContent = `⚠ ${count} violation${count!==1?'s':''}`;
+}
+
+function showViolationWarning(msg, autoHide = true) {
+  const el = document.getElementById('v-warning');
+  el.textContent = `⚠ ${msg}`;
+  el.style.display = 'block';
+  if (autoHide) setTimeout(() => el.style.display = 'none', 4000);
+}
+
+function resumeFromViolation() {
+  hideOverlay('overlay-violation');
+  enterFullscreen();
+}
+
+// ── Fullscreen ────────────────────────────────────────────────────────────────
+function enterFullscreen() {
+  const el = document.documentElement;
+  const req = el.requestFullscreen || el.webkitRequestFullscreen || el.mozRequestFullScreen;
+  if (req) {
+    req.call(el).catch(() => showOverlay('overlay-fullscreen'));
+  }
+  hideOverlay('overlay-fullscreen');
+}
+
+function exitFullscreen() {
+  const exit = document.exitFullscreen || document.webkitExitFullscreen;
+  if (exit && document.fullscreenElement) exit.call(document).catch(()=>{});
+}
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+function showOverlay(id) { document.getElementById(id).style.display = 'flex'; }
+function hideOverlay(id) { document.getElementById(id).style.display = 'none'; }
+
+function esc(str) {
+  return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function apiFetch(path, opts = {}) {
+  return fetch(API + path, {
+    ...opts,
+    headers: { Authorization: `Bearer ${token}`, ...(opts.headers || {}) },
+  });
+}
+
+function goToDashboard() {
+  examActive = false;
+  clearInterval(timerInterval);
+  clearInterval(heartbeatInterval);
+  exitFullscreen();
+  document.querySelectorAll('.overlay').forEach(o => o.style.display = 'none');
+  document.getElementById('exam-view').style.display = 'none';
+  document.getElementById('dashboard').style.display = 'block';
+  document.getElementById('headerTitle').textContent = 'Babcock CBT';
+  loadDashboard();
+}
+
+function logout() {
+  localStorage.clear();
+  window.location.href = 'login.html';
+}
+</script>
+</body>
+</html>

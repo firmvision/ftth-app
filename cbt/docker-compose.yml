@@ -1,0 +1,39 @@
+version: "3.9"
+
+services:
+  cbt-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://cbt:cbt_pass@db:5432/cbt_exam
+      - SECRET_KEY=${SECRET_KEY:-change_this_to_a_long_random_string_in_production}
+      - ADMIN_USERNAME=${ADMIN_USERNAME:-admin}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD:-Admin@1234}
+      - CORS_ORIGINS=*
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+    volumes:
+      - ./backend:/app
+
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: cbt_exam
+      POSTGRES_USER: cbt
+      POSTGRES_PASSWORD: cbt_pass
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U cbt -d cbt_exam"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+volumes:
+  pgdata:
