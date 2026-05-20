@@ -210,6 +210,21 @@ input.form-in:focus,select.form-sel:focus{outline:1px solid var(--accent);border
 .form-actions{display:flex;gap:8px;margin-top:16px;justify-content:flex-end}
 .fill-bar-wrap{background:var(--bg3);border-radius:3px;height:8px;overflow:hidden;margin-top:4px}
 .fill-bar{height:100%;border-radius:3px;transition:.3s}
+/* ── SCRIPT EDITOR ── */
+#script-editor{width:100%;min-height:160px;background:#04090f;color:#7dd3fc;border:1px solid var(--border2);border-radius:6px;padding:10px;font-family:'Cascadia Code','Fira Code','Courier New',monospace;font-size:12px;line-height:1.6;resize:vertical;outline:none;tab-size:2}
+#script-editor:focus{border-color:var(--accent)}
+#script-console{background:#020609;border:1px solid var(--border);border-radius:6px;padding:8px 10px;font-family:'Cascadia Code','Fira Code','Courier New',monospace;font-size:11px;max-height:200px;overflow-y:auto;margin-top:8px}
+.sc-line{margin-bottom:2px;line-height:1.5;white-space:pre-wrap;word-break:break-all}
+.sc-ok{color:#22c55e}.sc-err{color:#ef4444}.sc-warn{color:#eab308}.sc-info{color:#38bdf8}.sc-dim{color:var(--text3)}
+.script-ref{background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:10px;margin-top:8px;font-size:11px}
+.script-ref summary{cursor:pointer;color:var(--accent2);font-weight:600;font-size:11px;list-style:none;display:flex;align-items:center;gap:5px}
+.script-ref summary::before{content:'▶';font-size:9px;transition:.15s}
+.script-ref[open] summary::before{content:'▼'}
+.script-ref table{width:100%;border-collapse:collapse;margin-top:8px}
+.script-ref table td{padding:3px 6px;font-size:10px;vertical-align:top;border-bottom:1px solid var(--border)}
+.script-ref table td:first-child{color:#7dd3fc;font-family:monospace;white-space:nowrap;min-width:180px}
+.script-ref table td:last-child{color:var(--text3)}
+.script-btns{display:flex;gap:5px;flex-wrap:wrap;margin:8px 0}
 .fill-pass{background:var(--green)}
 .fill-warn{background:var(--yellow)}
 .fill-fail{background:var(--red)}
@@ -544,6 +559,7 @@ button,.btn,.tool-btn,.rb,.ptab,.stab,.map-btn,.elem-item,.survey-check,.mhdr-bt
     <div class="ptab" onclick="showTab('p2p')">P2P/BHL</div>
     <div class="ptab" onclick="showTab('bom')">BoM</div>
     <div class="ptab" onclick="showTab('survey')">Survey</div>
+    <div class="ptab" onclick="showTab('script')">⌨ Script</div>
   </div>
   <div id="panel-body"></div>
 </div>
@@ -1446,7 +1462,7 @@ function calcBoM(){
 // ── TABS ──
 function showTab(name){
   S.activePanel=name;
-  const tabs=['elements','routes','pon','p2p','bom','survey'];
+  const tabs=['elements','routes','pon','p2p','bom','survey','script'];
   document.querySelectorAll('.ptab').forEach((t,i)=>t.classList.toggle('active',tabs[i]===name));
   updateUI();
 }
@@ -1459,6 +1475,7 @@ function updateUI(){
     case 'p2p':      pb.innerHTML=renderP2P(); bindP2PEvents(); break;
     case 'bom':      pb.innerHTML=renderBoM(); bindBoMEvents(); break;
     case 'survey':   pb.innerHTML=renderSurvey(); bindSurveyEvents(); break;
+    case 'script':   pb.innerHTML=renderScript(); bindScriptEvents(); break;
   }
 }
 
@@ -2292,7 +2309,7 @@ function showTab(name){
   const isMobile=window.innerWidth<=768;
   // call original logic
   S.activePanel=name;
-  const tabs=['elements','routes','pon','p2p','bom','survey'];
+  const tabs=['elements','routes','pon','p2p','bom','survey','script'];
   document.querySelectorAll('.ptab').forEach((t,i)=>t.classList.toggle('active',tabs[i]===name));
   updateUI();
   if(isMobile){
@@ -2506,6 +2523,329 @@ function calcClosureSpacing(){
       + 1 closure at every branch/split point regardless of distance
     </div>
   </div>`;
+}
+
+// ══════════════════════════════════════════════════════════════
+// ── SCRIPT ENGINE ─────────────────────────────────────────────
+// ══════════════════════════════════════════════════════════════
+
+const SCRIPT_EXAMPLES = {
+  'Basic Placement': `# Place a Central Office and three cabinets
+place co 6.5244 3.3792 CO-001 48
+place cabinet 6.5260 3.3810 FDH-001 24
+place cabinet 6.5230 3.3780 FDH-002 24
+place cabinet 6.5255 3.3770 FDH-003 24
+
+# Connect CO to each cabinet with aerial fiber
+connect aerial CO-001 FDH-001 label=AER-001 cable=12 qty=1
+connect aerial CO-001 FDH-002 label=AER-002 cable=12 qty=1
+connect aerial CO-001 FDH-003 label=AER-003 cable=12 qty=1`,
+
+  'Pole Line': `# Drop poles every 50 m along a bearing, then string aerial cable
+# poles <infraType> <startLat> <startLng> <endLat> <endLng> span=<m> label=<prefix>
+poles closure 6.5244 3.3792 6.5244 3.3900 span=50 label=CLS
+
+# Place ODP at each end
+place odp 6.5244 3.3792 ODP-START 8
+place odp 6.5244 3.3900 ODP-END 8`,
+
+  'Street FTTH Rollout': `# Variables
+set lat  6.5244
+set lng  3.3792
+set step 0.0003
+
+# CO anchor
+place co $lat $lng CO-MAIN 96
+
+# Feeder cabinets along the street (offset north)
+place cabinet $lat+0.0010 $lng         FDH-N1 24
+place cabinet $lat+0.0020 $lng         FDH-N2 24
+place cabinet $lat+0.0010 $lng+0.0015  FDH-E1 24
+
+# Feeder routes
+connect conduit CO-MAIN  FDH-N1 label=FDR-001 cable=7 qty=2
+connect conduit FDH-N1   FDH-N2 label=FDR-002 cable=7 qty=1
+connect conduit CO-MAIN  FDH-E1 label=FDR-003 cable=7 qty=2
+
+# ODPs off FDH-N1 (distribution)
+place odp $lat+0.0010 $lng+0.0008  ODP-N1A 8
+place odp $lat+0.0012 $lng-0.0008  ODP-N1B 8
+connect aerial FDH-N1 ODP-N1A label=DST-001 cable=5 qty=1
+connect aerial FDH-N1 ODP-N1B label=DST-002 cable=5 qty=1`,
+
+  'Grid Customers': `# Place a 3×4 grid of customer ONTs
+# grid <type> <centerLat> <centerLng> rows=N cols=N spacingM=M label=<prefix> fiber=N
+grid customer 6.5250 3.3800 rows=3 cols=4 spacingM=30 label=ONT fiber=1`,
+
+  'Ring Topology': `# Protection ring: CO → 4 PoPs → back to CO
+place co  6.5244 3.3792 CO-HUB  96
+place pop 6.5270 3.3820 POP-A   48
+place pop 6.5280 3.3790 POP-B   48
+place pop 6.5265 3.3760 POP-C   48
+place pop 6.5248 3.3755 POP-D   48
+
+# Primary path (Route A)
+connect aerial CO-HUB POP-A label=RING-A1 cable=20 qty=1 group=A
+connect aerial POP-A  POP-B label=RING-A2 cable=20 qty=1 group=A
+connect aerial POP-B  POP-C label=RING-A3 cable=20 qty=1 group=A
+connect aerial POP-C  POP-D label=RING-A4 cable=20 qty=1 group=A
+
+# Protection path (Route B — completes the ring)
+connect trench CO-HUB POP-D label=RING-B1 cable=20 qty=1 group=B`,
+};
+
+let _scriptVars = {};
+
+function renderScript(){
+  const saved = localStorage.getItem('ftth_script') || Object.values(SCRIPT_EXAMPLES)[0];
+  return `
+<div class="ph"><h3>⌨ Script Automation</h3></div>
+<div class="script-btns">
+  <button class="btn sm primary" onclick="execScript()">▶ Run</button>
+  <button class="btn sm" onclick="clearScriptConsole()">Clear Log</button>
+  <button class="btn sm" onclick="document.getElementById('script-editor').value='';localStorage.removeItem('ftth_script')">New</button>
+  <select class="btn sm" style="background:var(--bg2);color:var(--text);border:1px solid var(--border2);cursor:pointer" onchange="loadScriptExample(this.value);this.value=''">
+    <option value="">📂 Examples…</option>
+    ${Object.keys(SCRIPT_EXAMPLES).map(k=>`<option value="${k}">${k}</option>`).join('')}
+  </select>
+</div>
+<textarea id="script-editor" spellcheck="false" oninput="localStorage.setItem('ftth_script',this.value)">${saved}</textarea>
+<div id="script-console"><span class="sc-dim">// Output will appear here. Click ▶ Run to execute.</span></div>
+<details class="script-ref">
+  <summary>📖 Script Reference</summary>
+  <table>
+    <tr><td>place &lt;type&gt; &lt;lat&gt; &lt;lng&gt; [label] [fiber] [notes]</td><td>Place any infrastructure node</td></tr>
+    <tr><td>connect &lt;routeType&gt; &lt;label1&gt; &lt;label2&gt; [label=…] [cable=N] [qty=N] [group=A|B]</td><td>Draw route between two named elements</td></tr>
+    <tr><td>route &lt;routeType&gt; &lt;lat,lng&gt; &lt;lat,lng&gt; … [label=…] [cable=N] [qty=N]</td><td>Draw route through explicit coordinates</td></tr>
+    <tr><td>poles &lt;type&gt; &lt;lat1&gt; &lt;lng1&gt; &lt;lat2&gt; &lt;lng2&gt; span=&lt;m&gt; [label=&lt;prefix&gt;]</td><td>Auto-place poles/closures at regular intervals</td></tr>
+    <tr><td>grid &lt;type&gt; &lt;lat&gt; &lt;lng&gt; rows=N cols=N spacingM=M [label=…] [fiber=N]</td><td>Place elements in a rectangular grid</td></tr>
+    <tr><td>set &lt;name&gt; &lt;value&gt;</td><td>Define a variable (use as $name or $name±offset)</td></tr>
+    <tr><td># comment</td><td>Line comment — ignored</td></tr>
+    <tr><td colspan="2" style="color:var(--text3);font-size:10px"><b>Types:</b> co cabinet odp closure patchpanel manhole customer rack tower pop edfa dwdm otn &nbsp;|&nbsp; <b>Routes:</b> trench conduit aerial trussbore underpass</td></tr>
+  </table>
+</details>`;
+}
+
+function bindScriptEvents(){
+  // restore saved script
+  const saved = localStorage.getItem('ftth_script');
+  if(saved){const ed=document.getElementById('script-editor');if(ed)ed.value=saved;}
+}
+
+function loadScriptExample(name){
+  if(!name||!SCRIPT_EXAMPLES[name])return;
+  const ed=document.getElementById('script-editor'); if(!ed)return;
+  ed.value=SCRIPT_EXAMPLES[name];
+  localStorage.setItem('ftth_script',ed.value);
+}
+
+function clearScriptConsole(){
+  const con=document.getElementById('script-console'); if(!con)return;
+  con.innerHTML='<span class="sc-dim">// Console cleared.</span>';
+}
+
+// ── Script Runner ──────────────────────────────────────────────
+function execScript(){
+  const ed=document.getElementById('script-editor');
+  const con=document.getElementById('script-console');
+  if(!ed||!con)return;
+  const src=ed.value;
+  con.innerHTML='';
+  _scriptVars={};
+  let placed=0, routed=0, errors=0;
+
+  function scLog(msg,cls='sc-info'){
+    const d=document.createElement('div');
+    d.className='sc-line '+cls;
+    d.textContent=msg;
+    con.appendChild(d);
+    con.scrollTop=con.scrollHeight;
+  }
+
+  scLog('▶ Running script…','sc-dim');
+
+  const lines=src.split('\n');
+  for(let li=0;li<lines.length;li++){
+    let raw=lines[li];
+    // substitute variables (support $name and $name+0.001 / $name-0.001)
+    raw=raw.replace(/\$(\w+)([\+\-][0-9.]+)?/g,(_,name,offset)=>{
+      const v=_scriptVars[name];
+      if(v===undefined)return '0';
+      const base=parseFloat(v)||0;
+      return offset ? String(base+(parseFloat(offset)||0)) : String(v);
+    });
+    const line=raw.trim();
+    if(!line||line.startsWith('#'))continue;
+
+    const parts=_tokenise(line);
+    const cmd=parts[0]?.toLowerCase();
+
+    try{
+      if(cmd==='set'){
+        // set name value
+        const [,name,...rest]=parts;
+        _scriptVars[name]=rest.join(' ');
+        scLog(`  set ${name} = ${_scriptVars[name]}`, 'sc-dim');
+
+      } else if(cmd==='place'){
+        // place <type> <lat> <lng> [label] [fiber] [notes]
+        const type=parts[1]?.toLowerCase();
+        if(!INFRA[type]) throw new Error(`Unknown infra type "${type}". Valid: ${Object.keys(INFRA).join(', ')}`);
+        const lat=parseFloat(parts[2]), lng=parseFloat(parts[3]);
+        if(isNaN(lat)||isNaN(lng)) throw new Error('Invalid lat/lng');
+        const count=S.elements.filter(e=>e.type===type).length+1;
+        const label=parts[4]||`${INFRA[type].abbr}-${String(count).padStart(3,'0')}`;
+        const fiber=parseInt(parts[5])||0;
+        const notes=parts.slice(6).join(' ');
+        placeElem(type,{lat,lng},label,fiber,notes);
+        scLog(`  ✓ place ${type} @ ${lat.toFixed(5)},${lng.toFixed(5)}  → ${label}${fiber?' ('+fiber+'F)':''}`, 'sc-ok');
+        placed++;
+
+      } else if(cmd==='connect'){
+        // connect <routeType> <labelA> <labelB> [label=…] [cable=N] [qty=N] [group=A|B]
+        const rtype=parts[1]?.toLowerCase();
+        if(!ROUTES[rtype]) throw new Error(`Unknown route type "${rtype}". Valid: ${Object.keys(ROUTES).join(', ')}`);
+        const labelA=parts[2], labelB=parts[3];
+        const elA=S.elements.find(e=>e.label===labelA);
+        const elB=S.elements.find(e=>e.label===labelB);
+        if(!elA) throw new Error(`Element not found: "${labelA}"`);
+        if(!elB) throw new Error(`Element not found: "${labelB}"`);
+        const opts=_parseKwargs(parts.slice(4));
+        const ci=parseInt(opts.cable)||0;
+        const qty=Math.max(1,parseInt(opts.qty)||1);
+        const rlabel=opts.label||(rtype.substring(0,3).toUpperCase()+'-'+String(S.routes.length+1).padStart(3,'0'));
+        const grp=opts.group||'none';
+        const cable=CABLES[ci]||CABLES[0];
+        const prevType=S.routeType; S.routeType=rtype;
+        S.pendingRoute={
+          pts:[L.latLng(elA.ll.lat,elA.ll.lng),L.latLng(elB.ll.lat,elB.ll.lng)],
+          fromEl:elA.id, toEl:elB.id
+        };
+        commitRoute(rlabel,cable.fibers*qty,grp,'',{cable,qty,duct:opts.duct||'none',cableIdx:ci});
+        S.routeType=prevType;
+        scLog(`  ✓ connect ${rtype} ${labelA} → ${labelB}  route="${rlabel}" ${cable.fibers*qty}F`,'sc-ok');
+        routed++;
+
+      } else if(cmd==='route'){
+        // route <routeType> <lat,lng> <lat,lng> … [label=…] [cable=N] [qty=N]
+        const rtype=parts[1]?.toLowerCase();
+        if(!ROUTES[rtype]) throw new Error(`Unknown route type "${rtype}"`);
+        const kwStart=parts.findIndex((p,i)=>i>1&&p.includes('='));
+        const coordParts=kwStart<0?parts.slice(2):parts.slice(2,kwStart);
+        const kwargs=_parseKwargs(kwStart<0?[]:parts.slice(kwStart));
+        const pts=coordParts.map(cp=>{
+          const [a,b]=cp.split(',');
+          const lat=parseFloat(a),lng=parseFloat(b);
+          if(isNaN(lat)||isNaN(lng)) throw new Error(`Bad coordinate: "${cp}"`);
+          return L.latLng(lat,lng);
+        });
+        if(pts.length<2) throw new Error('Need at least 2 coordinate pairs');
+        const ci=parseInt(kwargs.cable)||0;
+        const qty=Math.max(1,parseInt(kwargs.qty)||1);
+        const cable=CABLES[ci]||CABLES[0];
+        const rlabel=kwargs.label||(rtype.substring(0,3).toUpperCase()+'-'+String(S.routes.length+1).padStart(3,'0'));
+        const grp=kwargs.group||'none';
+        const prevType=S.routeType; S.routeType=rtype;
+        S.pendingRoute={
+          pts,
+          fromEl:snapToElem(pts[0]),
+          toEl:snapToElem(pts[pts.length-1])
+        };
+        commitRoute(rlabel,cable.fibers*qty,grp,'',{cable,qty,duct:kwargs.duct||'none',cableIdx:ci});
+        S.routeType=prevType;
+        scLog(`  ✓ route ${rtype} (${pts.length} pts) → "${rlabel}" ${cable.fibers*qty}F`,'sc-ok');
+        routed++;
+
+      } else if(cmd==='poles'){
+        // poles <type> <lat1> <lng1> <lat2> <lng2> span=<m> [label=<prefix>]
+        const type=parts[1]?.toLowerCase();
+        if(!INFRA[type]) throw new Error(`Unknown infra type "${type}"`);
+        const lat1=parseFloat(parts[2]),lng1=parseFloat(parts[3]);
+        const lat2=parseFloat(parts[4]),lng2=parseFloat(parts[5]);
+        if([lat1,lng1,lat2,lng2].some(isNaN)) throw new Error('Invalid coordinates for poles');
+        const kwargs=_parseKwargs(parts.slice(6));
+        const spanM=parseFloat(kwargs.span)||50;
+        const prefix=kwargs.label||(INFRA[type].abbr);
+        // interpolate points along the line
+        const totalDist=MAP.distance([lat1,lng1],[lat2,lng2]);
+        const count=Math.max(1,Math.floor(totalDist/spanM)-1); // exclude endpoints
+        let poleNum=S.elements.filter(e=>e.type===type).length+1;
+        for(let i=1;i<=count;i++){
+          const f=i/(count+1);
+          const plat=lat1+(lat2-lat1)*f;
+          const plng=lng1+(lng2-lng1)*f;
+          const lbl=`${prefix}-${String(poleNum++).padStart(3,'0')}`;
+          placeElem(type,{lat:plat,lng:plng},lbl,0,'');
+        }
+        scLog(`  ✓ poles ${type} × ${count} @ ${spanM}m span  (${prefix}-…)`,'sc-ok');
+        placed+=count;
+
+      } else if(cmd==='grid'){
+        // grid <type> <lat> <lng> rows=N cols=N spacingM=M [label=prefix] [fiber=N]
+        const type=parts[1]?.toLowerCase();
+        if(!INFRA[type]) throw new Error(`Unknown infra type "${type}"`);
+        const centerLat=parseFloat(parts[2]),centerLng=parseFloat(parts[3]);
+        if(isNaN(centerLat)||isNaN(centerLng)) throw new Error('Invalid center coordinates');
+        const kwargs=_parseKwargs(parts.slice(4));
+        const rows=Math.max(1,Math.min(20,parseInt(kwargs.rows)||3));
+        const cols=Math.max(1,Math.min(20,parseInt(kwargs.cols)||3));
+        const spacingM=parseFloat(kwargs.spacingM||kwargs.spacing)||50;
+        const prefix=kwargs.label||(INFRA[type].abbr);
+        const fiber=parseInt(kwargs.fiber)||0;
+        // 1 degree lat ≈ 111320 m, 1 degree lng ≈ 111320 * cos(lat)
+        const dLat=spacingM/111320;
+        const dLng=spacingM/(111320*Math.cos(centerLat*Math.PI/180));
+        const startLat=centerLat-dLat*(rows-1)/2;
+        const startLng=centerLng-dLng*(cols-1)/2;
+        let n=S.elements.filter(e=>e.type===type).length+1;
+        for(let r=0;r<rows;r++){
+          for(let c=0;c<cols;c++){
+            const lat=startLat+r*dLat, lng=startLng+c*dLng;
+            const lbl=`${prefix}-${String(n++).padStart(3,'0')}`;
+            placeElem(type,{lat,lng},lbl,fiber,'');
+          }
+        }
+        const total=rows*cols;
+        scLog(`  ✓ grid ${type} ${rows}×${cols} = ${total} elements @ ${spacingM}m spacing`,'sc-ok');
+        placed+=total;
+
+      } else {
+        throw new Error(`Unknown command "${cmd}". Valid: place, connect, route, poles, grid, set`);
+      }
+    } catch(err){
+      scLog(`  ✗ Line ${li+1}: ${err.message}`,'sc-err');
+      errors++;
+    }
+  }
+
+  scLog('','sc-dim');
+  scLog(`Done — ${placed} placed, ${routed} routes drawn, ${errors} error(s).`, errors?'sc-warn':'sc-ok');
+  if(placed||routed) fitAll();
+  updateUI();
+}
+
+// Tokenise a script line respecting quoted strings
+function _tokenise(line){
+  const tokens=[];
+  let cur='', inQ=false, q='';
+  for(const ch of line){
+    if(inQ){if(ch===q){inQ=false;}else cur+=ch;}
+    else if(ch==='"'||ch==="'"){inQ=true;q=ch;}
+    else if(ch===' '||ch==='\t'){if(cur){tokens.push(cur);cur='';}}
+    else cur+=ch;
+  }
+  if(cur)tokens.push(cur);
+  return tokens;
+}
+
+// Parse key=value pairs from token array
+function _parseKwargs(tokens){
+  const o={};
+  tokens.forEach(t=>{
+    const eq=t.indexOf('=');
+    if(eq>0)o[t.substring(0,eq)]=t.substring(eq+1);
+  });
+  return o;
 }
 
 function init(){
