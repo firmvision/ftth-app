@@ -4,963 +4,1163 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Babcock CBT — Admin Panel</title>
-<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Segoe UI',system-ui,sans-serif;background:#f1f5f9;min-height:100vh}
 :root{--primary:#1a1a2e;--accent:#0f3460;--green:#15803d;--red:#dc2626;--amber:#d97706}
-input,select,textarea{font-family:inherit}
-.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 18px;border-radius:8px;font-size:14px;font-weight:600;border:none;cursor:pointer;transition:.15s}
-.btn-primary{background:var(--accent);color:#fff}.btn-primary:hover{background:#16213e}
-.btn-success{background:var(--green);color:#fff}.btn-success:hover{background:#166534}
-.btn-danger{background:var(--red);color:#fff}.btn-danger:hover{background:#b91c1c}
-.btn-ghost{background:#f1f5f9;color:#374151;border:1.5px solid #e2e8f0}.btn-ghost:hover{border-color:var(--accent);color:var(--accent)}
-.btn-sm{padding:5px 12px;font-size:13px}
-.btn:disabled{opacity:.5;cursor:not-allowed}
-input[type=text],input[type=password],input[type=email],input[type=number],input[type=datetime-local],select,textarea{
-  width:100%;border:1.5px solid #e2e8f0;border-radius:8px;padding:9px 12px;font-size:14px;outline:none;color:#1a1a2e;background:#fff;transition:.15s
-}
-input:focus,select:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(15,52,96,.1)}
-label{display:block;font-size:13px;font-weight:600;color:#374151;margin-bottom:5px}
-.form-group{margin-bottom:16px}
-table{width:100%;border-collapse:collapse;font-size:14px}
-th{background:#f8fafc;padding:10px 12px;text-align:left;font-size:12px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid #e2e8f0}
-td{padding:10px 12px;border-bottom:1px solid #f1f5f9;color:#374151;vertical-align:middle}
-tr:hover td{background:#f8fafc}
-.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:600}
-.badge-blue{background:#dbeafe;color:#1d4ed8}
-.badge-green{background:#dcfce7;color:#15803d}
-.badge-amber{background:#fef9c3;color:#854d0e}
-.badge-red{background:#fee2e2;color:#dc2626}
-.badge-gray{background:#f1f5f9;color:#475569}
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1000;display:flex;align-items:center;justify-content:center;padding:16px}
-.modal{background:#fff;border-radius:16px;width:100%;max-width:600px;max-height:90vh;overflow-y:auto;box-shadow:0 25px 60px rgba(0,0,0,.3)}
-.modal-header{padding:20px 24px 0;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:#fff;padding-bottom:16px;border-bottom:1px solid #e2e8f0}
-.modal-header h2{font-size:18px;font-weight:700;color:#1a1a2e}
-.modal-body{padding:24px}
-.modal-footer{padding:16px 24px;border-top:1px solid #e2e8f0;display:flex;justify-content:flex-end;gap:10px;background:#fff;position:sticky;bottom:0}
-.close-btn{background:none;border:none;font-size:22px;cursor:pointer;color:#94a3b8;line-height:1}
-.card{background:#fff;border-radius:12px;padding:24px;box-shadow:0 2px 8px rgba(0,0,0,.06);border:1px solid #e2e8f0}
-.stat-card{background:#fff;border-radius:12px;padding:20px;box-shadow:0 2px 8px rgba(0,0,0,.06);border-left:4px solid var(--accent)}
-.stat-val{font-size:32px;font-weight:800;color:#1a1a2e}
-.stat-label{font-size:13px;color:#64748b;margin-top:4px}
-.tabs-bar{display:flex;gap:4px;border-bottom:2px solid #e2e8f0;margin-bottom:24px}
-.tab-item{padding:10px 18px;font-size:14px;font-weight:600;cursor:pointer;color:#64748b;border-bottom:2px solid transparent;margin-bottom:-2px;transition:.15s}
-.tab-item.active{color:var(--accent);border-bottom-color:var(--accent)}
-.spinner{display:inline-block;width:16px;height:16px;border:2px solid #e2e8f0;border-top-color:var(--accent);border-radius:50%;animation:spin .6s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
-.toast{position:fixed;bottom:24px;right:24px;z-index:9999;background:#1a1a2e;color:#fff;padding:12px 20px;border-radius:10px;font-size:14px;font-weight:500;box-shadow:0 8px 24px rgba(0,0,0,.3);animation:slideUp .3s ease}
-@keyframes slideUp{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
-.sidebar{width:220px;min-width:200px;background:#1a1a2e;min-height:100vh;display:flex;flex-direction:column}
-.sidebar-logo{padding:20px 18px;border-bottom:1px solid rgba(255,255,255,.1)}
-.sidebar-logo h1{color:#fff;font-size:16px;font-weight:700}
-.sidebar-logo p{color:rgba(255,255,255,.5);font-size:12px;margin-top:2px}
-.nav-item{padding:11px 18px;font-size:14px;font-weight:500;color:rgba(255,255,255,.7);cursor:pointer;display:flex;align-items:center;gap:10px;transition:.15s}
-.nav-item:hover{background:rgba(255,255,255,.08);color:#fff}
-.nav-item.active{background:rgba(255,255,255,.12);color:#fff;border-right:3px solid #60a5fa}
-.nav-section{padding:12px 18px 6px;font-size:11px;font-weight:700;color:rgba(255,255,255,.3);text-transform:uppercase;letter-spacing:.5px}
+input,select,textarea,button{font-family:inherit}
 .layout{display:flex;min-height:100vh}
-.main-area{flex:1;display:flex;flex-direction:column;min-height:100vh}
+
+/* Sidebar */
+.sidebar{width:220px;min-width:200px;background:var(--primary);display:flex;flex-direction:column;min-height:100vh}
+.sb-logo{padding:18px;border-bottom:1px solid rgba(255,255,255,.1)}
+.sb-logo h1{color:#fff;font-size:16px;font-weight:700}
+.sb-logo p{color:rgba(255,255,255,.4);font-size:12px;margin-top:2px}
+.sb-section{padding:10px 18px 4px;font-size:11px;font-weight:700;color:rgba(255,255,255,.3);text-transform:uppercase;letter-spacing:.5px}
+.nav-item{padding:10px 18px;font-size:14px;font-weight:500;color:rgba(255,255,255,.65);cursor:pointer;display:flex;align-items:center;gap:10px;transition:.15s;border-right:3px solid transparent}
+.nav-item:hover{background:rgba(255,255,255,.07);color:#fff}
+.nav-item.active{background:rgba(255,255,255,.1);color:#fff;border-right-color:#60a5fa}
+.sb-spacer{flex:1}
+.sb-user{padding:10px 18px;font-size:12px;color:rgba(255,255,255,.4)}
+.sb-logout{padding:10px 18px;font-size:14px;color:rgba(255,80,80,.7);cursor:pointer;display:flex;align-items:center;gap:8px}
+.sb-logout:hover{color:#f87171;background:rgba(255,80,80,.08)}
+
+/* Main */
+.main-area{flex:1;display:flex;flex-direction:column}
 .topbar{background:#fff;border-bottom:1px solid #e2e8f0;padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between}
 .topbar h2{font-size:18px;font-weight:700;color:#1a1a2e}
-.page{padding:24px;flex:1;overflow-y:auto}
-.q-type-badge{font-size:11px;padding:2px 8px;border-radius:4px;font-weight:600}
-.q-mcq{background:#dbeafe;color:#1d4ed8}
-.q-tf{background:#dcfce7;color:#15803d}
-.q-multi{background:#fef9c3;color:#854d0e}
-.q-essay{background:#f3e8ff;color:#7e22ce}
-.option-row{display:flex;gap:8px;align-items:center;margin-bottom:8px}
-.option-row input[type=text]{flex:1}
-.alert{border-radius:8px;padding:12px 16px;font-size:14px;margin-bottom:16px}
+.topbar-sub{font-size:13px;color:#64748b}
+.page{padding:24px;flex:1}
+
+/* Buttons */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:8px;font-size:14px;font-weight:600;border:none;cursor:pointer;transition:.15s;text-decoration:none}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn-primary{background:var(--accent);color:#fff}.btn-primary:hover:not(:disabled){background:#16213e}
+.btn-success{background:var(--green);color:#fff}.btn-success:hover:not(:disabled){background:#166534}
+.btn-danger{background:var(--red);color:#fff}.btn-danger:hover:not(:disabled){background:#b91c1c}
+.btn-ghost{background:#f1f5f9;color:#374151;border:1.5px solid #e2e8f0}.btn-ghost:hover:not(:disabled){border-color:var(--accent);color:var(--accent)}
+.btn-amber{background:#fef9c3;color:#854d0e;border:1.5px solid #fde047}.btn-amber:hover:not(:disabled){background:#fde047}
+.btn-sm{padding:5px 12px;font-size:13px}
+.btn-xs{padding:3px 9px;font-size:12px}
+
+/* Forms */
+.form-group{margin-bottom:14px}
+label.fl{display:block;font-size:13px;font-weight:600;color:#374151;margin-bottom:5px}
+.fi{width:100%;border:1.5px solid #e2e8f0;border-radius:8px;padding:9px 12px;font-size:14px;outline:none;color:#1a1a2e;background:#fff;transition:.15s}
+.fi:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(15,52,96,.1)}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+.check-row{display:flex;align-items:center;gap:8px;cursor:pointer;font-size:14px;color:#374151}
+.check-row input{width:16px;height:16px;accent-color:var(--accent);cursor:pointer}
+
+/* Cards */
+.card{background:#fff;border-radius:12px;padding:20px;box-shadow:0 2px 8px rgba(0,0,0,.06);border:1px solid #e2e8f0;margin-bottom:16px}
+.stat-card{background:#fff;border-radius:12px;padding:18px;box-shadow:0 2px 8px rgba(0,0,0,.06);border-left:4px solid var(--accent)}
+.stat-val{font-size:32px;font-weight:800;color:#1a1a2e;line-height:1}
+.stat-lbl{font-size:13px;color:#64748b;margin-top:6px}
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin-bottom:24px}
+
+/* Tables */
+.table-wrap{background:#fff;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,.06);border:1px solid #e2e8f0;overflow:hidden;margin-bottom:16px}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{background:#f8fafc;padding:10px 14px;text-align:left;font-size:12px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.4px;border-bottom:1px solid #e2e8f0;white-space:nowrap}
+td{padding:10px 14px;border-bottom:1px solid #f1f5f9;color:#374151;vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#f8fafc}
+.td-actions{display:flex;gap:6px;flex-wrap:wrap}
+.empty-row{text-align:center;padding:36px;color:#94a3b8;font-size:14px}
+
+/* Badges */
+.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:600;line-height:1.4}
+.b-blue{background:#dbeafe;color:#1d4ed8}
+.b-green{background:#dcfce7;color:#15803d}
+.b-amber{background:#fef9c3;color:#854d0e}
+.b-red{background:#fee2e2;color:#b91c1c}
+.b-gray{background:#f1f5f9;color:#475569}
+.b-purple{background:#f3e8ff;color:#7e22ce}
+
+/* Q-type chips */
+.q-chip{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600}
+.qc-mcq{background:#dbeafe;color:#1d4ed8}
+.qc-tf{background:#dcfce7;color:#15803d}
+.qc-multi{background:#fef9c3;color:#854d0e}
+.qc-essay{background:#f3e8ff;color:#7e22ce}
+
+/* Toolbar */
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;align-items:center}
+.toolbar-right{margin-left:auto;display:flex;gap:8px}
+.search-box{padding:8px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:14px;outline:none;width:220px;transition:.15s}
+.search-box:focus{border-color:var(--accent)}
+.count-label{font-size:13px;color:#64748b;margin-bottom:10px}
+
+/* Modal */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1000;display:none;align-items:center;justify-content:center;padding:16px}
+.modal-overlay.open{display:flex}
+.modal{background:#fff;border-radius:16px;width:100%;max-width:640px;max-height:90vh;display:flex;flex-direction:column;box-shadow:0 25px 60px rgba(0,0,0,.3)}
+.modal-sm{max-width:420px}
+.modal-lg{max-width:900px}
+.modal-hd{padding:18px 24px;border-bottom:1px solid #e2e8f0;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.modal-hd h2{font-size:17px;font-weight:700;color:#1a1a2e}
+.modal-close{background:none;border:none;font-size:22px;cursor:pointer;color:#94a3b8;line-height:1;padding:0}
+.modal-body{padding:24px;overflow-y:auto;flex:1}
+.modal-ft{padding:14px 24px;border-top:1px solid #e2e8f0;display:flex;justify-content:flex-end;gap:10px;flex-shrink:0}
+
+/* Option rows in Q editor */
+.opt-row{display:flex;gap:8px;align-items:center;margin-bottom:8px}
+.opt-row .fi{flex:1}
+.opt-radio{width:18px;height:18px;accent-color:var(--accent);cursor:pointer;flex-shrink:0}
+
+/* Alert */
+.alert{border-radius:8px;padding:12px 14px;font-size:13px;margin-bottom:14px}
 .alert-info{background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe}
 .alert-warn{background:#fef9c3;color:#854d0e;border:1px solid #fde047}
+
+/* Toast */
+.toast{position:fixed;bottom:24px;right:24px;z-index:9999;background:#1a1a2e;color:#fff;padding:12px 20px;border-radius:10px;font-size:14px;font-weight:500;box-shadow:0 8px 24px rgba(0,0,0,.3);display:none;animation:slideUp .25s ease}
+.toast.err{background:var(--red)}
+.toast.warn{background:var(--amber)}
+@keyframes slideUp{from{transform:translateY(12px);opacity:0}to{transform:translateY(0);opacity:1}}
+
+/* Spinner */
+.spin{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:sp .6s linear infinite}
+.spin-dark{border-color:rgba(15,52,96,.15);border-top-color:var(--accent)}
+@keyframes sp{to{transform:rotate(360deg)}}
+
+/* Result answer cards */
+.ans-card{background:#fff;border-radius:10px;padding:18px;margin-bottom:12px;border:1px solid #e2e8f0;border-left:4px solid #e2e8f0}
+.ans-card.correct{border-left-color:var(--green)}
+.ans-card.wrong{border-left-color:var(--red)}
+.ans-card.essay{border-left-color:#7e22ce}
+.ans-card.unanswered{border-left-color:#94a3b8}
+.opt-choice{padding:6px 10px;border-radius:6px;font-size:14px;color:#374151;margin-bottom:4px}
+.opt-choice.student-pick{background:#fee2e2;color:var(--red)}
+.opt-choice.correct-ans{background:#dcfce7;color:var(--green);font-weight:600}
+.opt-choice.both{background:#dcfce7;color:var(--green);font-weight:600}
+.exam-q-manager{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.q-list-panel{background:#fff;border-radius:12px;border:1px solid #e2e8f0;overflow:hidden;display:flex;flex-direction:column;max-height:620px}
+.q-list-hd{padding:12px 16px;background:#f8fafc;border-bottom:1px solid #e2e8f0;font-size:13px;font-weight:700;color:#374151}
+.q-list-body{overflow-y:auto;flex:1}
+.q-row{padding:10px 14px;border-bottom:1px solid #f1f5f9;display:flex;align-items:flex-start;gap:8px}
+.q-row:last-child{border-bottom:none}
+.q-row:hover{background:#f8fafc}
+.q-row-text{flex:1;min-width:0;font-size:13px;color:#1a1a2e;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.q-row-meta{display:flex;gap:6px;margin-top:4px;align-items:center}
 </style>
 </head>
 <body>
-<div id="root"></div>
-<script type="text/babel">
-const { useState, useEffect, useCallback, useRef } = React;
 
-// ── Config ────────────────────────────────────────────────────────────────────
-const API = (location.hostname==='localhost'||location.hostname==='127.0.0.1')
+<div class="layout">
+  <!-- Sidebar -->
+  <nav class="sidebar" id="sidebar">
+    <div class="sb-logo">
+      <h1>Babcock CBT</h1>
+      <p>Admin Panel</p>
+    </div>
+    <div class="sb-section">Navigation</div>
+    <div class="nav-item active" data-page="dashboard" onclick="nav('dashboard')">📊 Dashboard</div>
+    <div class="nav-item" data-page="students" onclick="nav('students')">👥 Students</div>
+    <div class="nav-item" data-page="subjects" onclick="nav('subjects')">📚 Subjects</div>
+    <div class="nav-item" data-page="questions" onclick="nav('questions')">❓ Question Bank</div>
+    <div class="nav-item" data-page="exams" onclick="nav('exams')">📝 Exams</div>
+    <div class="sb-spacer"></div>
+    <div class="sb-section">Account</div>
+    <div class="sb-user" id="sb-user-name"></div>
+    <div class="sb-logout" onclick="logout()">🚪 Log out</div>
+  </nav>
+
+  <!-- Main -->
+  <div class="main-area">
+    <div class="topbar">
+      <h2 id="page-title">Dashboard</h2>
+      <span class="topbar-sub" id="topbar-sub"></span>
+    </div>
+    <div class="page" id="page-content">
+      <div style="text-align:center;padding:60px"><span class="spin spin-dark"></span></div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal-overlay" id="modal-overlay" onclick="if(event.target===this)closeModal()">
+  <div class="modal" id="modal-box"></div>
+</div>
+
+<!-- Confirm modal -->
+<div class="modal-overlay modal-sm" id="confirm-overlay">
+  <div class="modal modal-sm">
+    <div class="modal-hd"><h2>Confirm</h2><button class="modal-close" onclick="closeConfirm()">×</button></div>
+    <div class="modal-body"><p id="confirm-msg" style="color:#374151;font-size:15px"></p></div>
+    <div class="modal-ft">
+      <button class="btn btn-ghost" onclick="closeConfirm()">Cancel</button>
+      <button class="btn btn-danger" id="confirm-ok-btn">Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ── Auth check ────────────────────────────────────────────────────────────────
+const _token = localStorage.getItem('cbt_token');
+const _role  = localStorage.getItem('cbt_role');
+const _name  = localStorage.getItem('cbt_name');
+if (!_token || (_role !== 'admin' && _role !== 'teacher')) location.href = 'login.html';
+
+const API = (location.hostname === 'localhost' || location.hostname === '127.0.0.1')
   ? 'http://localhost:8000' : location.origin;
-const token = localStorage.getItem('cbt_token');
-const role  = localStorage.getItem('cbt_role');
-const name  = localStorage.getItem('cbt_name');
-if (!token || (role!=='admin'&&role!=='teacher')) location.href='login.html';
 
-async function api(path, opts={}) {
-  const r = await fetch(API+path, {
+document.getElementById('sb-user-name').textContent = _name || 'Admin';
+document.getElementById('topbar-sub').textContent = 'Logged in as ' + (_name || '');
+
+// ── API helpers ───────────────────────────────────────────────────────────────
+async function api(path, opts = {}) {
+  const r = await fetch(API + path, {
     ...opts,
-    headers: { Authorization:`Bearer ${token}`, ...(opts.headers||{}) },
+    headers: { Authorization: `Bearer ${_token}`, ...(opts.headers || {}) },
   });
-  if (r.status===401) { localStorage.clear(); location.href='login.html'; }
+  if (r.status === 401) { localStorage.clear(); location.href = 'login.html'; }
   return r;
 }
-async function apiJSON(path, opts={}) {
-  const r = await api(path, { ...opts, headers:{'Content-Type':'application/json',...(opts.headers||{})} });
+async function apiJSON(path, opts = {}) {
+  const r = await api(path, {
+    ...opts,
+    headers: { 'Content-Type': 'application/json', ...(opts.headers || {}), ...(opts.headers || {}) },
+  });
   const d = await r.json();
   if (!r.ok) throw new Error(d.detail || 'Request failed');
   return d;
 }
 
 // ── Toast ─────────────────────────────────────────────────────────────────────
-function useToast() {
-  const [toast, setToast] = useState(null);
-  const show = useCallback((msg, type='success') => {
-    setToast({ msg, type });
-    setTimeout(() => setToast(null), 3500);
-  }, []);
-  return { toast, show };
+let _toastTimer;
+function toast(msg, type = 'ok') {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'toast' + (type === 'error' ? ' err' : type === 'warn' ? ' warn' : '');
+  el.style.display = 'block';
+  clearTimeout(_toastTimer);
+  _toastTimer = setTimeout(() => el.style.display = 'none', 3200);
 }
 
-function Toast({ toast }) {
-  if (!toast) return null;
-  const bg = toast.type==='error' ? '#dc2626' : toast.type==='warn' ? '#d97706' : '#15803d';
-  return <div className="toast" style={{background:bg}}>{toast.msg}</div>;
+// ── Modal ─────────────────────────────────────────────────────────────────────
+function openModal(html, large = false) {
+  const box = document.getElementById('modal-box');
+  box.className = 'modal' + (large ? ' modal-lg' : '');
+  box.innerHTML = html;
+  document.getElementById('modal-overlay').classList.add('open');
+}
+function closeModal() {
+  document.getElementById('modal-overlay').classList.remove('open');
+  document.getElementById('modal-box').innerHTML = '';
 }
 
-// ── Small shared components ────────────────────────────────────────────────────
-function Modal({ title, onClose, children, footer }) {
-  return <div className="modal-overlay" onClick={e=>e.target===e.currentTarget&&onClose()}>
-    <div className="modal">
-      <div className="modal-header">
-        <h2>{title}</h2>
-        <button className="close-btn" onClick={onClose}>×</button>
-      </div>
-      <div className="modal-body">{children}</div>
-      {footer && <div className="modal-footer">{footer}</div>}
-    </div>
-  </div>;
+let _confirmCb;
+function confirm(msg, cb, btnLabel = 'Delete') {
+  document.getElementById('confirm-msg').textContent = msg;
+  document.getElementById('confirm-ok-btn').textContent = btnLabel;
+  document.getElementById('confirm-overlay').classList.add('open');
+  _confirmCb = cb;
+  document.getElementById('confirm-ok-btn').onclick = () => { closeConfirm(); cb(); };
 }
+function closeConfirm() { document.getElementById('confirm-overlay').classList.remove('open'); }
 
-function Spinner() { return <span className="spinner"></span>; }
-
-function Badge({ status }) {
-  const map = {
-    draft:['gray','Draft'], scheduled:['blue','Scheduled'], active:['green','Active'], ended:['gray','Ended'],
-    submitted:['green','Submitted'], auto_submitted:['amber','Auto-submitted'], timed_out:['red','Timed out'],
-    in_progress:['amber','In Progress'], not_started:['gray','Not Started'],
-    admin:['blue','Admin'], teacher:['amber','Teacher'], student:['gray','Student'],
+// ── Utilities ─────────────────────────────────────────────────────────────────
+function esc(s) {
+  return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function badge(status) {
+  const M = {
+    draft:['b-gray','Draft'], scheduled:['b-blue','Scheduled'],
+    active:['b-green','Active'], ended:['b-gray','Ended'],
+    submitted:['b-green','Submitted'], auto_submitted:['b-amber','Auto-submitted'],
+    timed_out:['b-red','Timed out'], in_progress:['b-amber','In Progress'],
+    not_started:['b-gray','Not Started'],
+    admin:['b-blue','Admin'], teacher:['b-amber','Teacher'], student:['b-gray','Student'],
   };
-  const [cls, label] = map[status] || ['gray', status];
-  return <span className={`badge badge-${cls}`}>{label}</span>;
+  const [cls, label] = M[status] || ['b-gray', status];
+  return `<span class="badge ${cls}">${label}</span>`;
+}
+function qChip(type) {
+  const M = {mcq:'qc-mcq',true_false:'qc-tf',multi_select:'qc-multi',essay:'qc-essay'};
+  const L = {mcq:'MCQ',true_false:'T/F',multi_select:'Multi',essay:'Essay'};
+  return `<span class="q-chip ${M[type]||''}">${L[type]||type}</span>`;
+}
+function spinner() { return '<span class="spin spin-dark"></span>'; }
+function pct(score, total) { return total ? Math.round(score/total*100) : 0; }
+
+// ── Navigation ────────────────────────────────────────────────────────────────
+const PAGE_TITLES = {
+  dashboard:'Dashboard', students:'Students', subjects:'Subjects',
+  questions:'Question Bank', exams:'Exams',
+};
+let _currentPage = '';
+
+function nav(page) {
+  _currentPage = page;
+  document.querySelectorAll('.nav-item').forEach(el => {
+    el.classList.toggle('active', el.dataset.page === page);
+  });
+  document.getElementById('page-title').textContent = PAGE_TITLES[page] || page;
+  document.getElementById('page-content').innerHTML =
+    `<div style="text-align:center;padding:60px">${spinner()}</div>`;
+  window._subPage = null;
+  switch (page) {
+    case 'dashboard': loadDashboard(); break;
+    case 'students':  loadStudents(); break;
+    case 'subjects':  loadSubjects(); break;
+    case 'questions': loadQuestions(); break;
+    case 'exams':     loadExams(); break;
+  }
 }
 
-function ConfirmModal({ msg, onConfirm, onCancel }) {
-  return <Modal title="Confirm" onClose={onCancel} footer={<>
-    <button className="btn btn-ghost" onClick={onCancel}>Cancel</button>
-    <button className="btn btn-danger" onClick={onConfirm}>Confirm</button>
-  </>}><p style={{color:'#374151'}}>{msg}</p></Modal>;
-}
+function logout() { localStorage.clear(); location.href = 'login.html'; }
 
-// ── Dashboard page ────────────────────────────────────────────────────────────
-function DashboardPage() {
-  const [stats, setStats] = useState(null);
-  useEffect(() => {
-    Promise.all([
+// ════════════════════════════════════════════════════════════════════════════
+// DASHBOARD
+// ════════════════════════════════════════════════════════════════════════════
+async function loadDashboard() {
+  try {
+    const [students, exams, questions] = await Promise.all([
       apiJSON('/api/admin/users?role=student'),
       apiJSON('/api/admin/exams'),
       apiJSON('/api/admin/questions'),
-    ]).then(([students, exams, questions]) => {
-      setStats({
-        students: students.length,
-        exams: exams.length,
-        active: exams.filter(e=>e.status==='active').length,
-        questions: questions.length,
-      });
-    }).catch(()=>{});
-  }, []);
-
-  if (!stats) return <div style={{textAlign:'center',padding:60}}><Spinner/></div>;
-  return <>
-    <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(200px,1fr))',gap:16,marginBottom:28}}>
-      {[
-        {label:'Total Students',val:stats.students,color:'#0f3460'},
-        {label:'Total Exams',val:stats.exams,color:'#7e22ce'},
-        {label:'Active Exams',val:stats.active,color:'#15803d'},
-        {label:'Questions in Bank',val:stats.questions,color:'#d97706'},
-      ].map(s=><div key={s.label} className="stat-card" style={{borderLeftColor:s.color}}>
-        <div className="stat-val" style={{color:s.color}}>{s.val}</div>
-        <div className="stat-label">{s.label}</div>
-      </div>)}
-    </div>
-    <div className="card">
-      <h3 style={{marginBottom:12,color:'#1a1a2e'}}>Quick Start</h3>
-      <p style={{color:'#64748b',fontSize:14,lineHeight:1.7}}>
-        1. Add <strong>Subjects</strong> and <strong>Students</strong> under their respective pages.<br/>
-        2. Build your <strong>Question Bank</strong>.<br/>
-        3. Create an <strong>Exam</strong>, add questions from the bank, then set status to <strong>Active</strong>.<br/>
-        4. Students log in and take the exam from the <em>student.html</em> page.
-      </p>
-    </div>
-  </>;
+    ]);
+    const active = exams.filter(e => e.status === 'active').length;
+    document.getElementById('page-content').innerHTML = `
+      <div class="stats-grid">
+        <div class="stat-card" style="border-left-color:var(--accent)">
+          <div class="stat-val">${students.length}</div>
+          <div class="stat-lbl">Total Students</div>
+        </div>
+        <div class="stat-card" style="border-left-color:#7e22ce">
+          <div class="stat-val">${exams.length}</div>
+          <div class="stat-lbl">Total Exams</div>
+        </div>
+        <div class="stat-card" style="border-left-color:var(--green)">
+          <div class="stat-val">${active}</div>
+          <div class="stat-lbl">Active Exams</div>
+        </div>
+        <div class="stat-card" style="border-left-color:var(--amber)">
+          <div class="stat-val">${questions.length}</div>
+          <div class="stat-lbl">Questions in Bank</div>
+        </div>
+      </div>
+      <div class="card">
+        <h3 style="margin-bottom:10px;color:#1a1a2e">Quick Start Guide</h3>
+        <p style="color:#64748b;font-size:14px;line-height:1.8">
+          <strong>1.</strong> Add <strong>Subjects</strong> (e.g. Mathematics, English).<br>
+          <strong>2.</strong> Add <strong>Students</strong> individually or bulk-import from CSV.<br>
+          <strong>3.</strong> Build the <strong>Question Bank</strong> — MCQ, True/False, Multi-select, or Essay.<br>
+          <strong>4.</strong> Create an <strong>Exam</strong>, add questions from the bank, then set status to <em>Active</em>.<br>
+          <strong>5.</strong> Students open <code>student.html</code> (or your server URL), log in, and take the exam.<br>
+          <strong>6.</strong> View <strong>Results</strong> per exam; grade essay answers manually.
+        </p>
+      </div>`;
+  } catch(e) { document.getElementById('page-content').innerHTML = `<div class="card">Error: ${esc(e.message)}</div>`; }
 }
 
-// ── Students page ─────────────────────────────────────────────────────────────
-function StudentsPage({ toast }) {
-  const [users, setUsers] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState('');
-  const [showModal, setShowModal] = useState(false);
-  const [editUser, setEditUser] = useState(null);
-  const [deleteId, setDeleteId] = useState(null);
-  const [showImport, setShowImport] = useState(false);
-  const fileRef = useRef();
+// ════════════════════════════════════════════════════════════════════════════
+// STUDENTS
+// ════════════════════════════════════════════════════════════════════════════
+let _students = [];
 
-  const load = () => {
-    setLoading(true);
-    apiJSON('/api/admin/users').then(setUsers).finally(()=>setLoading(false));
-  };
-  useEffect(load, []);
+async function loadStudents() {
+  try {
+    _students = await apiJSON('/api/admin/users');
+    renderStudents();
+  } catch(e) { document.getElementById('page-content').innerHTML = `<div class="card">Error: ${esc(e.message)}</div>`; }
+}
 
-  const filtered = users.filter(u =>
-    u.full_name.toLowerCase().includes(search.toLowerCase()) ||
-    (u.username||'').toLowerCase().includes(search.toLowerCase()) ||
-    (u.reg_number||'').toLowerCase().includes(search.toLowerCase()) ||
-    (u.class_name||'').toLowerCase().includes(search.toLowerCase())
+function renderStudents(search = '') {
+  const filtered = _students.filter(u =>
+    !search ||
+    u.full_name.toLowerCase().includes(search) ||
+    (u.username||'').toLowerCase().includes(search) ||
+    (u.reg_number||'').toLowerCase().includes(search) ||
+    (u.class_name||'').toLowerCase().includes(search)
   );
 
-  async function handleDelete() {
-    try {
-      await apiJSON(`/api/admin/users/${deleteId}`, {method:'DELETE'});
-      toast.show('User deleted');
-      setDeleteId(null); load();
-    } catch(e) { toast.show(e.message,'error'); }
-  }
+  const rows = filtered.length ? filtered.map(u => `
+    <tr>
+      <td style="font-weight:600">${esc(u.full_name)}</td>
+      <td style="color:#64748b">${esc(u.username)}</td>
+      <td>${esc(u.reg_number||'—')}</td>
+      <td>${esc(u.class_name||'—')}</td>
+      <td>${badge(u.role)}</td>
+      <td><span class="badge ${u.is_active?'b-green':'b-red'}">${u.is_active?'Active':'Disabled'}</span></td>
+      <td class="td-actions">
+        <button class="btn btn-ghost btn-sm" onclick="openUserModal(${u.id})">Edit</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteUser(${u.id},'${esc(u.full_name)}')">Delete</button>
+      </td>
+    </tr>`).join('') : `<tr><td colspan="7" class="empty-row">No users found.</td></tr>`;
 
-  async function handleImport() {
-    const file = fileRef.current?.files?.[0];
-    if (!file) return;
-    const fd = new FormData(); fd.append('file', file);
-    try {
-      const r = await api('/api/admin/users/bulk-import', {method:'POST', body:fd});
-      const d = await r.json();
-      if (!r.ok) throw new Error(d.detail);
-      toast.show(`Imported ${d.created} users (${d.skipped} skipped)`);
-      setShowImport(false); load();
-    } catch(e) { toast.show(e.message,'error'); }
-  }
-
-  return <>
-    <div style={{display:'flex',gap:10,marginBottom:20,flexWrap:'wrap'}}>
-      <input type="text" placeholder="Search by name, username, reg no…" value={search}
-        onChange={e=>setSearch(e.target.value)} style={{maxWidth:320}}/>
-      <button className="btn btn-ghost" onClick={()=>setShowImport(true)}>⬆ Bulk Import CSV</button>
-      <button className="btn btn-primary" onClick={()=>{setEditUser(null);setShowModal(true)}}>+ Add Student</button>
+  document.getElementById('page-content').innerHTML = `
+    <div class="toolbar">
+      <input class="search-box" type="text" placeholder="Search name, username, reg no…"
+        oninput="renderStudents(this.value.toLowerCase())" id="std-search">
+      <button class="btn btn-ghost" onclick="openImportModal()">⬆ Bulk Import CSV</button>
+      <div class="toolbar-right">
+        <button class="btn btn-primary" onclick="openUserModal(null)">+ Add Student</button>
+      </div>
     </div>
-
-    {loading ? <div style={{textAlign:'center',padding:40}}><Spinner/></div> : (
-      <div className="card" style={{padding:0,overflow:'hidden'}}>
-        <table>
-          <thead><tr>
-            <th>Name</th><th>Username</th><th>Reg No.</th>
-            <th>Class</th><th>Role</th><th>Status</th><th>Actions</th>
-          </tr></thead>
-          <tbody>{filtered.map(u=><tr key={u.id}>
-            <td style={{fontWeight:600}}>{u.full_name}</td>
-            <td style={{color:'#64748b'}}>{u.username}</td>
-            <td>{u.reg_number||'—'}</td>
-            <td>{u.class_name||'—'}</td>
-            <td><Badge status={u.role}/></td>
-            <td><span className={`badge badge-${u.is_active?'green':'red'}`}>{u.is_active?'Active':'Disabled'}</span></td>
-            <td>
-              <button className="btn btn-ghost btn-sm" style={{marginRight:6}}
-                onClick={()=>{setEditUser(u);setShowModal(true)}}>Edit</button>
-              <button className="btn btn-danger btn-sm" onClick={()=>setDeleteId(u.id)}>Delete</button>
-            </td>
-          </tr>)}</tbody>
-        </table>
-        {!filtered.length && <div style={{textAlign:'center',padding:32,color:'#94a3b8'}}>No users found.</div>}
-      </div>
-    )}
-
-    {showModal && <UserModal user={editUser} onClose={()=>setShowModal(false)} onSave={()=>{setShowModal(false);load();toast.show(editUser?'User updated':'User created');}} toast={toast}/>}
-    {deleteId && <ConfirmModal msg="Delete this user? This cannot be undone." onConfirm={handleDelete} onCancel={()=>setDeleteId(null)}/>}
-    {showImport && <Modal title="Bulk Import Students" onClose={()=>setShowImport(false)} footer={<>
-      <button className="btn btn-ghost" onClick={()=>setShowImport(false)}>Cancel</button>
-      <button className="btn btn-primary" onClick={handleImport}>Import</button>
-    </>}>
-      <div className="alert alert-info" style={{marginBottom:12}}>
-        CSV must have columns: <code>username, full_name, password</code> (required),
-        plus optional: <code>email, reg_number, class_name, role</code>
-      </div>
-      <input type="file" accept=".csv" ref={fileRef}/>
-    </Modal>}
-  </>;
+    <div class="count-label">${filtered.length} user${filtered.length!==1?'s':''}</div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr>
+          <th>Full Name</th><th>Username</th><th>Reg No.</th>
+          <th>Class</th><th>Role</th><th>Status</th><th>Actions</th>
+        </tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>`;
+  // restore search
+  const s = document.getElementById('std-search');
+  if (s && search) s.value = search;
 }
 
-function UserModal({ user, onClose, onSave, toast }) {
-  const [form, setForm] = useState({
-    username: user?.username||'', full_name: user?.full_name||'',
-    email: user?.email||'', reg_number: user?.reg_number||'',
-    class_name: user?.class_name||'', role: user?.role||'student',
-    password:'', is_active: user?.is_active??true,
+function openUserModal(userId) {
+  const u = userId ? _students.find(x => x.id === userId) : null;
+  openModal(`
+    <div class="modal-hd">
+      <h2>${u ? 'Edit User' : 'Add User'}</h2>
+      <button class="modal-close" onclick="closeModal()">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="grid-2">
+        <div class="form-group"><label class="fl">Full Name *</label>
+          <input class="fi" id="u-name" value="${esc(u?.full_name||'')}"></div>
+        <div class="form-group"><label class="fl">Username *</label>
+          <input class="fi" id="u-username" value="${esc(u?.username||'')}"></div>
+        <div class="form-group"><label class="fl">Password ${u?'(blank = no change)':'*'}</label>
+          <input class="fi" id="u-password" type="password"></div>
+        <div class="form-group"><label class="fl">Reg Number</label>
+          <input class="fi" id="u-reg" value="${esc(u?.reg_number||'')}"></div>
+        <div class="form-group"><label class="fl">Class</label>
+          <input class="fi" id="u-class" value="${esc(u?.class_name||'')}"></div>
+        <div class="form-group"><label class="fl">Email</label>
+          <input class="fi" id="u-email" type="email" value="${esc(u?.email||'')}"></div>
+        <div class="form-group"><label class="fl">Role</label>
+          <select class="fi" id="u-role">
+            <option value="student" ${u?.role==='student'?'selected':''}>Student</option>
+            <option value="teacher" ${u?.role==='teacher'?'selected':''}>Teacher</option>
+            <option value="admin" ${u?.role==='admin'?'selected':''}>Admin</option>
+          </select></div>
+        <div class="form-group"><label class="fl">Status</label>
+          <select class="fi" id="u-active">
+            <option value="true" ${u?.is_active!==false?'selected':''}>Active</option>
+            <option value="false" ${u?.is_active===false?'selected':''}>Disabled</option>
+          </select></div>
+      </div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" id="u-save-btn" onclick="saveUser(${userId||'null'})">Save</button>
+    </div>`);
+}
+
+async function saveUser(userId) {
+  const btn = document.getElementById('u-save-btn');
+  btn.disabled = true; btn.innerHTML = spinner() + ' Saving…';
+  const body = {
+    full_name:  document.getElementById('u-name').value.trim(),
+    username:   document.getElementById('u-username').value.trim(),
+    email:      document.getElementById('u-email').value.trim() || null,
+    reg_number: document.getElementById('u-reg').value.trim() || null,
+    class_name: document.getElementById('u-class').value.trim() || null,
+    role:       document.getElementById('u-role').value,
+    is_active:  document.getElementById('u-active').value === 'true',
+  };
+  const pw = document.getElementById('u-password').value;
+  if (pw) body.password = pw;
+  if (!body.full_name || !body.username) { toast('Name and username are required','error'); btn.disabled=false; btn.textContent='Save'; return; }
+  try {
+    if (userId) await apiJSON(`/api/admin/users/${userId}`, {method:'PUT', body:JSON.stringify(body)});
+    else {
+      if (!pw) { toast('Password required for new user','error'); btn.disabled=false; btn.textContent='Save'; return; }
+      await apiJSON('/api/admin/users', {method:'POST', body:JSON.stringify(body)});
+    }
+    closeModal();
+    toast(userId ? 'User updated' : 'User created');
+    _students = await apiJSON('/api/admin/users');
+    renderStudents();
+  } catch(e) { toast(e.message,'error'); btn.disabled=false; btn.textContent='Save'; }
+}
+
+async function deleteUser(id, name) {
+  confirm(`Delete "${name}"? This cannot be undone.`, async () => {
+    try {
+      await apiJSON(`/api/admin/users/${id}`, {method:'DELETE'});
+      toast('User deleted');
+      _students = await apiJSON('/api/admin/users');
+      renderStudents();
+    } catch(e) { toast(e.message,'error'); }
   });
-  const [saving, setSaving] = useState(false);
-  const set = (k,v) => setForm(f=>({...f,[k]:v}));
-
-  async function save() {
-    setSaving(true);
-    try {
-      const body = {...form};
-      if (!body.password) delete body.password;
-      if (user) {
-        await apiJSON(`/api/admin/users/${user.id}`, {method:'PUT', body:JSON.stringify(body)});
-      } else {
-        if (!body.password) { toast.show('Password required','error'); setSaving(false); return; }
-        await apiJSON('/api/admin/users', {method:'POST', body:JSON.stringify(body)});
-      }
-      onSave();
-    } catch(e) { toast.show(e.message,'error'); setSaving(false); }
-  }
-
-  return <Modal title={user?'Edit User':'Add User'} onClose={onClose} footer={<>
-    <button className="btn btn-ghost" onClick={onClose}>Cancel</button>
-    <button className="btn btn-primary" onClick={save} disabled={saving}>{saving?<Spinner/>:'Save'}</button>
-  </>}>
-    <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:14}}>
-      <div className="form-group"><label>Full Name *</label><input type="text" value={form.full_name} onChange={e=>set('full_name',e.target.value)}/></div>
-      <div className="form-group"><label>Username *</label><input type="text" value={form.username} onChange={e=>set('username',e.target.value)}/></div>
-      <div className="form-group"><label>Password {user?'(leave blank to keep)':'*'}</label><input type="password" value={form.password} onChange={e=>set('password',e.target.value)}/></div>
-      <div className="form-group"><label>Reg Number</label><input type="text" value={form.reg_number} onChange={e=>set('reg_number',e.target.value)}/></div>
-      <div className="form-group"><label>Class</label><input type="text" value={form.class_name} onChange={e=>set('class_name',e.target.value)}/></div>
-      <div className="form-group"><label>Email</label><input type="email" value={form.email} onChange={e=>set('email',e.target.value)}/></div>
-      <div className="form-group"><label>Role</label><select value={form.role} onChange={e=>set('role',e.target.value)}>
-        <option value="student">Student</option>
-        <option value="teacher">Teacher</option>
-        <option value="admin">Admin</option>
-      </select></div>
-      <div className="form-group"><label>Status</label><select value={form.is_active} onChange={e=>set('is_active',e.target.value==='true')}>
-        <option value="true">Active</option>
-        <option value="false">Disabled</option>
-      </select></div>
-    </div>
-  </Modal>;
 }
 
-// ── Subjects page ─────────────────────────────────────────────────────────────
-function SubjectsPage({ toast }) {
-  const [subjects, setSubjects] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [showModal, setShowModal] = useState(false);
-  const [edit, setEdit] = useState(null);
-  const [delId, setDelId] = useState(null);
-  const [form, setForm] = useState({name:'',code:''});
-  const [saving, setSaving] = useState(false);
-
-  const load = () => { setLoading(true); apiJSON('/api/admin/subjects').then(setSubjects).finally(()=>setLoading(false)); };
-  useEffect(load, []);
-
-  const openModal = (s) => { setEdit(s); setForm(s?{name:s.name,code:s.code}:{name:'',code:''}); setShowModal(true); };
-
-  async function save() {
-    setSaving(true);
-    try {
-      if (edit) await apiJSON(`/api/admin/subjects/${edit.id}`,{method:'PUT',body:JSON.stringify(form)});
-      else await apiJSON('/api/admin/subjects',{method:'POST',body:JSON.stringify(form)});
-      toast.show(edit?'Subject updated':'Subject created');
-      setShowModal(false); load();
-    } catch(e){toast.show(e.message,'error');}finally{setSaving(false);}
-  }
-  async function del() {
-    try{ await apiJSON(`/api/admin/subjects/${delId}`,{method:'DELETE'}); toast.show('Deleted'); setDelId(null); load(); }
-    catch(e){toast.show(e.message,'error');}
-  }
-
-  return <>
-    <div style={{marginBottom:16}}>
-      <button className="btn btn-primary" onClick={()=>openModal(null)}>+ Add Subject</button>
+function openImportModal() {
+  openModal(`
+    <div class="modal-hd"><h2>Bulk Import Students</h2><button class="modal-close" onclick="closeModal()">×</button></div>
+    <div class="modal-body">
+      <div class="alert alert-info">
+        CSV required columns: <code>username</code>, <code>full_name</code>, <code>password</code><br>
+        Optional columns: <code>email</code>, <code>reg_number</code>, <code>class_name</code>, <code>role</code>
+      </div>
+      <div class="form-group"><label class="fl">Select CSV file</label>
+        <input type="file" accept=".csv" id="csv-file" class="fi"></div>
+      <div id="import-result"></div>
     </div>
-    {loading?<div style={{textAlign:'center',padding:40}}><Spinner/></div>:(
-    <div className="card" style={{padding:0,overflow:'hidden'}}>
-      <table><thead><tr><th>Name</th><th>Code</th><th>Actions</th></tr></thead>
-      <tbody>{subjects.map(s=><tr key={s.id}>
-        <td style={{fontWeight:600}}>{s.name}</td>
-        <td><code style={{background:'#f1f5f9',padding:'2px 8px',borderRadius:4}}>{s.code}</code></td>
-        <td>
-          <button className="btn btn-ghost btn-sm" style={{marginRight:6}} onClick={()=>openModal(s)}>Edit</button>
-          <button className="btn btn-danger btn-sm" onClick={()=>setDelId(s.id)}>Delete</button>
-        </td>
-      </tr>)}</tbody></table>
-      {!subjects.length&&<div style={{textAlign:'center',padding:32,color:'#94a3b8'}}>No subjects yet.</div>}
-    </div>)}
-    {showModal&&<Modal title={edit?'Edit Subject':'Add Subject'} onClose={()=>setShowModal(false)} footer={<>
-      <button className="btn btn-ghost" onClick={()=>setShowModal(false)}>Cancel</button>
-      <button className="btn btn-primary" onClick={save} disabled={saving}>{saving?<Spinner/>:'Save'}</button>
-    </>}>
-      <div className="form-group"><label>Subject Name</label><input type="text" value={form.name} onChange={e=>setForm(f=>({...f,name:e.target.value}))}/></div>
-      <div className="form-group"><label>Code (e.g. MTH101)</label><input type="text" value={form.code} onChange={e=>setForm(f=>({...f,code:e.target.value}))}/></div>
-    </Modal>}
-    {delId&&<ConfirmModal msg="Delete this subject?" onConfirm={del} onCancel={()=>setDelId(null)}/>}
-  </>;
+    <div class="modal-ft">
+      <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" id="import-btn" onclick="doImport()">Import</button>
+    </div>`);
 }
 
-// ── Questions page ────────────────────────────────────────────────────────────
-function QuestionsPage({ toast }) {
-  const [questions, setQuestions] = useState([]);
-  const [subjects, setSubjects] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [filterSubject, setFilterSubject] = useState('');
-  const [filterType, setFilterType] = useState('');
-  const [search, setSearch] = useState('');
-  const [showModal, setShowModal] = useState(false);
-  const [editQ, setEditQ] = useState(null);
-  const [delId, setDelId] = useState(null);
+async function doImport() {
+  const file = document.getElementById('csv-file')?.files?.[0];
+  if (!file) { toast('Select a CSV file first','warn'); return; }
+  const btn = document.getElementById('import-btn');
+  btn.disabled = true; btn.innerHTML = spinner() + ' Importing…';
+  const fd = new FormData(); fd.append('file', file);
+  try {
+    const r = await api('/api/admin/users/bulk-import', {method:'POST', body:fd});
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.detail);
+    document.getElementById('import-result').innerHTML =
+      `<div class="alert alert-info">✓ Imported <strong>${d.created}</strong> users, skipped <strong>${d.skipped}</strong> duplicates.${
+        d.errors.length ? '<br>Errors: ' + d.errors.slice(0,5).map(esc).join('; ') : ''}</div>`;
+    toast(`Imported ${d.created} users`);
+    _students = await apiJSON('/api/admin/users');
+    renderStudents();
+  } catch(e) { toast(e.message,'error'); }
+  finally { btn.disabled=false; btn.textContent='Import'; }
+}
 
-  const load = () => {
-    setLoading(true);
-    Promise.all([apiJSON('/api/admin/questions'), apiJSON('/api/admin/subjects')])
-      .then(([q,s])=>{setQuestions(q);setSubjects(s);})
-      .finally(()=>setLoading(false));
-  };
-  useEffect(load,[]);
+// ════════════════════════════════════════════════════════════════════════════
+// SUBJECTS
+// ════════════════════════════════════════════════════════════════════════════
+let _subjects = [];
 
-  const filtered = questions.filter(q=>
-    (!filterSubject||String(q.subject_id)===filterSubject)&&
-    (!filterType||q.type===filterType)&&
-    (!search||q.text.toLowerCase().includes(search.toLowerCase()))
+async function loadSubjects() {
+  try {
+    _subjects = await apiJSON('/api/admin/subjects');
+    renderSubjects();
+  } catch(e) { document.getElementById('page-content').innerHTML = `<div class="card">Error: ${esc(e.message)}</div>`; }
+}
+
+function renderSubjects() {
+  const rows = _subjects.length ? _subjects.map(s => `
+    <tr>
+      <td style="font-weight:600">${esc(s.name)}</td>
+      <td><code style="background:#f1f5f9;padding:2px 8px;border-radius:4px;font-size:13px">${esc(s.code)}</code></td>
+      <td class="td-actions">
+        <button class="btn btn-ghost btn-sm" onclick="openSubjectModal(${s.id})">Edit</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteSubject(${s.id},'${esc(s.name)}')">Delete</button>
+      </td>
+    </tr>`).join('') : `<tr><td colspan="3" class="empty-row">No subjects yet.</td></tr>`;
+
+  document.getElementById('page-content').innerHTML = `
+    <div class="toolbar">
+      <div class="toolbar-right">
+        <button class="btn btn-primary" onclick="openSubjectModal(null)">+ Add Subject</button>
+      </div>
+    </div>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Subject Name</th><th>Code</th><th>Actions</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table></div>`;
+}
+
+function openSubjectModal(id) {
+  const s = id ? _subjects.find(x => x.id === id) : null;
+  openModal(`
+    <div class="modal-hd"><h2>${s?'Edit':'Add'} Subject</h2><button class="modal-close" onclick="closeModal()">×</button></div>
+    <div class="modal-body">
+      <div class="form-group"><label class="fl">Subject Name *</label>
+        <input class="fi" id="s-name" value="${esc(s?.name||'')}"></div>
+      <div class="form-group"><label class="fl">Code (e.g. MTH101)</label>
+        <input class="fi" id="s-code" value="${esc(s?.code||'')}"></div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" id="s-save-btn" onclick="saveSubject(${id||'null'})">Save</button>
+    </div>`);
+}
+
+async function saveSubject(id) {
+  const btn = document.getElementById('s-save-btn');
+  btn.disabled = true; btn.innerHTML = spinner() + ' Saving…';
+  const body = { name: document.getElementById('s-name').value.trim(), code: document.getElementById('s-code').value.trim() };
+  if (!body.name || !body.code) { toast('Name and code required','error'); btn.disabled=false; btn.textContent='Save'; return; }
+  try {
+    if (id) await apiJSON(`/api/admin/subjects/${id}`, {method:'PUT', body:JSON.stringify(body)});
+    else await apiJSON('/api/admin/subjects', {method:'POST', body:JSON.stringify(body)});
+    closeModal(); toast(id?'Subject updated':'Subject created');
+    _subjects = await apiJSON('/api/admin/subjects'); renderSubjects();
+  } catch(e) { toast(e.message,'error'); btn.disabled=false; btn.textContent='Save'; }
+}
+
+async function deleteSubject(id, name) {
+  confirm(`Delete subject "${name}"?`, async () => {
+    try { await apiJSON(`/api/admin/subjects/${id}`,{method:'DELETE'}); toast('Deleted'); _subjects=await apiJSON('/api/admin/subjects'); renderSubjects(); }
+    catch(e) { toast(e.message,'error'); }
+  });
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// QUESTION BANK
+// ════════════════════════════════════════════════════════════════════════════
+let _questions = [], _qFilter = {subject:'',type:'',search:''};
+
+async function loadQuestions() {
+  try {
+    [_questions, _subjects] = await Promise.all([apiJSON('/api/admin/questions'), apiJSON('/api/admin/subjects')]);
+    renderQuestions();
+  } catch(e) { document.getElementById('page-content').innerHTML = `<div class="card">Error: ${esc(e.message)}</div>`; }
+}
+
+function renderQuestions() {
+  const f = _qFilter;
+  const filtered = _questions.filter(q =>
+    (!f.subject || String(q.subject_id) === f.subject) &&
+    (!f.type || q.type === f.type) &&
+    (!f.search || q.text.toLowerCase().includes(f.search))
   );
 
-  const typeLabel = {mcq:'MCQ',true_false:'T/F',multi_select:'Multi',essay:'Essay'};
-  const typeCls = {mcq:'q-mcq',true_false:'q-tf',multi_select:'q-multi',essay:'q-essay'};
+  const subjOpts = _subjects.map(s => `<option value="${s.id}" ${f.subject===String(s.id)?'selected':''}>${esc(s.name)}</option>`).join('');
+  const rows = filtered.length ? filtered.map(q => {
+    const subj = _subjects.find(s => s.id === q.subject_id);
+    return `<tr>
+      <td style="color:#94a3b8;font-size:12px;width:40px">${q.id}</td>
+      <td style="max-width:320px"><div style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(q.text)}</div></td>
+      <td>${qChip(q.type)}</td>
+      <td>${esc(subj?.name||'—')}</td>
+      <td>${q.points}</td>
+      <td>${q.options?.length||0}</td>
+      <td class="td-actions">
+        <button class="btn btn-ghost btn-sm" onclick="openQModal(${q.id})">Edit</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteQuestion(${q.id})">Del</button>
+      </td>
+    </tr>`;
+  }).join('') : `<tr><td colspan="7" class="empty-row">No questions match your filters.</td></tr>`;
 
-  async function handleDelete() {
-    try{ await apiJSON(`/api/admin/questions/${delId}`,{method:'DELETE'}); toast.show('Deleted'); setDelId(null); load(); }
-    catch(e){toast.show(e.message,'error');}
-  }
-
-  return <>
-    <div style={{display:'flex',gap:8,marginBottom:16,flexWrap:'wrap'}}>
-      <input type="text" placeholder="Search questions…" value={search} onChange={e=>setSearch(e.target.value)} style={{maxWidth:240}}/>
-      <select value={filterSubject} onChange={e=>setFilterSubject(e.target.value)} style={{maxWidth:180}}>
-        <option value="">All Subjects</option>
-        {subjects.map(s=><option key={s.id} value={s.id}>{s.name}</option>)}
+  document.getElementById('page-content').innerHTML = `
+    <div class="toolbar">
+      <input class="search-box" type="text" placeholder="Search questions…" value="${esc(f.search)}"
+        oninput="_qFilter.search=this.value.toLowerCase();renderQuestions()">
+      <select class="fi" style="width:auto;min-width:160px" onchange="_qFilter.subject=this.value;renderQuestions()">
+        <option value="">All Subjects</option>${subjOpts}
       </select>
-      <select value={filterType} onChange={e=>setFilterType(e.target.value)} style={{maxWidth:150}}>
+      <select class="fi" style="width:auto;min-width:140px" onchange="_qFilter.type=this.value;renderQuestions()">
         <option value="">All Types</option>
-        <option value="mcq">MCQ</option>
-        <option value="true_false">True/False</option>
-        <option value="multi_select">Multi-select</option>
-        <option value="essay">Essay</option>
+        <option value="mcq" ${f.type==='mcq'?'selected':''}>MCQ</option>
+        <option value="true_false" ${f.type==='true_false'?'selected':''}>True/False</option>
+        <option value="multi_select" ${f.type==='multi_select'?'selected':''}>Multi-select</option>
+        <option value="essay" ${f.type==='essay'?'selected':''}>Essay</option>
       </select>
-      <button className="btn btn-primary" style={{marginLeft:'auto'}} onClick={()=>{setEditQ(null);setShowModal(true)}}>+ Add Question</button>
+      <div class="toolbar-right">
+        <button class="btn btn-primary" onclick="openQModal(null)">+ Add Question</button>
+      </div>
     </div>
-    <div style={{fontSize:13,color:'#64748b',marginBottom:12}}>{filtered.length} question{filtered.length!==1?'s':''}</div>
-
-    {loading?<div style={{textAlign:'center',padding:40}}><Spinner/></div>:(
-    <div className="card" style={{padding:0,overflow:'hidden'}}>
-      <table><thead><tr>
-        <th style={{width:48}}>#</th><th>Question</th><th>Type</th><th>Subject</th><th>Pts</th><th>Options</th><th>Actions</th>
-      </tr></thead>
-      <tbody>{filtered.map((q,i)=>{
-        const subj = subjects.find(s=>s.id===q.subject_id);
-        return <tr key={q.id}>
-          <td style={{color:'#94a3b8',fontSize:12}}>{q.id}</td>
-          <td style={{maxWidth:320}}><div style={{overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',maxWidth:300}}>{q.text}</div></td>
-          <td><span className={`q-type-badge ${typeCls[q.type]||''}`}>{typeLabel[q.type]||q.type}</span></td>
-          <td>{subj?.name||'—'}</td>
-          <td>{q.points}</td>
-          <td>{q.options?.length||0}</td>
-          <td>
-            <button className="btn btn-ghost btn-sm" style={{marginRight:6}} onClick={()=>{setEditQ(q);setShowModal(true)}}>Edit</button>
-            <button className="btn btn-danger btn-sm" onClick={()=>setDelId(q.id)}>Del</button>
-          </td>
-        </tr>;
-      })}</tbody></table>
-      {!filtered.length&&<div style={{textAlign:'center',padding:32,color:'#94a3b8'}}>No questions match.</div>}
-    </div>)}
-
-    {showModal&&<QuestionModal q={editQ} subjects={subjects} onClose={()=>setShowModal(false)} onSave={()=>{setShowModal(false);load();toast.show(editQ?'Question updated':'Question created');}} toast={toast}/>}
-    {delId&&<ConfirmModal msg="Delete this question?" onConfirm={handleDelete} onCancel={()=>setDelId(null)}/>}
-  </>;
+    <div class="count-label">${filtered.length} question${filtered.length!==1?'s':''}</div>
+    <div class="table-wrap"><table>
+      <thead><tr><th>#</th><th>Question</th><th>Type</th><th>Subject</th><th>Pts</th><th>Opts</th><th>Actions</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table></div>`;
 }
 
-function QuestionModal({ q, subjects, onClose, onSave, toast }) {
-  const [form, setForm] = useState({
-    text: q?.text||'', type: q?.type||'mcq', points: q?.points||1,
-    subject_id: q?.subject_id||'', explanation: q?.explanation||'',
-    options: q?.options||[{text:'',is_correct:true,order:0},{text:'',is_correct:false,order:1},{text:'',is_correct:false,order:2},{text:'',is_correct:false,order:3}],
-  });
-  const [saving, setSaving] = useState(false);
-  const set = (k,v) => setForm(f=>({...f,[k]:v}));
+// Question modal state
+window._qOpts = [];
+window._qEditId = null;
 
-  const needsOptions = ['mcq','true_false','multi_select'].includes(form.type);
+function openQModal(qId) {
+  const q = qId ? _questions.find(x => x.id === qId) : null;
+  window._qEditId = qId;
+  window._qOpts = q?.options?.map(o=>({text:o.text,is_correct:o.is_correct})) ||
+    [{text:'',is_correct:true},{text:'',is_correct:false},{text:'',is_correct:false},{text:'',is_correct:false}];
 
-  function setOption(i, key, val) {
-    const opts = [...form.options];
-    opts[i] = {...opts[i],[key]:val};
-    if (key==='is_correct' && form.type==='mcq') {
-      opts.forEach((_,j)=>{ if(j!==i) opts[j]={...opts[j],is_correct:false}; });
-    }
-    set('options',opts);
-  }
-  function addOption() { set('options',[...form.options,{text:'',is_correct:false,order:form.options.length}]); }
-  function removeOption(i) { set('options',form.options.filter((_,j)=>j!==i)); }
+  const subjOpts = _subjects.map(s => `<option value="${s.id}" ${q?.subject_id===s.id?'selected':''}>${esc(s.name)}</option>`).join('');
 
-  useEffect(()=>{
-    if (form.type==='true_false') {
-      set('options',[{text:'True',is_correct:true,order:0},{text:'False',is_correct:false,order:1}]);
-    }
-  },[form.type]);
-
-  async function save() {
-    if (!form.text.trim()) { toast.show('Question text is required','error'); return; }
-    setSaving(true);
-    try {
-      const body = {
-        ...form,
-        subject_id: form.subject_id ? parseInt(form.subject_id) : null,
-        points: parseFloat(form.points)||1,
-        options: needsOptions ? form.options.map((o,i)=>({...o,order:i})) : [],
-      };
-      if (q) await apiJSON(`/api/admin/questions/${q.id}`,{method:'PUT',body:JSON.stringify(body)});
-      else await apiJSON('/api/admin/questions',{method:'POST',body:JSON.stringify(body)});
-      onSave();
-    } catch(e){toast.show(e.message,'error');}finally{setSaving(false);}
-  }
-
-  return <Modal title={q?'Edit Question':'Add Question'} onClose={onClose} footer={<>
-    <button className="btn btn-ghost" onClick={onClose}>Cancel</button>
-    <button className="btn btn-primary" onClick={save} disabled={saving}>{saving?<Spinner/>:'Save'}</button>
-  </>}>
-    <div className="form-group"><label>Question Text *</label>
-      <textarea rows={3} value={form.text} onChange={e=>set('text',e.target.value)} placeholder="Enter question text…"/></div>
-    <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:12,marginBottom:16}}>
-      <div className="form-group"><label>Type</label><select value={form.type} onChange={e=>set('type',e.target.value)}>
-        <option value="mcq">Multiple Choice (MCQ)</option>
-        <option value="true_false">True / False</option>
-        <option value="multi_select">Multi-select</option>
-        <option value="essay">Essay / Short Answer</option>
-      </select></div>
-      <div className="form-group"><label>Points</label><input type="number" min="0.5" step="0.5" value={form.points} onChange={e=>set('points',e.target.value)}/></div>
-      <div className="form-group"><label>Subject</label><select value={form.subject_id} onChange={e=>set('subject_id',e.target.value)}>
-        <option value="">None</option>
-        {subjects.map(s=><option key={s.id} value={s.id}>{s.name}</option>)}
-      </select></div>
+  openModal(`
+    <div class="modal-hd"><h2>${q?'Edit':'Add'} Question</h2><button class="modal-close" onclick="closeModal()">×</button></div>
+    <div class="modal-body">
+      <div class="form-group"><label class="fl">Question Text *</label>
+        <textarea class="fi" id="q-text" rows="3" placeholder="Enter question…">${esc(q?.text||'')}</textarea></div>
+      <div class="grid-3">
+        <div class="form-group"><label class="fl">Type</label>
+          <select class="fi" id="q-type" onchange="onQTypeChange(this.value)">
+            <option value="mcq" ${q?.type==='mcq'?'selected':''}>Multiple Choice</option>
+            <option value="true_false" ${q?.type==='true_false'?'selected':''}>True / False</option>
+            <option value="multi_select" ${q?.type==='multi_select'?'selected':''}>Multi-select</option>
+            <option value="essay" ${q?.type==='essay'?'selected':''}>Essay / Short Answer</option>
+          </select></div>
+        <div class="form-group"><label class="fl">Points</label>
+          <input class="fi" type="number" id="q-pts" min="0.5" step="0.5" value="${q?.points||1}"></div>
+        <div class="form-group"><label class="fl">Subject</label>
+          <select class="fi" id="q-subj"><option value="">None</option>${subjOpts}</select></div>
+      </div>
+      <div id="q-opts-section"></div>
+      <div class="form-group"><label class="fl">Explanation (optional, shown after grading)</label>
+        <textarea class="fi" id="q-expl" rows="2" placeholder="Why is this the correct answer?">${esc(q?.explanation||'')}</textarea></div>
     </div>
+    <div class="modal-ft">
+      <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" id="q-save-btn" onclick="saveQuestion()">Save</button>
+    </div>`);
 
-    {needsOptions && <>
-      <label style={{marginBottom:10,display:'block'}}>
-        Answer Options {form.type==='mcq'?'(select correct answer)':form.type==='multi_select'?'(check all correct answers)':''}
-      </label>
-      {form.options.map((opt,i)=><div key={i} className="option-row">
-        <input type={form.type==='multi_select'?'checkbox':'radio'} name="correct"
-          checked={opt.is_correct} onChange={e=>setOption(i,'is_correct',e.target.checked)}
-          style={{width:16,height:16,accentColor:'var(--accent)',cursor:'pointer'}}
-          title="Mark as correct"/>
-        <input type="text" value={opt.text} placeholder={`Option ${i+1}`}
-          onChange={e=>setOption(i,'text',e.target.value)} disabled={form.type==='true_false'}/>
-        {form.type!=='true_false'&&<button className="btn btn-danger btn-sm" onClick={()=>removeOption(i)} style={{flexShrink:0}}>×</button>}
-      </div>)}
-      {form.type!=='true_false'&&<button className="btn btn-ghost btn-sm" onClick={addOption} style={{marginTop:4}}>+ Add Option</button>}
-    </>}
-
-    <div className="form-group" style={{marginTop:14}}>
-      <label>Explanation (shown after grading)</label>
-      <textarea rows={2} value={form.explanation} onChange={e=>set('explanation',e.target.value)} placeholder="Optional explanation…"/>
-    </div>
-  </Modal>;
+  renderQOptions(q?.type || 'mcq');
 }
 
-// ── Exams page ────────────────────────────────────────────────────────────────
-function ExamsPage({ toast }) {
-  const [exams, setExams] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [showCreateModal, setShowCreateModal] = useState(false);
-  const [editExam, setEditExam] = useState(null);
-  const [manageId, setManageId] = useState(null);
-  const [resultsId, setResultsId] = useState(null);
-  const [delId, setDelId] = useState(null);
-  const [subjects, setSubjects] = useState([]);
-
-  const load = () => { setLoading(true); Promise.all([apiJSON('/api/admin/exams'),apiJSON('/api/admin/subjects')]).then(([e,s])=>{setExams(e);setSubjects(s)}).finally(()=>setLoading(false)); };
-  useEffect(load,[]);
-
-  async function setStatus(id, status) {
-    try{ await apiJSON(`/api/admin/exams/${id}`,{method:'PUT',body:JSON.stringify({status})}); toast.show(`Exam ${status}`); load(); }
-    catch(e){toast.show(e.message,'error');}
+function onQTypeChange(type) {
+  if (type === 'true_false') {
+    window._qOpts = [{text:'True',is_correct:true},{text:'False',is_correct:false}];
+  } else if (type === 'essay') {
+    window._qOpts = [];
+  } else if (window._qOpts.length < 2) {
+    window._qOpts = [{text:'',is_correct:true},{text:'',is_correct:false},{text:'',is_correct:false},{text:'',is_correct:false}];
   }
-  async function handleDelete() {
-    try{ await apiJSON(`/api/admin/exams/${delId}`,{method:'DELETE'}); toast.show('Deleted'); setDelId(null); load(); }
-    catch(e){toast.show(e.message,'error');}
-  }
+  renderQOptions(type);
+}
 
-  const statusActions = (e) => {
-    if (e.status==='draft') return <button className="btn btn-success btn-sm" onClick={()=>setStatus(e.id,'active')}>Activate</button>;
-    if (e.status==='active') return <button className="btn btn-ghost btn-sm" onClick={()=>setStatus(e.id,'ended')}>End</button>;
-    return null;
+function renderQOptions(type) {
+  const sec = document.getElementById('q-opts-section');
+  if (!sec) return;
+  const needsOpts = ['mcq','true_false','multi_select'].includes(type);
+  if (!needsOpts) { sec.innerHTML = ''; return; }
+
+  const inputType = type === 'multi_select' ? 'checkbox' : 'radio';
+  const hint = type === 'mcq' ? 'Select the correct answer (radio)' :
+               type === 'multi_select' ? 'Check all correct answers' : '';
+
+  sec.innerHTML = `
+    <label class="fl" style="margin-bottom:8px">
+      Answer Options ${hint ? `<span style="font-weight:400;color:#64748b">— ${hint}</span>` : ''}
+    </label>
+    <div id="opts-list">
+      ${window._qOpts.map((o, i) => `
+        <div class="opt-row" id="orow-${i}">
+          <input class="opt-radio" type="${inputType}" name="qcorrect"
+            ${o.is_correct?'checked':''} ${type==='true_false'?'disabled':''}
+            onchange="setCorrect(${i},this.checked,'${type}')">
+          <input class="fi" value="${esc(o.text)}" placeholder="Option ${i+1}"
+            ${type==='true_false'?'disabled':''}
+            oninput="window._qOpts[${i}].text=this.value">
+          ${type!=='true_false' ? `<button class="btn btn-danger btn-xs" onclick="removeOpt(${i},'${type}')">×</button>` : ''}
+        </div>`).join('')}
+    </div>
+    ${type!=='true_false' ? `<button class="btn btn-ghost btn-sm" style="margin-top:4px" onclick="addOpt('${type}')">+ Add Option</button>` : ''}`;
+}
+
+function setCorrect(i, val, type) {
+  if (type === 'mcq' || type === 'true_false') {
+    window._qOpts.forEach((o, j) => o.is_correct = j === i);
+  } else {
+    window._qOpts[i].is_correct = val;
+  }
+  renderQOptions(type);
+}
+function addOpt(type) {
+  window._qOpts.push({text:'',is_correct:false});
+  renderQOptions(type);
+}
+function removeOpt(i, type) {
+  window._qOpts.splice(i, 1);
+  renderQOptions(type);
+}
+
+async function saveQuestion() {
+  const btn = document.getElementById('q-save-btn');
+  btn.disabled = true; btn.innerHTML = spinner() + ' Saving…';
+  const type = document.getElementById('q-type').value;
+  const body = {
+    text:       document.getElementById('q-text').value.trim(),
+    type,
+    points:     parseFloat(document.getElementById('q-pts').value) || 1,
+    subject_id: document.getElementById('q-subj').value ? parseInt(document.getElementById('q-subj').value) : null,
+    explanation:document.getElementById('q-expl').value.trim() || null,
+    options:    ['mcq','true_false','multi_select'].includes(type)
+                  ? window._qOpts.map((o,i) => ({text:o.text, is_correct:o.is_correct, order:i})) : [],
   };
-
-  if (manageId) return <ExamQuestionsManager examId={manageId} onBack={()=>{setManageId(null);load();}} toast={toast}/>;
-  if (resultsId) return <ResultsPage examId={resultsId} onBack={()=>setResultsId(null)} toast={toast}/>;
-
-  return <>
-    <div style={{marginBottom:16}}>
-      <button className="btn btn-primary" onClick={()=>{setEditExam(null);setShowCreateModal(true)}}>+ Create Exam</button>
-    </div>
-    {loading?<div style={{textAlign:'center',padding:40}}><Spinner/></div>:(
-    <div className="card" style={{padding:0,overflow:'hidden'}}>
-      <table><thead><tr>
-        <th>Title</th><th>Subject</th><th>Duration</th><th>Questions</th><th>Status</th><th>Actions</th>
-      </tr></thead>
-      <tbody>{exams.map(e=><tr key={e.id}>
-        <td style={{fontWeight:600}}>{e.title}</td>
-        <td>{e.subject_name||'—'}</td>
-        <td>{e.duration_minutes} min</td>
-        <td>{e.question_count}</td>
-        <td><Badge status={e.status}/></td>
-        <td>
-          <div style={{display:'flex',gap:6,flexWrap:'wrap'}}>
-            {statusActions(e)}
-            <button className="btn btn-ghost btn-sm" onClick={()=>setManageId(e.id)}>Questions</button>
-            <button className="btn btn-ghost btn-sm" onClick={()=>setResultsId(e.id)}>Results</button>
-            <button className="btn btn-ghost btn-sm" onClick={()=>{setEditExam(e);setShowCreateModal(true)}}>Edit</button>
-            <button className="btn btn-danger btn-sm" onClick={()=>setDelId(e.id)}>Del</button>
-          </div>
-        </td>
-      </tr>)}</tbody></table>
-      {!exams.length&&<div style={{textAlign:'center',padding:32,color:'#94a3b8'}}>No exams yet.</div>}
-    </div>)}
-
-    {showCreateModal&&<ExamModal exam={editExam} subjects={subjects} onClose={()=>setShowCreateModal(false)} onSave={()=>{setShowCreateModal(false);load();toast.show(editExam?'Exam updated':'Exam created');}} toast={toast}/>}
-    {delId&&<ConfirmModal msg="Delete this exam and all its data?" onConfirm={handleDelete} onCancel={()=>setDelId(null)}/>}
-  </>;
+  if (!body.text) { toast('Question text is required','error'); btn.disabled=false; btn.textContent='Save'; return; }
+  try {
+    if (window._qEditId) await apiJSON(`/api/admin/questions/${window._qEditId}`,{method:'PUT',body:JSON.stringify(body)});
+    else await apiJSON('/api/admin/questions',{method:'POST',body:JSON.stringify(body)});
+    closeModal(); toast(window._qEditId?'Question updated':'Question created');
+    _questions = await apiJSON('/api/admin/questions'); renderQuestions();
+  } catch(e) { toast(e.message,'error'); btn.disabled=false; btn.textContent='Save'; }
 }
 
-function ExamModal({ exam, subjects, onClose, onSave, toast }) {
-  const [form, setForm] = useState({
-    title:exam?.title||'', subject_id:exam?.subject_id||'',
-    duration_minutes:exam?.duration_minutes||60, pass_score:exam?.pass_score||50,
-    max_violations:exam?.max_violations||3, instructions:exam?.instructions||'',
-    shuffle_questions:exam?.shuffle_questions??true, shuffle_options:exam?.shuffle_options??true,
-    allowed_classes: (exam?.allowed_classes||[]).join(', '),
-    start_time:'', end_time:'',
+async function deleteQuestion(id) {
+  confirm('Delete this question?', async () => {
+    try { await apiJSON(`/api/admin/questions/${id}`,{method:'DELETE'}); toast('Deleted'); _questions=await apiJSON('/api/admin/questions'); renderQuestions(); }
+    catch(e){ toast(e.message,'error'); }
   });
-  const [saving, setSaving] = useState(false);
-  const set = (k,v) => setForm(f=>({...f,[k]:v}));
-
-  async function save() {
-    if (!form.title.trim()) { toast.show('Title required','error'); return; }
-    setSaving(true);
-    try {
-      const body = {
-        ...form,
-        subject_id: form.subject_id ? parseInt(form.subject_id) : null,
-        duration_minutes: parseInt(form.duration_minutes)||60,
-        pass_score: parseFloat(form.pass_score)||50,
-        max_violations: parseInt(form.max_violations)||3,
-        allowed_classes: form.allowed_classes ? form.allowed_classes.split(',').map(s=>s.trim()).filter(Boolean) : [],
-      };
-      if (exam) await apiJSON(`/api/admin/exams/${exam.id}`,{method:'PUT',body:JSON.stringify(body)});
-      else await apiJSON('/api/admin/exams',{method:'POST',body:JSON.stringify(body)});
-      onSave();
-    } catch(e){toast.show(e.message,'error');}finally{setSaving(false);}
-  }
-
-  return <Modal title={exam?'Edit Exam':'Create Exam'} onClose={onClose} footer={<>
-    <button className="btn btn-ghost" onClick={onClose}>Cancel</button>
-    <button className="btn btn-primary" onClick={save} disabled={saving}>{saving?<Spinner/>:'Save'}</button>
-  </>}>
-    <div className="form-group"><label>Exam Title *</label><input type="text" value={form.title} onChange={e=>set('title',e.target.value)}/></div>
-    <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:12}}>
-      <div className="form-group"><label>Subject</label><select value={form.subject_id} onChange={e=>set('subject_id',e.target.value)}>
-        <option value="">None</option>{subjects.map(s=><option key={s.id} value={s.id}>{s.name}</option>)}
-      </select></div>
-      <div className="form-group"><label>Duration (minutes)</label><input type="number" min={5} value={form.duration_minutes} onChange={e=>set('duration_minutes',e.target.value)}/></div>
-      <div className="form-group"><label>Pass Score (%)</label><input type="number" min={0} max={100} value={form.pass_score} onChange={e=>set('pass_score',e.target.value)}/></div>
-      <div className="form-group"><label>Max Violations before auto-submit</label><input type="number" min={1} max={20} value={form.max_violations} onChange={e=>set('max_violations',e.target.value)}/></div>
-    </div>
-    <div className="form-group"><label>Allowed Classes (comma-separated, blank = all)</label>
-      <input type="text" value={form.allowed_classes} onChange={e=>set('allowed_classes',e.target.value)} placeholder="e.g. SS1A, SS1B, SS2A"/></div>
-    <div className="form-group"><label>Instructions</label>
-      <textarea rows={3} value={form.instructions} onChange={e=>set('instructions',e.target.value)} placeholder="Exam instructions shown to students…"/></div>
-    <div style={{display:'flex',gap:24}}>
-      <label style={{display:'flex',alignItems:'center',gap:8,cursor:'pointer'}}>
-        <input type="checkbox" checked={form.shuffle_questions} onChange={e=>set('shuffle_questions',e.target.checked)} style={{width:16,height:16}}/>
-        Shuffle questions
-      </label>
-      <label style={{display:'flex',alignItems:'center',gap:8,cursor:'pointer'}}>
-        <input type="checkbox" checked={form.shuffle_options} onChange={e=>set('shuffle_options',e.target.checked)} style={{width:16,height:16}}/>
-        Shuffle options
-      </label>
-    </div>
-  </Modal>;
 }
 
-// ── Exam questions manager ────────────────────────────────────────────────────
-function ExamQuestionsManager({ examId, onBack, toast }) {
-  const [exam, setExam] = useState(null);
-  const [bankQ, setBankQ] = useState([]);
-  const [subjects, setSubjects] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [filterSubj, setFilterSubj] = useState('');
-  const [filterType, setFilterType] = useState('');
-  const [search, setSearch] = useState('');
-  const [adding, setAdding] = useState(false);
+// ════════════════════════════════════════════════════════════════════════════
+// EXAMS
+// ════════════════════════════════════════════════════════════════════════════
+let _exams = [];
 
-  const load = () => {
-    setLoading(true);
-    Promise.all([
+async function loadExams() {
+  try {
+    [_exams, _subjects] = await Promise.all([apiJSON('/api/admin/exams'), apiJSON('/api/admin/subjects')]);
+    renderExams();
+  } catch(e) { document.getElementById('page-content').innerHTML=`<div class="card">Error: ${esc(e.message)}</div>`; }
+}
+
+function renderExams() {
+  const rows = _exams.length ? _exams.map(e => {
+    const statusBtn = e.status==='draft'
+      ? `<button class="btn btn-success btn-sm" onclick="setExamStatus(${e.id},'active')">Activate</button>`
+      : e.status==='active'
+      ? `<button class="btn btn-amber btn-sm" onclick="setExamStatus(${e.id},'ended')">End Exam</button>`
+      : '';
+    return `<tr>
+      <td style="font-weight:600;max-width:240px"><div style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(e.title)}</div></td>
+      <td>${esc(e.subject_name||'—')}</td>
+      <td>${e.duration_minutes} min</td>
+      <td>${e.question_count}</td>
+      <td>${badge(e.status)}</td>
+      <td class="td-actions">
+        ${statusBtn}
+        <button class="btn btn-ghost btn-sm" onclick="openExamQManager(${e.id})">Questions</button>
+        <button class="btn btn-ghost btn-sm" onclick="openResults(${e.id})">Results</button>
+        <button class="btn btn-ghost btn-sm" onclick="openExamModal(${e.id})">Edit</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteExam(${e.id},'${esc(e.title)}')">Del</button>
+      </td>
+    </tr>`;
+  }).join('') : `<tr><td colspan="6" class="empty-row">No exams yet.</td></tr>`;
+
+  document.getElementById('page-content').innerHTML = `
+    <div class="toolbar">
+      <div class="toolbar-right">
+        <button class="btn btn-primary" onclick="openExamModal(null)">+ Create Exam</button>
+      </div>
+    </div>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Title</th><th>Subject</th><th>Duration</th><th>Questions</th><th>Status</th><th>Actions</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table></div>`;
+}
+
+function openExamModal(id) {
+  const e = id ? _exams.find(x => x.id === id) : null;
+  const subjOpts = _subjects.map(s => `<option value="${s.id}" ${e?.subject_id===s.id?'selected':''}>${esc(s.name)}</option>`).join('');
+  openModal(`
+    <div class="modal-hd"><h2>${e?'Edit':'Create'} Exam</h2><button class="modal-close" onclick="closeModal()">×</button></div>
+    <div class="modal-body">
+      <div class="form-group"><label class="fl">Exam Title *</label>
+        <input class="fi" id="ex-title" value="${esc(e?.title||'')}"></div>
+      <div class="grid-2">
+        <div class="form-group"><label class="fl">Subject</label>
+          <select class="fi" id="ex-subj"><option value="">None</option>${subjOpts}</select></div>
+        <div class="form-group"><label class="fl">Duration (minutes)</label>
+          <input class="fi" type="number" id="ex-dur" min="5" value="${e?.duration_minutes||60}"></div>
+        <div class="form-group"><label class="fl">Pass Score (%)</label>
+          <input class="fi" type="number" id="ex-pass" min="0" max="100" value="${e?.pass_score||50}"></div>
+        <div class="form-group"><label class="fl">Max violations before auto-submit</label>
+          <input class="fi" type="number" id="ex-maxv" min="1" value="${e?.max_violations||3}"></div>
+      </div>
+      <div class="form-group"><label class="fl">Allowed Classes (comma-separated, blank = all)</label>
+        <input class="fi" id="ex-classes" value="${esc((e?.allowed_classes||[]).join(', '))}" placeholder="e.g. SS1A, SS1B"></div>
+      <div class="form-group"><label class="fl">Instructions for students</label>
+        <textarea class="fi" id="ex-instr" rows="3" placeholder="Exam instructions…">${esc(e?.instructions||'')}</textarea></div>
+      <div style="display:flex;gap:24px;margin-top:4px">
+        <label class="check-row"><input type="checkbox" id="ex-shufq" ${e?.shuffle_questions!==false?'checked':''}> Shuffle questions per student</label>
+        <label class="check-row"><input type="checkbox" id="ex-shufo" ${e?.shuffle_options!==false?'checked':''}> Shuffle answer options</label>
+      </div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" id="ex-save-btn" onclick="saveExam(${id||'null'})">Save</button>
+    </div>`);
+}
+
+async function saveExam(id) {
+  const btn = document.getElementById('ex-save-btn');
+  btn.disabled=true; btn.innerHTML=spinner()+' Saving…';
+  const cls = document.getElementById('ex-classes').value.trim();
+  const body = {
+    title:              document.getElementById('ex-title').value.trim(),
+    subject_id:         document.getElementById('ex-subj').value ? parseInt(document.getElementById('ex-subj').value) : null,
+    duration_minutes:   parseInt(document.getElementById('ex-dur').value)||60,
+    pass_score:         parseFloat(document.getElementById('ex-pass').value)||50,
+    max_violations:     parseInt(document.getElementById('ex-maxv').value)||3,
+    allowed_classes:    cls ? cls.split(',').map(s=>s.trim()).filter(Boolean) : [],
+    instructions:       document.getElementById('ex-instr').value.trim()||null,
+    shuffle_questions:  document.getElementById('ex-shufq').checked,
+    shuffle_options:    document.getElementById('ex-shufo').checked,
+  };
+  if (!body.title) { toast('Title required','error'); btn.disabled=false; btn.textContent='Save'; return; }
+  try {
+    if (id) await apiJSON(`/api/admin/exams/${id}`,{method:'PUT',body:JSON.stringify(body)});
+    else await apiJSON('/api/admin/exams',{method:'POST',body:JSON.stringify(body)});
+    closeModal(); toast(id?'Exam updated':'Exam created');
+    _exams=await apiJSON('/api/admin/exams'); renderExams();
+  } catch(e){ toast(e.message,'error'); btn.disabled=false; btn.textContent='Save'; }
+}
+
+async function setExamStatus(id, status) {
+  try {
+    await apiJSON(`/api/admin/exams/${id}`,{method:'PUT',body:JSON.stringify({status})});
+    toast(`Exam ${status}`);
+    _exams=await apiJSON('/api/admin/exams'); renderExams();
+  } catch(e){ toast(e.message,'error'); }
+}
+
+async function deleteExam(id, title) {
+  confirm(`Delete exam "${title}" and all its data?`, async () => {
+    try{ await apiJSON(`/api/admin/exams/${id}`,{method:'DELETE'}); toast('Deleted'); _exams=await apiJSON('/api/admin/exams'); renderExams(); }
+    catch(e){ toast(e.message,'error'); }
+  });
+}
+
+// ── Exam Question Manager ─────────────────────────────────────────────────────
+let _eqExam=null, _eqBankQ=[], _eqFilter={subject:'',type:'',search:''};
+
+async function openExamQManager(examId) {
+  document.getElementById('page-content').innerHTML=`<div style="text-align:center;padding:60px">${spinner()}</div>`;
+  window._subPage='qmanager';
+  document.getElementById('page-title').textContent='Manage Questions';
+  try {
+    [_eqExam, _eqBankQ, _subjects] = await Promise.all([
       apiJSON(`/api/admin/exams/${examId}`),
       apiJSON('/api/admin/questions'),
       apiJSON('/api/admin/subjects'),
-    ]).then(([e,q,s])=>{setExam(e);setBankQ(q);setSubjects(s);}).finally(()=>setLoading(false));
-  };
-  useEffect(load,[]);
+    ]);
+    renderQManager();
+  } catch(e){ document.getElementById('page-content').innerHTML=`<div class="card">Error: ${esc(e.message)}</div>`; }
+}
 
-  if (!exam || loading) return <div style={{textAlign:'center',padding:60}}><Spinner/></div>;
-
-  const examQIds = new Set(exam.questions.map(eq=>eq.id));
-  const available = bankQ.filter(q=>
+function renderQManager() {
+  const examQIds = new Set(_eqExam.questions.map(eq=>eq.id));
+  const f = _eqFilter;
+  const available = _eqBankQ.filter(q=>
     !examQIds.has(q.id)&&
-    (!filterSubj||String(q.subject_id)===filterSubj)&&
-    (!filterType||q.type===filterType)&&
-    (!search||q.text.toLowerCase().includes(search.toLowerCase()))
+    (!f.subject||String(q.subject_id)===f.subject)&&
+    (!f.type||q.type===f.type)&&
+    (!f.search||q.text.toLowerCase().includes(f.search))
   );
+  const totalPts = _eqExam.questions.reduce((s,q)=>s+(q.points||0),0);
 
-  async function addQ(qid) {
-    setAdding(true);
-    try { await apiJSON(`/api/admin/exams/${examId}/questions`,{method:'POST',body:JSON.stringify({question_ids:[qid]})}); load(); }
-    catch(e){toast.show(e.message,'error');}finally{setAdding(false);}
-  }
-  async function removeQ(qid) {
-    try { await apiJSON(`/api/admin/exams/${examId}/questions/${qid}`,{method:'DELETE'}); load(); }
-    catch(e){toast.show(e.message,'error');}
-  }
+  const subjOpts = _subjects.map(s=>`<option value="${s.id}" ${f.subject===String(s.id)?'selected':''}>${esc(s.name)}</option>`).join('');
 
-  const typeLabel = {mcq:'MCQ',true_false:'T/F',multi_select:'Multi',essay:'Essay'};
-  const typeCls = {mcq:'q-mcq',true_false:'q-tf',multi_select:'q-multi',essay:'q-essay'};
-  const totalPts = exam.questions.reduce((s,q)=>s+(q.points||0),0);
-
-  return <>
-    <button className="btn btn-ghost" onClick={onBack} style={{marginBottom:16}}>← Back to Exams</button>
-    <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:20}}>
-      <div>
-        <h3 style={{marginBottom:12,color:'#1a1a2e'}}>In Exam — {exam.questions.length} questions ({totalPts} pts)</h3>
-        <div className="card" style={{padding:0,overflow:'hidden',maxHeight:600,overflowY:'auto'}}>
-          {exam.questions.length===0&&<div style={{padding:24,color:'#94a3b8',textAlign:'center'}}>No questions added yet.</div>}
-          {exam.questions.map((q,i)=>{
-            const subj = subjects.find(s=>s.id===q.subject_id);
-            return <div key={q.id} style={{padding:'10px 14px',borderBottom:'1px solid #f1f5f9',display:'flex',alignItems:'flex-start',gap:10}}>
-              <span style={{color:'#94a3b8',fontSize:12,marginTop:2,minWidth:24}}>{i+1}.</span>
-              <div style={{flex:1,minWidth:0}}>
-                <div style={{overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',fontSize:14,color:'#1a1a2e'}}>{q.text}</div>
-                <div style={{display:'flex',gap:6,marginTop:4}}>
-                  <span className={`q-type-badge ${typeCls[q.type]||''}`}>{typeLabel[q.type]||q.type}</span>
-                  {subj&&<span style={{fontSize:11,color:'#94a3b8'}}>{subj.name}</span>}
-                  <span style={{fontSize:11,color:'#94a3b8'}}>{q.points}pt</span>
-                </div>
-              </div>
-              <button className="btn btn-danger btn-sm" onClick={()=>removeQ(q.id)}>×</button>
-            </div>;
-          })}
-        </div>
-      </div>
-
-      <div>
-        <h3 style={{marginBottom:12,color:'#1a1a2e'}}>Question Bank</h3>
-        <div style={{display:'flex',gap:6,marginBottom:10,flexWrap:'wrap'}}>
-          <input type="text" placeholder="Search…" value={search} onChange={e=>setSearch(e.target.value)} style={{maxWidth:160}}/>
-          <select value={filterSubj} onChange={e=>setFilterSubj(e.target.value)} style={{maxWidth:140}}>
-            <option value="">All Subjects</option>{subjects.map(s=><option key={s.id} value={s.id}>{s.name}</option>)}
-          </select>
-          <select value={filterType} onChange={e=>setFilterType(e.target.value)} style={{maxWidth:120}}>
-            <option value="">All Types</option>
-            <option value="mcq">MCQ</option><option value="true_false">T/F</option>
-            <option value="multi_select">Multi</option><option value="essay">Essay</option>
-          </select>
-        </div>
-        <div className="card" style={{padding:0,overflow:'hidden',maxHeight:560,overflowY:'auto'}}>
-          {available.length===0&&<div style={{padding:24,color:'#94a3b8',textAlign:'center'}}>No questions available.</div>}
-          {available.map(q=>{
-            const subj = subjects.find(s=>s.id===q.subject_id);
-            return <div key={q.id} style={{padding:'10px 14px',borderBottom:'1px solid #f1f5f9',display:'flex',alignItems:'flex-start',gap:10}}>
-              <div style={{flex:1,minWidth:0}}>
-                <div style={{overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',fontSize:14,color:'#1a1a2e'}}>{q.text}</div>
-                <div style={{display:'flex',gap:6,marginTop:4}}>
-                  <span className={`q-type-badge ${typeCls[q.type]||''}`}>{typeLabel[q.type]||q.type}</span>
-                  {subj&&<span style={{fontSize:11,color:'#94a3b8'}}>{subj.name}</span>}
-                </div>
-              </div>
-              <button className="btn btn-success btn-sm" onClick={()=>addQ(q.id)} disabled={adding}>+</button>
-            </div>;
-          })}
-        </div>
-      </div>
-    </div>
-  </>;
-}
-
-// ── Results page ──────────────────────────────────────────────────────────────
-function ResultsPage({ examId, onBack, toast }) {
-  const [results, setResults] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [sessionId, setSessionId] = useState(null);
-
-  useEffect(()=>{
-    apiJSON(`/api/admin/exams/${examId}/results`).then(setResults).finally(()=>setLoading(false));
-  },[]);
-
-  if (sessionId) return <SessionDetailPage sessionId={sessionId} onBack={()=>setSessionId(null)} toast={toast}/>;
-
-  const avg = results.length ? (results.reduce((s,r)=>s+(r.percentage||0),0)/results.length).toFixed(1) : '—';
-  const passed = results.filter(r=>(r.percentage||0)>=50).length;
-
-  return <>
-    <button className="btn btn-ghost" onClick={onBack} style={{marginBottom:16}}>← Back to Exams</button>
-    <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:16,marginBottom:20}}>
-      {[{l:'Submissions',v:results.length},{l:'Average Score',v:avg+'%'},{l:'Pass Rate',v:results.length?Math.round(passed/results.length*100)+'%':'—'}]
-        .map(s=><div key={s.l} className="stat-card"><div className="stat-val">{s.v}</div><div className="stat-label">{s.l}</div></div>)}
-    </div>
-    {loading?<div style={{textAlign:'center',padding:40}}><Spinner/></div>:(
-    <div className="card" style={{padding:0,overflow:'hidden'}}>
-      <table><thead><tr>
-        <th>Student</th><th>Reg No.</th><th>Class</th><th>Score</th><th>%</th><th>Status</th><th>Violations</th><th>Actions</th>
-      </tr></thead>
-      <tbody>{results.map(r=><tr key={r.session_id}>
-        <td style={{fontWeight:600}}>{r.student_name}</td>
-        <td>{r.reg_number||'—'}</td>
-        <td>{r.class_name||'—'}</td>
-        <td>{r.score!=null?`${r.score}/${r.total_points}`:'—'}</td>
-        <td>
-          {r.percentage!=null&&<span style={{fontWeight:700,color:r.percentage>=50?'var(--green)':'var(--red)'}}>{r.percentage}%</span>}
-        </td>
-        <td><Badge status={r.status}/></td>
-        <td>{r.violation_count>0?<span style={{color:'var(--red)',fontWeight:600}}>{r.violation_count}</span>:0}</td>
-        <td><button className="btn btn-ghost btn-sm" onClick={()=>setSessionId(r.session_id)}>View</button></td>
-      </tr>)}</tbody></table>
-      {!results.length&&<div style={{textAlign:'center',padding:32,color:'#94a3b8'}}>No submissions yet.</div>}
-    </div>)}
-  </>;
-}
-
-function SessionDetailPage({ sessionId, onBack, toast }) {
-  const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [grading, setGrading] = useState({});
-
-  const load = () => { apiJSON(`/api/admin/sessions/${sessionId}`).then(setData).finally(()=>setLoading(false)); };
-  useEffect(load,[]);
-
-  async function gradeEssay(qid, pts) {
-    setGrading(g=>({...g,[qid]:true}));
-    try {
-      await apiJSON('/api/admin/sessions/grade-essay',{method:'POST',body:JSON.stringify({session_id:sessionId,question_id:qid,points_awarded:parseFloat(pts)})});
-      toast.show('Graded'); load();
-    } catch(e){toast.show(e.message,'error');}
-    finally{setGrading(g=>({...g,[qid]:false}));}
-  }
-
-  if (loading) return <div style={{textAlign:'center',padding:60}}><Spinner/></div>;
-  if (!data) return <div>Not found</div>;
-
-  const pct = data.total_points ? Math.round(data.score/data.total_points*100) : 0;
-
-  return <>
-    <button className="btn btn-ghost" onClick={onBack} style={{marginBottom:16}}>← Back to Results</button>
-    <div className="card" style={{marginBottom:20}}>
-      <div style={{display:'flex',gap:24,flexWrap:'wrap',alignItems:'center'}}>
-        <div><div style={{fontSize:13,color:'#64748b'}}>Student</div><div style={{fontWeight:700,fontSize:16}}>{data.student.full_name}</div></div>
-        <div><div style={{fontSize:13,color:'#64748b'}}>Score</div><div style={{fontWeight:700,fontSize:16}}>{data.score}/{data.total_points} ({pct}%)</div></div>
-        <div><div style={{fontSize:13,color:'#64748b'}}>Status</div><Badge status={data.status}/></div>
-        <div><div style={{fontSize:13,color:'#64748b'}}>Violations</div><div style={{fontWeight:700,color:data.violation_count>0?'var(--red)':'inherit'}}>{data.violation_count}</div></div>
-        {data.violations.length>0&&<div style={{fontSize:12,color:'#64748b'}}>{data.violations.map((v,i)=>`${v.type} (${new Date(v.timestamp).toLocaleTimeString()})`).join(', ')}</div>}
-      </div>
-    </div>
-    <div style={{display:'flex',flexDirection:'column',gap:12}}>
-      {data.answers.map((a,i)=>{
-        const isCorrect = a.question_type!=='essay'&&a.question_type!=='short_answer'&&(a.points_awarded||0)>0;
-        const isWrong = a.question_type!=='essay'&&a.question_type!=='short_answer'&&a.is_graded&&(a.points_awarded||0)===0;
-        return <div key={a.question_id} className="card" style={{borderLeft:`4px solid ${a.question_type==='essay'?'#7e22ce':isCorrect?'var(--green)':isWrong?'var(--red)':'#e2e8f0'}`}}>
-          <div style={{display:'flex',justifyContent:'space-between',marginBottom:8}}>
-            <span style={{fontSize:13,fontWeight:700,color:'#64748b'}}>Q{i+1} — {a.question_type}</span>
-            <span style={{fontSize:13,color:'#64748b'}}>{a.points_awarded!=null?a.points_awarded:0}/{a.points} pts</span>
+  const inExam = _eqExam.questions.length
+    ? _eqExam.questions.map((q,i)=>{
+        const subj=_subjects.find(s=>s.id===q.subject_id);
+        return `<div class="q-row">
+          <span style="color:#94a3b8;font-size:12px;min-width:22px">${i+1}.</span>
+          <div style="flex:1;min-width:0">
+            <div class="q-row-text">${esc(q.text)}</div>
+            <div class="q-row-meta">${qChip(q.type)}${subj?`<span style="font-size:11px;color:#94a3b8">${esc(subj.name)}</span>`:''}
+              <span style="font-size:11px;color:#94a3b8">${q.points}pt</span></div>
           </div>
-          <div style={{fontSize:15,color:'#1a1a2e',marginBottom:10}}>{a.question_text}</div>
-          {a.question_type==='essay'?(<>
-            <div style={{background:'#f8fafc',border:'1px solid #e2e8f0',borderRadius:8,padding:12,fontSize:14,color:'#374151',minHeight:60,marginBottom:10}}>
-              {a.text_answer||<em style={{color:'#94a3b8'}}>No answer</em>}
-            </div>
-            <div style={{display:'flex',gap:10,alignItems:'center'}}>
-              <label style={{fontSize:13}}>Award points:</label>
-              <input type="number" min={0} max={a.points} step={0.5} defaultValue={a.points_awarded||0}
-                id={`grade-${a.question_id}`} style={{width:80}}/>
-              <button className="btn btn-primary btn-sm" disabled={grading[a.question_id]}
-                onClick={()=>gradeEssay(a.question_id,document.getElementById(`grade-${a.question_id}`).value)}>
-                {grading[a.question_id]?<Spinner/>:'Save Grade'}
-              </button>
-            </div>
-          </>):(
-            a.options.map(opt=>{
-              const studentPicked = (a.selected_option_ids||[]).includes(opt.id);
-              const bg = opt.is_correct ? '#dcfce7' : studentPicked ? '#fee2e2' : 'transparent';
-              return <div key={opt.id} style={{padding:'6px 10px',borderRadius:6,fontSize:14,background:bg,color:'#374151',marginBottom:4}}>
-                {studentPicked?'► ':''}{opt.text} {opt.is_correct?'✓':''}
-              </div>;
-            })
-          )}
-        </div>;
-      })}
+          <button class="btn btn-danger btn-xs" onclick="removeExamQ(${q.id})">×</button>
+        </div>`;
+      }).join('')
+    : '<div style="padding:24px;text-align:center;color:#94a3b8;font-size:14px">No questions added yet.</div>';
+
+  const inBank = available.length
+    ? available.map(q=>{
+        const subj=_subjects.find(s=>s.id===q.subject_id);
+        return `<div class="q-row">
+          <div style="flex:1;min-width:0">
+            <div class="q-row-text">${esc(q.text)}</div>
+            <div class="q-row-meta">${qChip(q.type)}${subj?`<span style="font-size:11px;color:#94a3b8">${esc(subj.name)}</span>`:''}
+              <span style="font-size:11px;color:#94a3b8">${q.points}pt</span></div>
+          </div>
+          <button class="btn btn-success btn-xs" onclick="addExamQ(${q.id})">+</button>
+        </div>`;
+      }).join('')
+    : '<div style="padding:24px;text-align:center;color:#94a3b8;font-size:14px">No questions available.</div>';
+
+  document.getElementById('page-content').innerHTML = `
+    <div style="margin-bottom:16px;display:flex;gap:10px;align-items:center">
+      <button class="btn btn-ghost" onclick="loadExams();document.getElementById('page-title').textContent='Exams'">← Back to Exams</button>
+      <span style="font-size:14px;color:#64748b">Exam: <strong>${esc(_eqExam.title)}</strong></span>
     </div>
-  </>;
+    <div class="exam-q-manager">
+      <div>
+        <h3 style="margin-bottom:10px;font-size:15px;color:#1a1a2e">In Exam — ${_eqExam.questions.length} question${_eqExam.questions.length!==1?'s':''} (${totalPts} pts)</h3>
+        <div class="q-list-panel">
+          <div class="q-list-body">${inExam}</div>
+        </div>
+      </div>
+      <div>
+        <h3 style="margin-bottom:10px;font-size:15px;color:#1a1a2e">Question Bank</h3>
+        <div style="display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap">
+          <input class="search-box" style="width:150px" type="text" placeholder="Search…" value="${esc(f.search)}"
+            oninput="_eqFilter.search=this.value.toLowerCase();renderQManager()">
+          <select class="fi" style="width:auto;min-width:140px" onchange="_eqFilter.subject=this.value;renderQManager()">
+            <option value="">All Subjects</option>${subjOpts}
+          </select>
+          <select class="fi" style="width:auto;min-width:120px" onchange="_eqFilter.type=this.value;renderQManager()">
+            <option value="">All Types</option>
+            <option value="mcq" ${f.type==='mcq'?'selected':''}>MCQ</option>
+            <option value="true_false" ${f.type==='true_false'?'selected':''}>T/F</option>
+            <option value="multi_select" ${f.type==='multi_select'?'selected':''}>Multi</option>
+            <option value="essay" ${f.type==='essay'?'selected':''}>Essay</option>
+          </select>
+        </div>
+        <div class="q-list-panel" style="max-height:540px">
+          <div class="q-list-body">${inBank}</div>
+        </div>
+      </div>
+    </div>`;
 }
 
-// ── Main App ──────────────────────────────────────────────────────────────────
-const PAGES = [
-  { id:'dashboard', label:'Dashboard', icon:'📊' },
-  { id:'students',  label:'Students',  icon:'👥' },
-  { id:'subjects',  label:'Subjects',  icon:'📚' },
-  { id:'questions', label:'Question Bank', icon:'❓' },
-  { id:'exams',     label:'Exams',     icon:'📝' },
-];
+async function addExamQ(qid) {
+  try {
+    await apiJSON(`/api/admin/exams/${_eqExam.id}/questions`,{method:'POST',body:JSON.stringify({question_ids:[qid]})});
+    _eqExam = await apiJSON(`/api/admin/exams/${_eqExam.id}`);
+    renderQManager();
+  } catch(e){ toast(e.message,'error'); }
+}
+async function removeExamQ(qid) {
+  try {
+    await apiJSON(`/api/admin/exams/${_eqExam.id}/questions/${qid}`,{method:'DELETE'});
+    _eqExam = await apiJSON(`/api/admin/exams/${_eqExam.id}`);
+    renderQManager();
+  } catch(e){ toast(e.message,'error'); }
+}
 
-function App() {
-  const [page, setPage] = useState('dashboard');
-  const toast = useToast();
+// ── Results ───────────────────────────────────────────────────────────────────
+let _resultsExamId;
 
-  const pageTitle = PAGES.find(p=>p.id===page)?.label || '';
+async function openResults(examId) {
+  _resultsExamId = examId;
+  document.getElementById('page-content').innerHTML=`<div style="text-align:center;padding:60px">${spinner()}</div>`;
+  window._subPage='results';
+  document.getElementById('page-title').textContent='Results';
+  try {
+    const results = await apiJSON(`/api/admin/exams/${examId}/results`);
+    renderResults(results);
+  } catch(e){ document.getElementById('page-content').innerHTML=`<div class="card">Error: ${esc(e.message)}</div>`; }
+}
 
-  function renderPage() {
-    switch(page) {
-      case 'dashboard': return <DashboardPage/>;
-      case 'students':  return <StudentsPage toast={toast}/>;
-      case 'subjects':  return <SubjectsPage toast={toast}/>;
-      case 'questions': return <QuestionsPage toast={toast}/>;
-      case 'exams':     return <ExamsPage toast={toast}/>;
-      default: return null;
+function renderResults(results) {
+  const avg = results.length ? (results.reduce((s,r)=>s+(r.percentage||0),0)/results.length).toFixed(1)+'%' : '—';
+  const passed = results.filter(r=>(r.percentage||0)>=50).length;
+  const passRate = results.length ? Math.round(passed/results.length*100)+'%' : '—';
+
+  const rows = results.length ? results.map(r=>`
+    <tr>
+      <td style="font-weight:600">${esc(r.student_name)}</td>
+      <td>${esc(r.reg_number||'—')}</td>
+      <td>${esc(r.class_name||'—')}</td>
+      <td>${r.score!=null?`${r.score}/${r.total_points}`:'—'}</td>
+      <td>${r.percentage!=null?`<span style="font-weight:700;color:${r.percentage>=50?'var(--green)':'var(--red)'}">${r.percentage}%</span>`:'—'}</td>
+      <td>${badge(r.status)}</td>
+      <td>${r.violation_count>0?`<span style="color:var(--red);font-weight:700">${r.violation_count}</span>`:'0'}</td>
+      <td><button class="btn btn-ghost btn-sm" onclick="openSessionDetail(${r.session_id})">View</button></td>
+    </tr>`).join('') : `<tr><td colspan="8" class="empty-row">No submissions yet.</td></tr>`;
+
+  document.getElementById('page-content').innerHTML = `
+    <div style="margin-bottom:16px">
+      <button class="btn btn-ghost" onclick="loadExams();document.getElementById('page-title').textContent='Exams'">← Back to Exams</button>
+    </div>
+    <div class="stats-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:20px">
+      <div class="stat-card"><div class="stat-val">${results.length}</div><div class="stat-lbl">Submissions</div></div>
+      <div class="stat-card"><div class="stat-val">${avg}</div><div class="stat-lbl">Average Score</div></div>
+      <div class="stat-card"><div class="stat-val">${passRate}</div><div class="stat-lbl">Pass Rate (≥50%)</div></div>
+    </div>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Student</th><th>Reg No.</th><th>Class</th><th>Score</th><th>%</th><th>Status</th><th>Violations</th><th>Detail</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table></div>`;
+}
+
+async function openSessionDetail(sessionId) {
+  document.getElementById('page-content').innerHTML=`<div style="text-align:center;padding:60px">${spinner()}</div>`;
+  try {
+    const data = await apiJSON(`/api/admin/sessions/${sessionId}`);
+    renderSessionDetail(data);
+  } catch(e){ document.getElementById('page-content').innerHTML=`<div class="card">Error: ${esc(e.message)}</div>`; }
+}
+
+function renderSessionDetail(data) {
+  const p = pct(data.score, data.total_points);
+  const violStr = data.violations.length
+    ? data.violations.map(v=>`<span class="badge b-red" style="margin-right:4px">${esc(v.type)}</span>`).join('')
+    : '<span style="color:#64748b">None</span>';
+
+  const answers = data.answers.map((a,i)=>{
+    const isEssay = a.question_type === 'essay';
+    const isCorrect = !isEssay && a.is_graded && (a.points_awarded||0) > 0;
+    const isWrong   = !isEssay && a.is_graded && (a.points_awarded||0) === 0;
+    const cls = isEssay ? 'essay' : isCorrect ? 'correct' : isWrong ? 'wrong' : 'unanswered';
+
+    let body = '';
+    if (isEssay) {
+      body = `
+        <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:12px;font-size:14px;color:#374151;min-height:48px;margin-bottom:10px">
+          ${a.text_answer ? esc(a.text_answer) : '<em style="color:#94a3b8">No answer provided</em>'}
+        </div>
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+          <label class="fl" style="margin:0">Award points (max ${a.points}):</label>
+          <input class="fi" type="number" min="0" max="${a.points}" step="0.5" id="grade-${a.question_id}"
+            value="${a.points_awarded!=null?a.points_awarded:0}" style="width:80px">
+          <button class="btn btn-primary btn-sm" onclick="gradeEssay(${data.session_id},${a.question_id},${a.points},'grade-${a.question_id}')">
+            Save Grade
+          </button>
+        </div>`;
+    } else {
+      body = a.options.map(opt=>{
+        const picked = (a.selected_option_ids||[]).includes(opt.id);
+        const cls2 = opt.is_correct && picked ? 'both' : opt.is_correct ? 'correct-ans' : picked ? 'student-pick' : '';
+        return `<div class="opt-choice ${cls2}">${picked?'► ':''} ${esc(opt.text)} ${opt.is_correct?'✓':''}</div>`;
+      }).join('');
     }
-  }
 
-  return <div className="layout">
-    <div className="sidebar">
-      <div className="sidebar-logo">
-        <h1>Babcock CBT</h1>
-        <p>Admin Panel</p>
+    return `<div class="ans-card ${cls}">
+      <div style="display:flex;justify-content:space-between;margin-bottom:8px">
+        <span style="font-size:13px;font-weight:700;color:#64748b">Q${i+1} — ${qChip(a.question_type)}</span>
+        <span style="font-size:13px;color:#64748b" id="pts-${a.question_id}">${a.points_awarded!=null?a.points_awarded:0} / ${a.points} pts</span>
       </div>
-      <div className="nav-section">Navigation</div>
-      {PAGES.map(p=><div key={p.id} className={`nav-item ${page===p.id?'active':''}`} onClick={()=>setPage(p.id)}>
-        <span>{p.icon}</span>{p.label}
-      </div>)}
-      <div style={{flex:1}}/>
-      <div className="nav-section">Account</div>
-      <div className="nav-item" style={{fontSize:13,color:'rgba(255,255,255,.5)'}}>{name}</div>
-      <div className="nav-item" style={{color:'rgba(255,80,80,.7)'}} onClick={()=>{localStorage.clear();location.href='login.html'}}>🚪 Log out</div>
+      <div style="font-size:15px;color:#1a1a2e;margin-bottom:10px">${esc(a.question_text)}</div>
+      ${body}
+      ${a.explanation?`<div style="margin-top:8px;padding:8px 12px;background:#eff6ff;border-radius:6px;font-size:13px;color:#1d4ed8">
+        <strong>Explanation:</strong> ${esc(a.explanation)}</div>`:''}
+    </div>`;
+  }).join('');
+
+  document.getElementById('page-content').innerHTML = `
+    <div style="margin-bottom:16px">
+      <button class="btn btn-ghost" onclick="openResults(${_resultsExamId})">← Back to Results</button>
     </div>
-    <div className="main-area">
-      <div className="topbar">
-        <h2>{pageTitle}</h2>
-        <span style={{fontSize:13,color:'#64748b'}}>Logged in as <strong>{name}</strong></span>
+    <div class="card" style="margin-bottom:16px">
+      <div style="display:flex;gap:24px;flex-wrap:wrap;align-items:center">
+        <div><div style="font-size:12px;color:#64748b">Student</div><div style="font-weight:700;font-size:16px">${esc(data.student.full_name)}</div></div>
+        <div><div style="font-size:12px;color:#64748b">Score</div><div style="font-weight:700;font-size:16px" id="total-score">${data.score} / ${data.total_points} (${p}%)</div></div>
+        <div><div style="font-size:12px;color:#64748b">Status</div>${badge(data.status)}</div>
+        <div><div style="font-size:12px;color:#64748b">Violations</div>${violStr}</div>
       </div>
-      <div className="page">{renderPage()}</div>
     </div>
-    <Toast toast={toast.toast}/>
-  </div>;
+    <div>${answers}</div>`;
 }
 
-ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+async function gradeEssay(sessionId, questionId, maxPts, inputId) {
+  const pts = parseFloat(document.getElementById(inputId)?.value);
+  if (isNaN(pts) || pts < 0 || pts > maxPts) { toast(`Points must be 0–${maxPts}`,'warn'); return; }
+  try {
+    const result = await apiJSON('/api/admin/sessions/grade-essay',{
+      method:'POST',
+      body:JSON.stringify({session_id:sessionId,question_id:questionId,points_awarded:pts}),
+    });
+    toast('Grade saved');
+    const el = document.getElementById(`pts-${questionId}`);
+    if (el) el.textContent = `${pts} / ${maxPts} pts`;
+    const scoreEl = document.getElementById('total-score');
+    if (scoreEl && result.new_score != null) {
+      const data_total = parseFloat(scoreEl.textContent.split('/')[1]);
+      scoreEl.textContent = `${result.new_score} / ${data_total!=null?data_total:'?'} (${pct(result.new_score,data_total)}%)`;
+    }
+  } catch(e){ toast(e.message,'error'); }
+}
+
+// ── Boot ──────────────────────────────────────────────────────────────────────
+nav('dashboard');
 </script>
 </body>
 </html>
