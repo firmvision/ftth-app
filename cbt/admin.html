@@ -1040,9 +1040,26 @@ async function openResults(examId) {
 }
 
 function renderResults(results) {
-  const avg = results.length ? (results.reduce((s,r)=>s+(r.percentage||0),0)/results.length).toFixed(1)+'%' : '—';
-  const passed = results.filter(r=>(r.percentage||0)>=50).length;
-  const passRate = results.length ? Math.round(passed/results.length*100)+'%' : '—';
+  const avg = results.length ? (results.reduce((s,r)=>s+(r.percentage||0),0)/results.length).toFixed(1) : 0;
+  const passed  = results.filter(r=>(r.percentage||0)>=50).length;
+  const failed  = results.filter(r=>(r.percentage||0)<50&&r.percentage!=null).length;
+  const highest = results.length ? Math.max(...results.map(r=>r.percentage||0)) : 0;
+  const passRate = results.length ? Math.round(passed/results.length*100) : 0;
+
+  // Score distribution buckets: 0-9, 10-19, …, 90-100
+  const buckets = Array(10).fill(0);
+  results.forEach(r=>{ if(r.percentage!=null) buckets[Math.min(9,Math.floor(r.percentage/10))]++; });
+  const bucketMax = Math.max(1,...buckets);
+  const chartBars = buckets.map((n,i)=>{
+    const h = Math.round((n/bucketMax)*80);
+    const label = i===9?'90-100':`${i*10}-${i*10+9}`;
+    const colour = i<5?'var(--red)':i<7?'var(--amber)':'var(--green)';
+    return `<div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex:1">
+      <span style="font-size:11px;font-weight:600;color:#64748b;min-height:16px">${n||''}</span>
+      <div style="width:100%;height:${h}px;background:${colour};border-radius:4px 4px 0 0;min-height:${n?4:0}px"></div>
+      <span style="font-size:10px;color:#94a3b8;writing-mode:vertical-lr;transform:rotate(180deg);height:36px;line-height:1">${label}%</span>
+    </div>`;
+  }).join('');
 
   const rows = results.length ? results.map(r=>`
     <tr>
@@ -1060,11 +1077,34 @@ function renderResults(results) {
     <div style="margin-bottom:16px">
       <button class="btn btn-ghost" onclick="loadExams();document.getElementById('page-title').textContent='Exams'">← Back to Exams</button>
     </div>
-    <div class="stats-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:20px">
+    <div class="stats-grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:20px">
       <div class="stat-card"><div class="stat-val">${results.length}</div><div class="stat-lbl">Submissions</div></div>
-      <div class="stat-card"><div class="stat-val">${avg}</div><div class="stat-lbl">Average Score</div></div>
-      <div class="stat-card"><div class="stat-val">${passRate}</div><div class="stat-lbl">Pass Rate (≥50%)</div></div>
+      <div class="stat-card" style="border-left-color:var(--green)"><div class="stat-val" style="color:var(--green)">${passed}</div><div class="stat-lbl">Passed</div></div>
+      <div class="stat-card" style="border-left-color:var(--red)"><div class="stat-val" style="color:var(--red)">${failed}</div><div class="stat-lbl">Failed</div></div>
+      <div class="stat-card" style="border-left-color:var(--amber)"><div class="stat-val" style="color:var(--amber)">${avg}%</div><div class="stat-lbl">Class Average</div></div>
     </div>
+
+    ${results.length ? `
+    <div class="card" style="margin-bottom:20px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px">
+        <div>
+          <div style="font-size:14px;font-weight:700;color:#1a1a2e;margin-bottom:2px">Score Distribution</div>
+          <div style="font-size:12px;color:#64748b">How students scored across percentage bands</div>
+        </div>
+        <div style="display:flex;gap:16px;font-size:12px">
+          <span style="display:flex;align-items:center;gap:5px"><span style="display:inline-block;width:10px;height:10px;background:var(--red);border-radius:2px"></span> Below 50%</span>
+          <span style="display:flex;align-items:center;gap:5px"><span style="display:inline-block;width:10px;height:10px;background:var(--amber);border-radius:2px"></span> 50–69%</span>
+          <span style="display:flex;align-items:center;gap:5px"><span style="display:inline-block;width:10px;height:10px;background:var(--green);border-radius:2px"></span> 70%+</span>
+        </div>
+      </div>
+      <div style="display:flex;gap:4px;align-items:flex-end;height:110px;padding-bottom:4px">${chartBars}</div>
+      <div style="display:flex;justify-content:space-between;margin-top:10px;padding-top:8px;border-top:1px solid #f1f5f9;font-size:12px;color:#64748b">
+        <span>Pass rate: <strong style="color:${passRate>=50?'var(--green)':'var(--red)'}">${passRate}%</strong></span>
+        <span>Highest: <strong>${highest}%</strong></span>
+        <span>Class average: <strong>${avg}%</strong></span>
+      </div>
+    </div>` : ''}
+
     <div class="table-wrap"><table>
       <thead><tr><th>Student</th><th>Reg No.</th><th>Class</th><th>Score</th><th>%</th><th>Status</th><th>Violations</th><th>Detail</th></tr></thead>
       <tbody>${rows}</tbody>
