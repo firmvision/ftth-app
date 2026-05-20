@@ -1,0 +1,957 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CBT Platform Proposal — Firmvision Technologies</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@700&display=swap');
+
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#0f2a4a;
+  --blue:#1a5fa8;
+  --light-blue:#e8f0fb;
+  --accent:#e8a020;
+  --green:#166534;
+  --light-green:#dcfce7;
+  --text:#1e293b;
+  --muted:#475569;
+  --border:#e2e8f0;
+  --page-bg:#f8fafc;
+}
+body{font-family:'Inter',sans-serif;color:var(--text);background:var(--page-bg);font-size:10.5pt;line-height:1.65}
+
+/* ── Print / page setup ── */
+@media print{
+  body{background:#fff}
+  .no-print{display:none}
+  .page-break{page-break-after:always}
+  section{page-break-inside:avoid}
+}
+.print-btn{position:fixed;bottom:24px;right:24px;background:var(--blue);color:#fff;border:none;border-radius:10px;padding:12px 22px;font-size:14px;font-weight:600;cursor:pointer;box-shadow:0 4px 16px rgba(26,95,168,.4);z-index:100}
+.print-btn:hover{background:var(--navy)}
+
+/* ── Page wrapper ── */
+.document{max-width:820px;margin:0 auto;background:#fff;box-shadow:0 4px 40px rgba(0,0,0,.08)}
+
+/* ── Cover page ── */
+.cover{background:linear-gradient(160deg,var(--navy) 0%,#1a3a6a 60%,#1a5fa8 100%);color:#fff;padding:70px 64px 60px;min-height:97vh;display:flex;flex-direction:column;justify-content:space-between;position:relative;overflow:hidden}
+.cover::before{content:'';position:absolute;top:-80px;right:-80px;width:400px;height:400px;background:rgba(255,255,255,.04);border-radius:50%}
+.cover::after{content:'';position:absolute;bottom:-60px;left:-60px;width:300px;height:300px;background:rgba(255,255,255,.03);border-radius:50%}
+.cover-top{position:relative;z-index:1}
+.firm-name{font-size:22px;font-weight:800;letter-spacing:.5px;color:#fff}
+.firm-tagline{font-size:12px;color:rgba(255,255,255,.5);margin-top:3px;letter-spacing:1px;text-transform:uppercase}
+.cover-divider{width:48px;height:3px;background:var(--accent);border-radius:2px;margin:36px 0}
+.cover-label{font-size:11px;font-weight:600;color:rgba(255,255,255,.5);letter-spacing:2px;text-transform:uppercase;margin-bottom:14px}
+.cover-title{font-family:'Playfair Display',serif;font-size:38px;line-height:1.25;color:#fff;margin-bottom:18px}
+.cover-subtitle{font-size:16px;color:rgba(255,255,255,.7);font-weight:400;max-width:500px;line-height:1.6}
+.cover-bottom{position:relative;z-index:1}
+.cover-meta{display:flex;gap:48px}
+.cover-meta-item label{font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,.45);display:block;margin-bottom:5px}
+.cover-meta-item span{font-size:14px;font-weight:600;color:#fff}
+.cover-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);border-radius:20px;padding:5px 14px;font-size:12px;color:rgba(255,255,255,.8);margin-bottom:24px}
+.cover-ref{font-size:11px;color:rgba(255,255,255,.3);margin-top:20px}
+
+/* ── Body layout ── */
+.body-wrap{padding:0 64px 64px}
+
+/* ── Sections ── */
+section{margin-bottom:40px}
+.section-label{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--blue);margin-bottom:10px}
+h2{font-family:'Playfair Display',serif;font-size:24px;color:var(--navy);margin-bottom:16px;padding-bottom:10px;border-bottom:2px solid var(--light-blue)}
+h3{font-size:14px;font-weight:700;color:var(--navy);margin-bottom:10px;margin-top:20px}
+p{margin-bottom:12px;color:var(--muted)}
+p strong{color:var(--text)}
+
+/* ── Divider / header band ── */
+.section-band{background:var(--navy);color:#fff;padding:10px 64px;margin:0 -64px 32px;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase}
+.accent-band{background:var(--accent);color:var(--navy);padding:8px 64px;margin:0 -64px 24px;font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase}
+
+/* ── Feature grid ── */
+.feature-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-top:16px}
+.feature-card{border:1.5px solid var(--border);border-radius:10px;padding:16px;transition:.2s}
+.feature-card:hover{border-color:var(--blue);background:var(--light-blue)}
+.feature-icon{font-size:24px;margin-bottom:8px}
+.feature-title{font-size:13px;font-weight:700;color:var(--navy);margin-bottom:5px}
+.feature-desc{font-size:12px;color:var(--muted);line-height:1.55}
+
+/* ── Security list ── */
+.security-list{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:14px}
+.sec-item{display:flex;gap:10px;align-items:flex-start;background:var(--light-blue);border-radius:8px;padding:12px 14px}
+.sec-icon{font-size:18px;flex-shrink:0;margin-top:1px}
+.sec-text strong{display:block;font-size:13px;font-weight:700;color:var(--navy);margin-bottom:2px}
+.sec-text span{font-size:12px;color:var(--muted)}
+
+/* ── Architecture table / deployment ── */
+.deploy-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:14px}
+.deploy-card{border-radius:10px;padding:20px;border:1.5px solid var(--border)}
+.deploy-card.primary{border-color:var(--blue);background:var(--light-blue)}
+.deploy-card.secondary{background:#f8fafc}
+.deploy-tag{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--blue);margin-bottom:8px}
+.deploy-title{font-size:15px;font-weight:700;color:var(--navy);margin-bottom:10px}
+.deploy-list{list-style:none;font-size:12px;color:var(--muted)}
+.deploy-list li{padding:4px 0;display:flex;align-items:flex-start;gap:6px}
+.deploy-list li::before{content:'✓';color:var(--green);font-weight:700;flex-shrink:0}
+
+/* ── Tech table ── */
+.tech-table{width:100%;border-collapse:collapse;font-size:13px;margin-top:14px}
+.tech-table th{background:var(--navy);color:#fff;padding:9px 14px;text-align:left;font-size:11px;font-weight:600;letter-spacing:.5px;text-transform:uppercase}
+.tech-table td{padding:9px 14px;border-bottom:1px solid var(--border);color:var(--muted)}
+.tech-table td:first-child{font-weight:600;color:var(--text);width:180px}
+.tech-table tr:last-child td{border-bottom:none}
+.tech-table tr:nth-child(even) td{background:#f8fafc}
+
+/* ── Timeline ── */
+.timeline{margin-top:16px;position:relative;padding-left:28px}
+.timeline::before{content:'';position:absolute;left:7px;top:6px;bottom:6px;width:2px;background:var(--border)}
+.tl-item{position:relative;margin-bottom:20px}
+.tl-dot{position:absolute;left:-28px;top:3px;width:14px;height:14px;border-radius:50%;background:var(--blue);border:2px solid #fff;box-shadow:0 0 0 2px var(--blue)}
+.tl-phase{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--blue);margin-bottom:3px}
+.tl-title{font-size:14px;font-weight:700;color:var(--navy);margin-bottom:4px}
+.tl-desc{font-size:12px;color:var(--muted);line-height:1.55}
+.tl-weeks{display:inline-block;background:var(--light-blue);color:var(--blue);font-size:11px;font-weight:600;padding:2px 8px;border-radius:4px;margin-bottom:5px}
+
+/* ── Pricing ── */
+.pricing-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:16px}
+.price-card{border:1.5px solid var(--border);border-radius:12px;padding:22px;text-align:center;transition:.2s}
+.price-card.featured{border-color:var(--blue);background:linear-gradient(160deg,var(--navy),#1a5fa8);color:#fff}
+.price-card.featured .price-name{color:rgba(255,255,255,.7)}
+.price-card.featured .price-desc{color:rgba(255,255,255,.6)}
+.price-card.featured .price-item{color:rgba(255,255,255,.8);border-bottom-color:rgba(255,255,255,.15)}
+.price-card.featured .price-note{color:rgba(255,255,255,.5)}
+.price-recommended{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--accent);background:rgba(232,160,32,.15);border-radius:4px;padding:2px 8px;display:inline-block;margin-bottom:8px}
+.price-name{font-size:14px;font-weight:700;color:var(--navy);margin-bottom:4px}
+.price-amount{font-family:'Playfair Display',serif;font-size:28px;color:var(--navy);margin:12px 0 4px;line-height:1}
+.price-card.featured .price-amount{color:#fff}
+.price-currency{font-size:16px;vertical-align:top;margin-top:4px;display:inline-block}
+.price-period{font-size:12px;color:var(--muted);margin-bottom:14px}
+.price-desc{font-size:12px;color:var(--muted);margin-bottom:14px;min-height:36px}
+.price-list{list-style:none;text-align:left;font-size:12px;color:var(--muted)}
+.price-item{padding:5px 0;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;gap:6px}
+.price-item::before{content:'✓';color:var(--green);font-weight:700;flex-shrink:0}
+.price-note{font-size:11px;color:var(--muted);margin-top:14px}
+
+/* ── Maintenance ── */
+.maint-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:14px}
+.maint-card{background:var(--light-blue);border-radius:10px;padding:16px;text-align:center}
+.maint-icon{font-size:26px;margin-bottom:8px}
+.maint-title{font-size:13px;font-weight:700;color:var(--navy);margin-bottom:4px}
+.maint-desc{font-size:12px;color:var(--muted)}
+
+/* ── Why us ── */
+.why-list{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:14px}
+.why-item{display:flex;gap:12px;align-items:flex-start;padding:14px;border-radius:8px;background:#f8fafc;border:1px solid var(--border)}
+.why-num{width:28px;height:28px;border-radius:50%;background:var(--blue);color:#fff;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.why-content strong{display:block;font-size:13px;color:var(--navy);margin-bottom:3px}
+.why-content span{font-size:12px;color:var(--muted)}
+
+/* ── Terms / conditions ── */
+.terms-list{padding-left:18px;font-size:12px;color:var(--muted);line-height:1.7}
+.terms-list li{margin-bottom:6px}
+
+/* ── Signature block ── */
+.signature-block{border-top:2px solid var(--navy);padding-top:24px;margin-top:40px}
+.sig-grid{display:grid;grid-template-columns:1fr 1fr;gap:40px;margin-top:20px}
+.sig-party strong{display:block;font-size:14px;font-weight:700;color:var(--navy);margin-bottom:4px}
+.sig-party p{font-size:12px;color:var(--muted);margin-bottom:20px}
+.sig-line{border-top:1px solid var(--text);margin-top:40px;padding-top:8px;font-size:12px;color:var(--muted)}
+
+/* ── Callout box ── */
+.callout{background:linear-gradient(135deg,#e8f0fb,#f0f7ff);border:1.5px solid #bfdbfe;border-radius:10px;padding:18px 20px;margin:16px 0;display:flex;gap:14px;align-items:flex-start}
+.callout-icon{font-size:22px;flex-shrink:0}
+.callout-text strong{display:block;font-size:14px;color:var(--navy);margin-bottom:4px}
+.callout-text span{font-size:13px;color:var(--muted)}
+
+/* ── Footer on pages ── */
+.page-footer{background:var(--navy);color:rgba(255,255,255,.5);text-align:center;font-size:11px;padding:14px 64px;letter-spacing:.3px}
+.page-footer span{color:rgba(255,255,255,.8)}
+</style>
+</head>
+<body>
+
+<button class="print-btn no-print" onclick="window.print()">🖨 Print / Save as PDF</button>
+
+<div class="document">
+
+<!-- ══════════════════════════════════════════════════════════════ COVER -->
+<div class="cover page-break">
+  <div class="cover-top">
+    <div class="firm-name">FIRMVISION TECHNOLOGIES</div>
+    <div class="firm-tagline">Delivering Tomorrow's Solutions Today</div>
+
+    <div class="cover-divider"></div>
+
+    <div class="cover-badge">📄 Project Proposal &nbsp;·&nbsp; Ref: FVT/CBT/2026/001</div>
+    <div class="cover-label">Submitted To</div>
+    <div class="cover-title">Babcock University<br>High School</div>
+    <div class="cover-subtitle">
+      A proposal for the design, development, and deployment of a
+      secure Computer-Based Testing (CBT) Platform to serve over
+      5,000 students across all academic levels.
+    </div>
+  </div>
+
+  <div class="cover-bottom">
+    <div class="cover-meta">
+      <div class="cover-meta-item">
+        <label>Date Submitted</label>
+        <span>May 20, 2026</span>
+      </div>
+      <div class="cover-meta-item">
+        <label>Prepared By</label>
+        <span>Firmvision Technologies Ltd.</span>
+      </div>
+      <div class="cover-meta-item">
+        <label>Valid For</label>
+        <span>60 Days from Submission</span>
+      </div>
+    </div>
+    <div class="cover-ref">Confidential — Prepared exclusively for Babcock University High School</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ BODY STARTS -->
+<div class="body-wrap">
+
+<!-- ── Table of Contents ─────────────────────────────────────────── -->
+<section style="padding-top:48px">
+  <div class="section-label">Document Guide</div>
+  <h2>Table of Contents</h2>
+  <table style="width:100%;border-collapse:collapse;font-size:13px">
+    <tr style="border-bottom:1px solid var(--border)"><td style="padding:7px 0;color:var(--muted)">1.</td><td style="padding:7px 0;font-weight:600">Executive Summary</td></tr>
+    <tr style="border-bottom:1px solid var(--border)"><td style="padding:7px 0;color:var(--muted)">2.</td><td style="padding:7px 0">About Firmvision Technologies</td></tr>
+    <tr style="border-bottom:1px solid var(--border)"><td style="padding:7px 0;color:var(--muted)">3.</td><td style="padding:7px 0">Understanding the Challenge</td></tr>
+    <tr style="border-bottom:1px solid var(--border)"><td style="padding:7px 0;color:var(--muted)">4.</td><td style="padding:7px 0">Proposed Solution Overview</td></tr>
+    <tr style="border-bottom:1px solid var(--border)"><td style="padding:7px 0;color:var(--muted)">5.</td><td style="padding:7px 0">Key Platform Features</td></tr>
+    <tr style="border-bottom:1px solid var(--border)"><td style="padding:7px 0;color:var(--muted)">6.</td><td style="padding:7px 0">Security &amp; Examination Integrity</td></tr>
+    <tr style="border-bottom:1px solid var(--border)"><td style="padding:7px 0;color:var(--muted)">7.</td><td style="padding:7px 0">Deployment Options — Offline &amp; Online</td></tr>
+    <tr style="border-bottom:1px solid var(--border)"><td style="padding:7px 0;color:var(--muted)">8.</td><td style="padding:7px 0">Technical Architecture</td></tr>
+    <tr style="border-bottom:1px solid var(--border)"><td style="padding:7px 0;color:var(--muted)">9.</td><td style="padding:7px 0">Implementation Timeline</td></tr>
+    <tr style="border-bottom:1px solid var(--border)"><td style="padding:7px 0;color:var(--muted)">10.</td><td style="padding:7px 0">Investment &amp; Pricing</td></tr>
+    <tr style="border-bottom:1px solid var(--border)"><td style="padding:7px 0;color:var(--muted)">11.</td><td style="padding:7px 0">Support &amp; Maintenance</td></tr>
+    <tr style="border-bottom:1px solid var(--border)"><td style="padding:7px 0;color:var(--muted)">12.</td><td style="padding:7px 0">Why Firmvision Technologies</td></tr>
+    <tr style="border-bottom:1px solid var(--border)"><td style="padding:7px 0;color:var(--muted)">13.</td><td style="padding:7px 0">Terms &amp; Conditions</td></tr>
+    <tr><td style="padding:7px 0;color:var(--muted)">14.</td><td style="padding:7px 0">Acceptance &amp; Signatures</td></tr>
+  </table>
+</section>
+
+<!-- ── 1. Executive Summary ───────────────────────────────────────── -->
+<section>
+  <div class="section-label">Section 1</div>
+  <h2>Executive Summary</h2>
+
+  <p>
+    Firmvision Technologies Limited is pleased to present this proposal for the design, development,
+    and full deployment of a <strong>secure, enterprise-grade Computer-Based Testing (CBT) Platform</strong>
+    tailored exclusively for Babcock University High School.
+  </p>
+  <p>
+    As one of Nigeria's leading faith-based academic institutions, Babcock University High School
+    maintains rigorous academic standards across a student population exceeding <strong>5,000 learners</strong>.
+    Managing internal assessments, continuous assessment tests (CATs), terminal examinations, and
+    promotional examinations at this scale — while preserving integrity, reducing administrative burden,
+    and generating timely results — requires a purpose-built digital solution.
+  </p>
+  <p>
+    Our proposed <strong>Babcock CBT Platform</strong> delivers a fully-featured examination environment
+    with an administrative control panel for teachers and management, a secure student examination portal,
+    a centralised question bank, automated marking, and a robust results management system. The platform
+    is engineered to operate on the school's existing local area network (LAN) without any dependency on
+    internet connectivity — and can equally be accessed over the internet when required, giving the
+    institution the flexibility of a <strong>hybrid deployment model</strong>.
+  </p>
+
+  <div class="callout">
+    <div class="callout-icon">🎯</div>
+    <div class="callout-text">
+      <strong>Our Core Promise</strong>
+      <span>A tamper-proof, efficient, and cost-effective CBT system that eliminates paper-based exam
+      challenges, reduces result-processing time from days to minutes, and gives Babcock University
+      High School full ownership and control of its academic assessment data.</span>
+    </div>
+  </div>
+</section>
+
+<!-- ── 2. About Firmvision ────────────────────────────────────────── -->
+<section>
+  <div class="section-label">Section 2</div>
+  <h2>About Firmvision Technologies</h2>
+
+  <p>
+    <strong>Firmvision Technologies Limited</strong> is a Nigerian-registered software development and
+    technology consulting company dedicated to building bespoke digital solutions for the education,
+    healthcare, and enterprise sectors. We combine deep technical expertise with a thorough understanding
+    of the Nigerian educational landscape to deliver solutions that are practical, reliable, and
+    built to last.
+  </p>
+
+  <h3>Our Core Capabilities</h3>
+  <div class="feature-grid" style="grid-template-columns:repeat(3,1fr)">
+    <div class="feature-card">
+      <div class="feature-icon">💻</div>
+      <div class="feature-title">Custom Software Development</div>
+      <div class="feature-desc">Web, mobile, and desktop applications built from the ground up to exact specifications.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🎓</div>
+      <div class="feature-title">EdTech Solutions</div>
+      <div class="feature-desc">Learning management systems, CBT platforms, student portals, and academic ERP systems.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🔐</div>
+      <div class="feature-title">Cybersecurity & Data</div>
+      <div class="feature-desc">Secure authentication, encrypted data storage, role-based access control, and audit trails.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">☁️</div>
+      <div class="feature-title">Cloud & On-premise Deployment</div>
+      <div class="feature-desc">Solutions that work on local school networks, cloud servers, or both simultaneously.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">📊</div>
+      <div class="feature-title">Analytics & Reporting</div>
+      <div class="feature-desc">Real-time dashboards, result analytics, and exportable reports for school management.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🛠</div>
+      <div class="feature-title">Training & Support</div>
+      <div class="feature-desc">On-site staff training, documentation, and ongoing technical support packages.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ── 3. Understanding the Challenge ────────────────────────────── -->
+<section>
+  <div class="section-label">Section 3</div>
+  <h2>Understanding the Challenge</h2>
+
+  <p>
+    Large secondary schools managing thousands of students face compounding challenges when
+    conducting examinations through traditional paper-based methods. We have identified the
+    following pain points common to institutions of Babcock University High School's scale:
+  </p>
+
+  <h3>Current Challenges</h3>
+  <table class="tech-table">
+    <thead><tr><th>Challenge Area</th><th>Impact</th></tr></thead>
+    <tbody>
+      <tr><td>Paper & printing costs</td><td>Significant recurring expenditure on question papers, answer sheets, and logistics per examination cycle</td></tr>
+      <tr><td>Examination malpractice</td><td>Question leakage, answer copying, impersonation — difficult to control at scale with paper-based systems</td></tr>
+      <tr><td>Result processing time</td><td>Manual marking and result compilation can take days to weeks, delaying academic progression decisions</td></tr>
+      <tr><td>Question bank management</td><td>No centralised repository — teachers recreate questions repeatedly; no reuse or quality control</td></tr>
+      <tr><td>Scalability</td><td>Simultaneously examining 5,000+ students in a controlled environment is a major logistical challenge</td></tr>
+      <tr><td>Connectivity dependency</td><td>Most cloud-based CBT platforms require constant, stable internet — unreliable in many Nigerian school settings</td></tr>
+      <tr><td>Result integrity</td><td>Paper results are susceptible to tampering, loss, and transcription errors</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ── 4. Proposed Solution ───────────────────────────────────────── -->
+<section>
+  <div class="section-label">Section 4</div>
+  <h2>Proposed Solution Overview</h2>
+
+  <p>
+    Firmvision Technologies proposes the development and deployment of the
+    <strong>Babcock CBT Platform</strong> — a purpose-built, offline-capable, internet-ready
+    Computer-Based Testing system designed specifically for Babcock University High School.
+  </p>
+  <p>
+    The platform consists of three integrated components working seamlessly together:
+  </p>
+
+  <div class="feature-grid" style="margin-top:18px">
+    <div class="feature-card" style="border-color:var(--blue);background:var(--light-blue)">
+      <div class="feature-icon">🛡️</div>
+      <div class="feature-title">Student Examination Portal</div>
+      <div class="feature-desc">A secure, locked-down examination interface for students. Features fullscreen enforcement,
+      tab-switch detection, countdown timer, auto-save, and automated submission. Designed to work on any
+      modern browser — no app installation required on student devices.</div>
+    </div>
+    <div class="feature-card" style="border-color:var(--blue);background:var(--light-blue)">
+      <div class="feature-icon">👩‍💼</div>
+      <div class="feature-title">Admin &amp; Teacher Control Panel</div>
+      <div class="feature-desc">A comprehensive management dashboard for school administrators and teachers.
+      Manage students in bulk, build and organise the question bank, create and schedule examinations,
+      monitor live sessions, view detailed results, and manually grade essay questions.</div>
+    </div>
+    <div class="feature-card" style="border-color:var(--blue);background:var(--light-blue)">
+      <div class="feature-icon">⚙️</div>
+      <div class="feature-title">Secure Backend API</div>
+      <div class="feature-desc">A high-performance Python FastAPI backend with role-based authentication, encrypted
+      data storage, question randomisation engine, automatic grading, violation logging, and support for
+      both SQLite (offline/LAN) and PostgreSQL (cloud/enterprise) databases.</div>
+    </div>
+    <div class="feature-card" style="border-color:var(--blue);background:var(--light-blue)">
+      <div class="feature-icon">📦</div>
+      <div class="feature-title">Zero-Dependency Design</div>
+      <div class="feature-desc">Unlike platforms requiring constant internet access, all platform components —
+      including the admin panel and student portal — function entirely from the school's local server.
+      No third-party CDN, cloud service, or internet connection is required during examination sessions.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ── 5. Key Platform Features ──────────────────────────────────── -->
+<section>
+  <div class="section-label">Section 5</div>
+  <h2>Key Platform Features</h2>
+
+  <h3>Question Bank Management</h3>
+  <p>A centralised, subject-organised repository of examination questions that teachers build once and reuse across multiple examinations.</p>
+  <ul style="padding-left:20px;font-size:13px;color:var(--muted);line-height:2">
+    <li>Four question types: <strong>Multiple Choice (MCQ)</strong>, <strong>True / False</strong>, <strong>Multi-select</strong>, and <strong>Essay / Short Answer</strong></li>
+    <li>Questions tagged by subject, class level, and topic</li>
+    <li>Configurable point values per question</li>
+    <li>Optional explanations for each question — displayed after grading</li>
+    <li>Full-text search and filter by subject, type, or keyword</li>
+  </ul>
+
+  <h3>Examination Management</h3>
+  <ul style="padding-left:20px;font-size:13px;color:var(--muted);line-height:2">
+    <li>Create exams from question bank with drag-and-drop question selection</li>
+    <li>Set time limits, start/end windows, and target class groups</li>
+    <li>Configurable pass mark percentage per exam</li>
+    <li>Questions and answer options shuffled uniquely per student</li>
+    <li>Exam status workflow: <em>Draft → Active → Ended</em></li>
+  </ul>
+
+  <h3>Student Management</h3>
+  <ul style="padding-left:20px;font-size:13px;color:var(--muted);line-height:2">
+    <li>Register students individually or bulk-import up to 5,000+ via CSV upload</li>
+    <li>Students organised by class, registration number, and academic level</li>
+    <li>Role-based access: Admin, Teacher, Student</li>
+    <li>Account enable/disable without data deletion</li>
+    <li>Secure password management with bcrypt encryption</li>
+  </ul>
+
+  <h3>Results &amp; Analytics</h3>
+  <ul style="padding-left:20px;font-size:13px;color:var(--muted);line-height:2">
+    <li>Instant automatic grading for MCQ, True/False, and Multi-select questions</li>
+    <li>Manual essay grading interface with partial marks support</li>
+    <li>Per-student result cards showing score, percentage, time taken, and violation log</li>
+    <li>Class-wide results table sortable by score, name, or class</li>
+    <li>Average score, pass rate, and highest/lowest scores per examination</li>
+    <li>Export-ready data for school record systems</li>
+  </ul>
+</section>
+
+<!-- ── 6. Security ────────────────────────────────────────────────── -->
+<section>
+  <div class="section-label">Section 6</div>
+  <h2>Security &amp; Examination Integrity</h2>
+
+  <p>
+    Examination integrity is the cornerstone of any credible assessment system. The Babcock CBT Platform
+    employs a multi-layered security architecture at both the technical and procedural level.
+  </p>
+
+  <div class="security-list">
+    <div class="sec-item">
+      <div class="sec-icon">🖥️</div>
+      <div class="sec-text">
+        <strong>Fullscreen Enforcement</strong>
+        <span>The exam automatically requests fullscreen mode on start. Exiting fullscreen logs a violation and triggers a warning. Repeated exits auto-submit the exam.</span>
+      </div>
+    </div>
+    <div class="sec-item">
+      <div class="sec-icon">🔁</div>
+      <div class="sec-text">
+        <strong>Tab-Switch Detection</strong>
+        <span>Any navigation away from the exam tab or window is instantly detected, logged, and reported. Students are warned; repeated switches trigger auto-submission.</span>
+      </div>
+    </div>
+    <div class="sec-item">
+      <div class="sec-icon">🎲</div>
+      <div class="sec-text">
+        <strong>Question &amp; Option Randomisation</strong>
+        <span>Each student receives questions and answer options in a unique random order, making sharing answers between adjacent students impossible.</span>
+      </div>
+    </div>
+    <div class="sec-item">
+      <div class="sec-icon">🎫</div>
+      <div class="sec-text">
+        <strong>One-Time Session Tokens</strong>
+        <span>A unique cryptographic token is issued per student per exam. The same student cannot open the same exam on two different devices simultaneously.</span>
+      </div>
+    </div>
+    <div class="sec-item">
+      <div class="sec-icon">🚫</div>
+      <div class="sec-text">
+        <strong>Copy &amp; Right-Click Disabled</strong>
+        <span>During active examinations, clipboard access, right-click menus, and browser developer tools are blocked to prevent question extraction.</span>
+      </div>
+    </div>
+    <div class="sec-item">
+      <div class="sec-icon">⏱️</div>
+      <div class="sec-text">
+        <strong>Server-Authoritative Timer</strong>
+        <span>Exam time is tracked server-side and verified via regular heartbeat calls. Manipulating the browser clock has no effect on the exam timer.</span>
+      </div>
+    </div>
+    <div class="sec-item">
+      <div class="sec-icon">🔐</div>
+      <div class="sec-text">
+        <strong>JWT Authentication &amp; Bcrypt</strong>
+        <span>All sessions use industry-standard JSON Web Tokens. Passwords are stored using bcrypt hashing — never in plain text. All API endpoints are protected.</span>
+      </div>
+    </div>
+    <div class="sec-item">
+      <div class="sec-icon">📋</div>
+      <div class="sec-text">
+        <strong>Violation Audit Log</strong>
+        <span>Every security event is timestamped and stored against the student's session. Administrators can review the full violation history for any submission.</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── 7. Deployment ──────────────────────────────────────────────── -->
+<section>
+  <div class="section-label">Section 7</div>
+  <h2>Deployment Options — Offline &amp; Online</h2>
+
+  <p>
+    A key differentiator of the Babcock CBT Platform is its ability to operate in <strong>both offline (LAN)
+    and online (internet) environments</strong> without any code changes. The school can choose either mode
+    or run them simultaneously.
+  </p>
+
+  <div class="deploy-grid">
+    <div class="deploy-card primary">
+      <div class="deploy-tag">Mode 1 — Recommended</div>
+      <div class="deploy-title">🏫 School LAN (Offline)</div>
+      <p style="font-size:12px;color:var(--muted);margin-bottom:12px">
+        The platform server runs on a single school computer or dedicated server.
+        All students connect through the school's Wi-Fi or LAN cable.
+        <strong>No internet access required at any point.</strong>
+      </p>
+      <ul class="deploy-list">
+        <li>Works on existing school Wi-Fi infrastructure</li>
+        <li>All data stays within the school premises</li>
+        <li>SQLite database — zero additional software</li>
+        <li>Supports 500+ concurrent users on a standard PC</li>
+        <li>Single command to start: <code>./start.sh</code></li>
+        <li>Ideal for terminal exams and internal assessments</li>
+      </ul>
+    </div>
+    <div class="deploy-card secondary">
+      <div class="deploy-tag">Mode 2</div>
+      <div class="deploy-title">🌐 Cloud / Internet</div>
+      <p style="font-size:12px;color:var(--muted);margin-bottom:12px">
+        Deployed on a cloud server (e.g. a VPS or dedicated server), the platform
+        is accessible from anywhere — school, home, or mobile — over the internet.
+      </p>
+      <ul class="deploy-list">
+        <li>Accessible from any device, anywhere</li>
+        <li>PostgreSQL database for high-volume concurrency</li>
+        <li>Docker deployment for easy management</li>
+        <li>Encrypted HTTPS for all data in transit</li>
+        <li>Suitable for remote/take-home assessments</li>
+        <li>Daily automated database backups</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="callout" style="margin-top:20px">
+    <div class="callout-icon">💡</div>
+    <div class="callout-text">
+      <strong>Hybrid Recommendation</strong>
+      <span>For maximum reliability, we recommend the <em>LAN-primary, internet-backup</em> model: conduct
+      all formal examinations on the school's local network (zero dependency on internet provider), while
+      keeping the cloud deployment available for remote access by school management and reporting.</span>
+    </div>
+  </div>
+</section>
+
+<!-- ── 8. Technical Architecture ─────────────────────────────────── -->
+<section>
+  <div class="section-label">Section 8</div>
+  <h2>Technical Architecture</h2>
+
+  <p>The platform is built on a modern, proven technology stack selected for performance, security,
+  long-term maintainability, and independence from expensive proprietary software licenses.</p>
+
+  <table class="tech-table">
+    <thead><tr><th>Layer</th><th>Technology</th><th>Why</th></tr></thead>
+    <tbody>
+      <tr>
+        <td>Backend API</td>
+        <td>Python 3.12 + FastAPI</td>
+        <td>Async I/O handles thousands of concurrent exam sessions; auto-generates API documentation; type-safe</td>
+      </tr>
+      <tr>
+        <td>Database (LAN)</td>
+        <td>SQLite</td>
+        <td>Zero installation; single file; works offline; easily backed up; sufficient for 5,000 students</td>
+      </tr>
+      <tr>
+        <td>Database (Cloud)</td>
+        <td>PostgreSQL 16</td>
+        <td>Enterprise-grade; handles 10,000+ concurrent connections; full ACID compliance; free, open-source</td>
+      </tr>
+      <tr>
+        <td>Authentication</td>
+        <td>JWT + bcrypt</td>
+        <td>Industry standard; stateless tokens; passwords never stored in plain text</td>
+      </tr>
+      <tr>
+        <td>Admin Frontend</td>
+        <td>Vanilla HTML/CSS/JavaScript</td>
+        <td>Zero CDN or internet dependency; loads instantly on any device; no framework licensing costs</td>
+      </tr>
+      <tr>
+        <td>Student Frontend</td>
+        <td>Vanilla HTML/CSS/JavaScript</td>
+        <td>Lightweight, reliable under low-bandwidth LAN conditions; works on any browser including older devices</td>
+      </tr>
+      <tr>
+        <td>Containerisation</td>
+        <td>Docker + Docker Compose</td>
+        <td>Reproducible, portable deployment; the entire system runs with a single command</td>
+      </tr>
+      <tr>
+        <td>Web Server</td>
+        <td>Uvicorn (ASGI)</td>
+        <td>High-performance Python server; handles thousands of requests per second</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>Minimum Server Requirements (LAN Mode)</h3>
+  <table class="tech-table">
+    <thead><tr><th>Component</th><th>Minimum</th><th>Recommended</th></tr></thead>
+    <tbody>
+      <tr><td>Processor</td><td>Intel Core i3 / equivalent</td><td>Intel Core i5 / i7 or better</td></tr>
+      <tr><td>RAM</td><td>4 GB</td><td>8 GB or more</td></tr>
+      <tr><td>Storage</td><td>50 GB HDD</td><td>120 GB SSD</td></tr>
+      <tr><td>Operating System</td><td>Windows 10, Ubuntu 20.04</td><td>Ubuntu 22.04 LTS (Linux)</td></tr>
+      <tr><td>Network</td><td>100 Mbps switch</td><td>Gigabit switch + structured cabling</td></tr>
+      <tr><td>Python</td><td>Python 3.10</td><td>Python 3.12</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ── 9. Timeline ────────────────────────────────────────────────── -->
+<section>
+  <div class="section-label">Section 9</div>
+  <h2>Implementation Timeline</h2>
+  <p>From contract signing to full go-live, the project is structured into four phases over an estimated <strong>6–8 weeks</strong>.</p>
+
+  <div class="timeline">
+    <div class="tl-item">
+      <div class="tl-dot"></div>
+      <div class="tl-weeks">Weeks 1 – 2</div>
+      <div class="tl-phase">Phase 1 — Discovery &amp; Setup</div>
+      <div class="tl-title">Requirements Finalisation &amp; Infrastructure Setup</div>
+      <div class="tl-desc">
+        Kick-off meeting with school management and IT team. Finalise subject list, class structure,
+        user roles, and examination policies. Assess existing network infrastructure.
+        Set up the server environment (school-provided hardware or cloud, per agreement).
+        Install and configure all platform components. Create initial admin accounts.
+      </div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot"></div>
+      <div class="tl-weeks">Weeks 3 – 4</div>
+      <div class="tl-phase">Phase 2 — Data Migration &amp; Configuration</div>
+      <div class="tl-title">Student Registration &amp; Question Bank Loading</div>
+      <div class="tl-desc">
+        Bulk import of all student records (name, class, registration number) from school register.
+        Subject configuration for all classes and academic levels. Teachers receive accounts and
+        begin loading questions into the bank with Firmvision technical support on-site.
+        Platform customised with school branding (name, logo, colour scheme).
+      </div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot"></div>
+      <div class="tl-weeks">Weeks 5 – 6</div>
+      <div class="tl-phase">Phase 3 — Training &amp; Pilot Testing</div>
+      <div class="tl-title">Staff Training &amp; Mock Examination</div>
+      <div class="tl-desc">
+        Structured training for administrators, teachers, and IT staff on all platform functions.
+        Printed user guide and quick-reference cards for teachers. Conduct a supervised pilot
+        examination with a sample student group (one class or year group) to validate the full
+        workflow from question loading to result generation. Feedback incorporated and issues resolved.
+      </div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot"></div>
+      <div class="tl-weeks">Weeks 7 – 8</div>
+      <div class="tl-phase">Phase 4 — Go-Live &amp; Handover</div>
+      <div class="tl-title">Full Deployment &amp; Official Launch</div>
+      <div class="tl-desc">
+        Full school-wide examination conducted on the platform. Firmvision technical team present
+        on-site for the first official examination cycle. Formal handover documentation, admin credentials,
+        backup procedures, and disaster recovery guide delivered. 90-day intensive post-launch
+        support period commences.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── 10. Pricing ────────────────────────────────────────────────── -->
+<section>
+  <div class="section-label">Section 10</div>
+  <h2>Investment &amp; Pricing</h2>
+
+  <p>All packages include the complete platform as described in this proposal. The difference
+  between packages lies in support depth, additional features, and maintenance coverage.
+  All prices are in Nigerian Naira (₦) and exclude VAT.</p>
+
+  <div class="pricing-grid">
+    <!-- Standard -->
+    <div class="price-card">
+      <div class="price-name">Standard</div>
+      <div class="price-amount"><span class="price-currency">₦</span>1,800,000</div>
+      <div class="price-period">One-time setup fee</div>
+      <div class="price-desc">Ideal for getting started — LAN deployment with essential features.</div>
+      <ul class="price-list">
+        <li class="price-item">Full CBT platform (LAN only)</li>
+        <li class="price-item">Up to 3,000 student accounts</li>
+        <li class="price-item">Question bank &amp; 4 question types</li>
+        <li class="price-item">Automated result &amp; grading</li>
+        <li class="price-item">3-day on-site staff training</li>
+        <li class="price-item">30-day post-launch support</li>
+        <li class="price-item">1-year software updates</li>
+      </ul>
+      <div class="price-note">+ ₦400,000/year maintenance</div>
+    </div>
+
+    <!-- Professional (featured) -->
+    <div class="price-card featured">
+      <div class="price-recommended">Recommended</div>
+      <div class="price-name">Professional</div>
+      <div class="price-amount"><span class="price-currency">₦</span>2,800,000</div>
+      <div class="price-period">One-time setup fee</div>
+      <div class="price-desc">Full-featured LAN + cloud hybrid deployment for up to 6,000 students.</div>
+      <ul class="price-list">
+        <li class="price-item">LAN + cloud hybrid deployment</li>
+        <li class="price-item">Up to 6,000 student accounts</li>
+        <li class="price-item">All Standard features</li>
+        <li class="price-item">PostgreSQL (cloud) database</li>
+        <li class="price-item">HTTPS/SSL certificate setup</li>
+        <li class="price-item">5-day on-site staff training</li>
+        <li class="price-item">90-day post-launch support</li>
+        <li class="price-item">2-year software updates</li>
+        <li class="price-item">Results analytics dashboard</li>
+        <li class="price-item">Priority support (4-hr response)</li>
+      </ul>
+      <div class="price-note" style="color:rgba(255,255,255,.5)">+ ₦600,000/year maintenance</div>
+    </div>
+
+    <!-- Enterprise -->
+    <div class="price-card">
+      <div class="price-name">Enterprise</div>
+      <div class="price-amount"><span class="price-currency">₦</span>4,500,000</div>
+      <div class="price-period">One-time setup fee</div>
+      <div class="price-desc">Complete solution for the entire school with full customisation and dedicated SLA.</div>
+      <ul class="price-list">
+        <li class="price-item">All Professional features</li>
+        <li class="price-item">Unlimited student accounts</li>
+        <li class="price-item">Custom school branding &amp; domain</li>
+        <li class="price-item">Parent result portal</li>
+        <li class="price-item">Dedicated server setup &amp; config</li>
+        <li class="price-item">Full network audit &amp; hardening</li>
+        <li class="price-item">7-day training programme</li>
+        <li class="price-item">1-year post-launch support</li>
+        <li class="price-item">3-year software updates</li>
+        <li class="price-item">2-hour emergency SLA</li>
+      </ul>
+      <div class="price-note">+ ₦900,000/year maintenance</div>
+    </div>
+  </div>
+
+  <h3 style="margin-top:24px">Payment Terms</h3>
+  <table class="tech-table">
+    <thead><tr><th>Milestone</th><th>Payment</th><th>When</th></tr></thead>
+    <tbody>
+      <tr><td>Mobilisation</td><td>50% of agreed package fee</td><td>Upon contract signing</td></tr>
+      <tr><td>Pilot completion</td><td>30% of agreed package fee</td><td>After successful pilot examination</td></tr>
+      <tr><td>Go-live</td><td>20% of agreed package fee</td><td>After official launch and handover</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout" style="margin-top:20px">
+    <div class="callout-icon">🤝</div>
+    <div class="callout-text">
+      <strong>Flexible Financing Available</strong>
+      <span>We understand budget planning cycles in educational institutions. Firmvision is open to discussing
+      structured payment plans that align with the school's term-based budget releases, subject to mutual agreement.</span>
+    </div>
+  </div>
+</section>
+
+<!-- ── 11. Support & Maintenance ──────────────────────────────────── -->
+<section>
+  <div class="section-label">Section 11</div>
+  <h2>Support &amp; Maintenance</h2>
+
+  <p>A technology platform is only as valuable as the support behind it. Firmvision provides
+  comprehensive post-deployment support to ensure continuous, uninterrupted operation.</p>
+
+  <div class="maint-grid">
+    <div class="maint-card">
+      <div class="maint-icon">📞</div>
+      <div class="maint-title">Helpdesk Support</div>
+      <div class="maint-desc">Dedicated phone and email support line for teachers and IT staff during school hours (7 AM – 6 PM)</div>
+    </div>
+    <div class="maint-card">
+      <div class="maint-icon">🔄</div>
+      <div class="maint-title">Software Updates</div>
+      <div class="maint-desc">Regular platform updates including bug fixes, security patches, and new feature releases</div>
+    </div>
+    <div class="maint-card">
+      <div class="maint-icon">💾</div>
+      <div class="maint-title">Data Backups</div>
+      <div class="maint-desc">Automated daily database backups with tested recovery procedures. Backup copies stored securely</div>
+    </div>
+    <div class="maint-card">
+      <div class="maint-icon">🧑‍🏫</div>
+      <div class="maint-title">Refresher Training</div>
+      <div class="maint-desc">Annual one-day refresher session for new staff and teachers joining after initial deployment</div>
+    </div>
+    <div class="maint-card">
+      <div class="maint-icon">🚨</div>
+      <div class="maint-title">Exam-Day Support</div>
+      <div class="maint-desc">Remote (and on-site for Enterprise) technical standby during scheduled major examination periods</div>
+    </div>
+    <div class="maint-card">
+      <div class="maint-icon">📈</div>
+      <div class="maint-title">Quarterly Reviews</div>
+      <div class="maint-desc">Quarterly check-in meetings to review system performance, address feedback, and plan enhancements</div>
+    </div>
+  </div>
+</section>
+
+<!-- ── 12. Why Firmvision ─────────────────────────────────────────── -->
+<section>
+  <div class="section-label">Section 12</div>
+  <h2>Why Firmvision Technologies</h2>
+
+  <div class="why-list">
+    <div class="why-item">
+      <div class="why-num">1</div>
+      <div class="why-content">
+        <strong>Built for Nigerian Schools</strong>
+        <span>We understand the realities of Nigerian school infrastructure — unreliable internet, mixed device types, and varying technical literacy. Our solution is engineered for these conditions, not imported from foreign contexts.</span>
+      </div>
+    </div>
+    <div class="why-item">
+      <div class="why-num">2</div>
+      <div class="why-content">
+        <strong>Full Source Code Ownership</strong>
+        <span>Unlike SaaS subscription platforms that hold your data hostage, Babcock University High School retains full ownership of the platform and all student data. There are no recurring licence fees or vendor lock-in risks.</span>
+      </div>
+    </div>
+    <div class="why-item">
+      <div class="why-num">3</div>
+      <div class="why-content">
+        <strong>Purpose-Built, Not Generic</strong>
+        <span>This is not an off-the-shelf product with unwanted features. Every element of the Babcock CBT Platform is built specifically for your school's assessment workflows, class structures, and examination calendar.</span>
+      </div>
+    </div>
+    <div class="why-item">
+      <div class="why-num">4</div>
+      <div class="why-content">
+        <strong>Proven Security Architecture</strong>
+        <span>Multi-layer examination integrity controls — fullscreen enforcement, tab detection, one-time tokens, question randomisation — backed by cryptographic authentication and a complete violation audit trail.</span>
+      </div>
+    </div>
+    <div class="why-item">
+      <div class="why-num">5</div>
+      <div class="why-content">
+        <strong>Zero Recurring Licence Costs</strong>
+        <span>The platform is built on open-source technology (Python, FastAPI, PostgreSQL). After the one-time setup fee, there are no per-user, per-exam, or per-month licensing charges — ever.</span>
+      </div>
+    </div>
+    <div class="why-item">
+      <div class="why-num">6</div>
+      <div class="why-content">
+        <strong>Long-Term Partnership</strong>
+        <span>We do not disappear after go-live. Our support packages, quarterly reviews, and refresher training programmes are designed to ensure the school's IT team grows in confidence with the platform over time.</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── 13. Terms ──────────────────────────────────────────────────── -->
+<section>
+  <div class="section-label">Section 13</div>
+  <h2>Terms &amp; Conditions</h2>
+
+  <ol class="terms-list">
+    <li>This proposal is valid for <strong>60 calendar days</strong> from the date of submission (i.e., until 19 July 2026). After this period, pricing is subject to review.</li>
+    <li>All prices are exclusive of Value Added Tax (VAT) at the prevailing rate. VAT will be itemised separately on the invoice.</li>
+    <li>The scope of work is as described in this proposal. Any additions or modifications requested after contract signing will be subject to a formal change order and additional charges.</li>
+    <li>The school undertakes to provide access to necessary infrastructure, including server hardware (or cloud subscription), school network access, and student registration data in the agreed format.</li>
+    <li>Firmvision Technologies will treat all student data, examination content, and institutional information with strict confidentiality and in compliance with applicable Nigerian data protection regulations (NDPR).</li>
+    <li>Intellectual property of the platform codebase will transfer fully to Babcock University High School upon receipt of the final payment milestone.</li>
+    <li>Annual maintenance fees cover the services described in Section 11. Failure to renew the maintenance agreement does not affect the operation of the installed platform but will suspend support services.</li>
+    <li>Firmvision Technologies shall not be held liable for examination integrity failures arising from school-side procedural breaches (e.g., students sharing login credentials) or failures of school-provided hardware and network infrastructure.</li>
+    <li>Either party may terminate the agreement before the pilot phase with 14 days written notice. In such cases, the mobilisation payment (50%) is non-refundable to cover work already commenced.</li>
+    <li>This proposal supersedes all prior verbal or written discussions between Firmvision Technologies and Babcock University High School regarding this project.</li>
+  </ol>
+</section>
+
+<!-- ── 14. Signatures ─────────────────────────────────────────────── -->
+<section>
+  <div class="section-label">Section 14</div>
+  <h2>Acceptance &amp; Signatures</h2>
+
+  <p>
+    By signing below, both parties confirm their understanding and acceptance of the terms set out in this
+    proposal and agree to proceed with contract formalisation.
+  </p>
+
+  <div class="signature-block">
+    <div class="sig-grid">
+      <div class="sig-party">
+        <strong>For Firmvision Technologies Limited</strong>
+        <p>Proposing Party</p>
+        <div class="sig-line">
+          Signature: ____________________________<br><br>
+          Name: ________________________________<br><br>
+          Title: Director / Authorised Signatory<br><br>
+          Date: ________________________________<br><br>
+          Stamp:
+        </div>
+      </div>
+      <div class="sig-party">
+        <strong>For Babcock University High School</strong>
+        <p>Receiving Party</p>
+        <div class="sig-line">
+          Signature: ____________________________<br><br>
+          Name: ________________________________<br><br>
+          Title: Principal / Authorised Officer<br><br>
+          Date: ________________________________<br><br>
+          Stamp:
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="margin-top:40px;padding:20px;background:var(--light-blue);border-radius:10px;text-align:center">
+    <div style="font-size:13px;color:var(--muted);margin-bottom:4px">For enquiries regarding this proposal, please contact:</div>
+    <div style="font-size:15px;font-weight:700;color:var(--navy);margin-bottom:4px">Firmvision Technologies Limited</div>
+    <div style="font-size:13px;color:var(--muted)">
+      📧 info@firmvision.tech &nbsp;·&nbsp; 📞 +234 800 FIRMVIS &nbsp;·&nbsp; 🌐 www.firmvision.tech
+    </div>
+    <div style="font-size:12px;color:var(--muted);margin-top:6px">RC No: [Registration Number] &nbsp;·&nbsp; Nigeria</div>
+  </div>
+</section>
+
+</div><!-- /body-wrap -->
+
+<div class="page-footer">
+  <span>Firmvision Technologies Limited</span> &nbsp;·&nbsp;
+  Babcock CBT Platform Proposal &nbsp;·&nbsp;
+  Ref: FVT/CBT/2026/001 &nbsp;·&nbsp;
+  Confidential &amp; Proprietary &nbsp;·&nbsp;
+  May 2026
+</div>
+
+</div><!-- /document -->
+</body>
+</html>
