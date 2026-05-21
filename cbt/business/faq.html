@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FAQ — Firmvision CBT Platform</title>
+<style>
+  :root { --navy: #0f2a4a; --blue: #1a5fa8; --gold: #e8a020; --light: #f4f8ff; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: Arial, Helvetica, sans-serif; font-size: 11pt; color: #1a1a2e; background: #fff; line-height: 1.7; }
+  .page { max-width: 820px; margin: 0 auto; padding: 40px 50px; }
+  .header { background: var(--navy); color: #fff; padding: 30px 40px; border-radius: 10px; margin-bottom: 32px; }
+  .header h1 { font-size: 22pt; margin-bottom: 6px; }
+  .header p { opacity: 0.85; font-size: 12pt; }
+  .header .logo { font-size: 9pt; color: var(--gold); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 8px; }
+  .category { margin-bottom: 32px; }
+  .category h2 { font-size: 14pt; color: var(--blue); border-left: 4px solid var(--gold); padding-left: 14px; margin-bottom: 16px; }
+  .faq-item { border: 1px solid #d0ddf0; border-radius: 8px; margin-bottom: 10px; overflow: hidden; }
+  .faq-q { background: var(--light); padding: 14px 18px; font-weight: bold; color: var(--navy); cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-size: 11pt; }
+  .faq-q:hover { background: #e8f0fe; }
+  .faq-a { padding: 14px 18px; border-top: 1px solid #d0ddf0; font-size: 11pt; color: #333; }
+  .faq-a p { margin-bottom: 8px; }
+  .faq-a ul, .faq-a ol { padding-left: 20px; margin: 8px 0; }
+  .faq-a li { margin-bottom: 4px; }
+  .tag { display: inline-block; padding: 2px 10px; border-radius: 12px; font-size: 9pt; font-weight: bold; margin-right: 6px; }
+  .tag-tech { background: #dbeafe; color: #1e40af; }
+  .tag-admin { background: #d1fae5; color: #065f46; }
+  .tag-pricing { background: #fef3c7; color: #92400e; }
+  .cta-box { background: var(--navy); color: #fff; padding: 24px 30px; border-radius: 10px; text-align: center; margin-top: 30px; }
+  .cta-box h3 { margin-bottom: 10px; }
+  .no-print { text-align: center; margin-bottom: 20px; }
+  .btn { background: var(--navy); color: #fff; padding: 10px 24px; border: none; border-radius: 6px; font-size: 11pt; cursor: pointer; }
+  @media print { .no-print { display: none; } }
+
+  /* Simple accordion */
+  .faq-a { display: none; }
+  .faq-item.open .faq-a { display: block; }
+  .faq-item.open .faq-q { background: #e8f0fe; }
+  .arrow { transition: transform 0.2s; font-size: 10pt; }
+  .faq-item.open .arrow { transform: rotate(90deg); }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="no-print"><button class="btn" onclick="window.print()">🖨 Print FAQ</button></div>
+
+  <div class="header">
+    <div class="logo">Firmvision Technologies Ltd</div>
+    <h1>Frequently Asked Questions</h1>
+    <p>CBT Exam Platform — Pre-Sales & Technical Guide</p>
+  </div>
+
+  <!-- GENERAL -->
+  <div class="category">
+    <h2>General Questions</h2>
+
+    <div class="faq-item open">
+      <div class="faq-q" onclick="toggle(this)">What is the Firmvision CBT Platform? <span class="arrow">▶</span></div>
+      <div class="faq-a">
+        <p>Firmvision CBT Platform is a complete Computer-Based Testing solution designed specifically for Nigerian secondary schools. It allows schools to create, administer, and automatically grade examinations online or offline on a school LAN — with robust security features to prevent cheating.</p>
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggle(this)">Does the system require internet access during exams? <span class="arrow">▶</span></div>
+      <div class="faq-a">
+        <p><strong>No.</strong> This is one of the platform's core advantages. After installation, the system runs entirely on your school's local area network (LAN). Students access it via the school's Wi-Fi or wired network from any device — no internet connection required during examinations.</p>
+        <p>Internet is only needed for initial installation, software updates, and (optionally) cloud backup.</p>
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggle(this)">How many students can use the platform simultaneously? <span class="arrow">▶</span></div>
+      <div class="faq-a">
+        <p>The platform is built to support <strong>5,000+ students</strong> enrolled, with hundreds taking exams simultaneously — depending on your server specifications. On a recommended server (8 cores, 16 GB RAM), 200–500 concurrent exam sessions run smoothly.</p>
+        <p>For larger concurrent loads, we provide guidance on server scaling and load balancing.</p>
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggle(this)">What devices can students use? <span class="arrow">▶</span></div>
+      <div class="faq-a">
+        <p>Any device with a modern web browser:</p>
+        <ul>
+          <li>Desktop / laptop computers (Windows, macOS, Linux)</li>
+          <li>Android tablets and smartphones</li>
+          <li>iPads and iPhones</li>
+          <li>School Chromebooks</li>
+        </ul>
+        <p>No app installation is required — students open a web browser and navigate to the server address.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECURITY -->
+  <div class="category">
+    <h2>Exam Security & Integrity</h2>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggle(this)">How does the system prevent cheating? <span class="arrow">▶</span></div>
+      <div class="faq-a">
+        <p>Four layers of anti-cheat protection are built in:</p>
+        <ol>
+          <li><strong>Fullscreen Lock:</strong> The exam browser is forced into fullscreen mode. Exiting triggers a warning and violation count.</li>
+          <li><strong>Tab-Switch Detection:</strong> If a student switches browser tabs or minimises the window, this is detected and logged immediately.</li>
+          <li><strong>Question Randomisation:</strong> Questions and answer options are shuffled differently for every student — making copying nearly impossible.</li>
+          <li><strong>One-Time Session Tokens:</strong> Each exam session uses a unique cryptographic token. Sessions cannot be shared or used by another student.</li>
+        </ol>
+        <p>If a student triggers too many violations, the exam is automatically submitted on their behalf.</p>
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggle(this)">What happens if a student's power or network cuts during an exam? <span class="arrow">▶</span></div>
+      <div class="faq-a">
+        <p>The platform uses <strong>continuous auto-save</strong>. Every answer is saved to the server the moment the student selects it. If their device loses power or connection:</p>
+        <ul>
+          <li>All saved answers are preserved</li>
+          <li>The student can reconnect and resume from where they left off</li>
+          <li>The exam timer continues server-side — it cannot be paused by disconnecting</li>
+        </ul>
+        <p>The administrator can also manually reset a session if there is a genuine infrastructure failure.</p>
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggle(this)">Can students share their login credentials to have someone else take the exam? <span class="arrow">▶</span></div>
+      <div class="faq-a">
+        <p>The one-time session token system significantly mitigates this risk. Each exam session is bound to a single login token that cannot be reused. Schools are also advised to:</p>
+        <ul>
+          <li>Seat students in supervised examination halls</li>
+          <li>Issue unique, random passwords per exam period (bulk-resettable via admin panel)</li>
+          <li>Verify student identity before allowing them to log in</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADMINISTRATION -->
+  <div class="category">
+    <h2>Administration & Setup</h2>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggle(this)">How do we add 5,000 students to the system? <span class="arrow">▶</span></div>
+      <div class="faq-a">
+        <p>The Admin panel includes a <strong>bulk CSV import</strong> feature. You prepare a spreadsheet with columns: <code>full_name, username, password, class, arm</code> and upload it — all students are created instantly.</p>
+        <p>A filled template CSV with sample Nigerian student names is provided. The import validates data before processing and reports any errors.</p>
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggle(this)">What question types does the system support? <span class="arrow">▶</span></div>
+      <div class="faq-a">
+        <ul>
+          <li><strong>Multiple Choice (MCQ):</strong> One correct answer from 2–6 options</li>
+          <li><strong>True / False:</strong> Binary choice, auto-scored</li>
+          <li><strong>Multi-Select:</strong> Multiple correct answers; partial credit available</li>
+          <li><strong>Essay / Long Answer:</strong> Open text; manually graded by teacher</li>
+        </ul>
+        <p>All question types can be mixed within the same exam.</p>
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggle(this)">Can teachers create their own questions and exams? <span class="arrow">▶</span></div>
+      <div class="faq-a">
+        <p>Yes. Teachers are given a dedicated login with permission to:</p>
+        <ul>
+          <li>Add and edit questions in the question bank (their subjects only)</li>
+          <li>Create exams and assign questions</li>
+          <li>View results and grade essay answers</li>
+        </ul>
+        <p>Teachers cannot manage students, access other teachers' questions, or change system settings — those are restricted to admins.</p>
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggle(this)">How long does installation take? <span class="arrow">▶</span></div>
+      <div class="faq-a">
+        <p>A standard installation on a prepared server takes <strong>2–4 hours</strong>, including:</p>
+        <ul>
+          <li>Operating system and dependency setup</li>
+          <li>Platform installation and database configuration</li>
+          <li>Network access testing from student devices</li>
+          <li>Admin credential setup and initial data import</li>
+        </ul>
+        <p>The automated <code>setup.sh</code> script handles most of this. Full deployment including training typically takes 1–2 days on-site.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- PRICING & SUPPORT -->
+  <div class="category">
+    <h2>Pricing & Support</h2>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggle(this)">Are there recurring fees after purchase? <span class="arrow">▶</span></div>
+      <div class="faq-a">
+        <p><strong>No per-student or annual licence fees.</strong> The platform is a <strong>one-time purchase</strong>. After the support period (12 or 24 months, depending on your tier), optional extended support can be purchased at a discounted rate.</p>
+        <p>The software continues to function indefinitely without support renewal — you are not locked out.</p>
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggle(this)">What is the payment structure? <span class="arrow">▶</span></div>
+      <div class="faq-a">
+        <p>Payment is tied to project milestones:</p>
+        <ul>
+          <li><strong>50%</strong> on contract signing (to begin development)</li>
+          <li><strong>30%</strong> after successful pilot exam (to release full system)</li>
+          <li><strong>20%</strong> on final go-live acceptance</li>
+        </ul>
+        <p>No milestone payment is required until the deliverable is accepted.</p>
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggle(this)">What support do we get after go-live? <span class="arrow">▶</span></div>
+      <div class="faq-a">
+        <p>Support is provided via WhatsApp, email, and remote desktop during business hours (Mon–Sat, 7 AM – 10 PM). Response times per our SLA:</p>
+        <ul>
+          <li><strong>Critical issues (exam down):</strong> 1-hour response, 4-hour resolution</li>
+          <li><strong>High priority (major feature broken):</strong> 4-hour response, next-day resolution</li>
+          <li><strong>Medium/Low:</strong> 1–3 business days</li>
+        </ul>
+        <p>Security patches are applied as released; a quarterly performance health check is included.</p>
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggle(this)">Can we see a demo before purchasing? <span class="arrow">▶</span></div>
+      <div class="faq-a">
+        <p>Absolutely. We offer a <strong>free live demonstration</strong> — either on-site at your school or via remote screen share. Contact us to schedule:</p>
+        <ul>
+          <li>WhatsApp: +234-XXX-XXXX-XXX</li>
+          <li>Email: demo@firmvision.ng</li>
+        </ul>
+        <p>We can also provide a sandbox login so your administrators can explore the system before committing.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="cta-box">
+    <h3>Have More Questions?</h3>
+    <p>Our team is available Monday–Saturday, 8 AM – 8 PM.</p>
+    <p style="margin-top:10px;">📞 +234-XXX-XXXX-XXX &nbsp;|&nbsp; 📧 info@firmvision.ng &nbsp;|&nbsp; 🌐 www.firmvision.ng</p>
+  </div>
+</div>
+
+<script>
+function toggle(el) {
+  el.closest('.faq-item').classList.toggle('open');
+}
+</script>
+</body>
+</html>

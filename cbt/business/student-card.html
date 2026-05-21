@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Student Quick-Start Card — Firmvision CBT</title>
+<style>
+  :root { --navy: #0f2a4a; --blue: #1a5fa8; --gold: #e8a020; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: Arial, Helvetica, sans-serif; background: #e0e8f0; display: flex; flex-direction: column; align-items: center; padding: 30px; gap: 30px; }
+
+  /* A5 card size */
+  .card { width: 148mm; background: #fff; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.15); page-break-after: always; }
+
+  /* FRONT */
+  .card-front { }
+  .card-header { background: var(--navy); color: #fff; padding: 16px 20px; }
+  .card-header .logo { font-size: 7pt; color: var(--gold); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 4px; }
+  .card-header h1 { font-size: 14pt; }
+  .card-header p { font-size: 8pt; opacity: 0.8; margin-top: 2px; }
+  .card-body { padding: 16px 20px; }
+  .card-body h2 { font-size: 10pt; color: var(--navy); border-bottom: 2px solid var(--gold); padding-bottom: 4px; margin-bottom: 10px; }
+
+  .steps { list-style: none; }
+  .steps li { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 10px; }
+  .steps .num { background: var(--navy); color: #fff; width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 9pt; font-weight: bold; flex-shrink: 0; }
+  .steps .text { font-size: 9.5pt; line-height: 1.5; color: #1a1a2e; }
+  .steps .text strong { color: var(--navy); }
+
+  .url-box { background: var(--navy); color: #fff; border-radius: 6px; padding: 8px 14px; text-align: center; margin: 12px 0; }
+  .url-box .url { font-size: 13pt; font-weight: bold; letter-spacing: 1px; font-family: monospace; color: var(--gold); }
+  .url-box .label { font-size: 7pt; opacity: 0.7; margin-top: 2px; }
+
+  .creds-box { background: #f4f8ff; border: 1px solid #c8d8f0; border-radius: 6px; padding: 10px 14px; margin: 10px 0; }
+  .creds-box .row { display: flex; justify-content: space-between; font-size: 9pt; padding: 3px 0; }
+  .creds-box .row span:first-child { color: #666; font-weight: bold; }
+  .creds-box .row span:last-child { font-family: monospace; color: var(--navy); font-weight: bold; }
+  .creds-box .fill-in { border-bottom: 1px solid #999; display: inline-block; width: 120px; height: 14px; vertical-align: bottom; }
+
+  /* BACK */
+  .card-back { }
+  .card-back .card-header { background: var(--blue); }
+
+  .rules-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 10px 0; }
+  .rule { background: #f8f9ff; border-radius: 6px; padding: 8px 10px; }
+  .rule .icon { font-size: 14pt; margin-bottom: 3px; }
+  .rule p { font-size: 8pt; color: #333; line-height: 1.4; }
+  .rule strong { color: var(--navy); }
+
+  .warn-box { background: #fff0f0; border-left: 3px solid #dc2626; padding: 8px 12px; border-radius: 0 6px 6px 0; margin: 10px 0; }
+  .warn-box p { font-size: 8.5pt; color: #7f1d1d; line-height: 1.5; }
+
+  .help-box { background: var(--gold); border-radius: 6px; padding: 10px 14px; margin-top: 10px; }
+  .help-box p { font-size: 8pt; color: var(--navy); font-weight: bold; line-height: 1.6; }
+
+  .card-footer { background: #f4f8ff; padding: 8px 20px; border-top: 1px solid #d0ddf0; display: flex; justify-content: space-between; align-items: center; }
+  .card-footer p { font-size: 7pt; color: #888; }
+
+  .no-print { text-align: center; margin-bottom: 20px; }
+  .btn { background: var(--navy); color: #fff; padding: 10px 24px; border: none; border-radius: 6px; font-size: 11pt; cursor: pointer; }
+  @media print {
+    body { background: #fff; padding: 10px; }
+    .no-print { display: none; }
+    .card { box-shadow: none; border: 1px solid #ccc; margin: 0 auto 20px; }
+  }
+</style>
+</head>
+<body>
+<div class="no-print"><button class="btn" onclick="window.print()">🖨 Print Cards (2-up)</button></div>
+
+<!-- FRONT OF CARD -->
+<div class="card card-front">
+  <div class="card-header">
+    <div class="logo">Firmvision Technologies Ltd</div>
+    <h1>CBT Exam — Student Quick-Start</h1>
+    <p>Babcock University High School · Academic Year 2025/2026</p>
+  </div>
+  <div class="card-body">
+    <h2>YOUR EXAM PORTAL</h2>
+    <div class="url-box">
+      <div class="url">http://[server-address]</div>
+      <div class="label">Type this address in your browser (no internet needed)</div>
+    </div>
+
+    <div class="creds-box">
+      <div class="row"><span>Username:</span><span class="fill-in"></span></div>
+      <div class="row"><span>Password:</span><span class="fill-in"></span></div>
+      <div class="row"><span>Class / Arm:</span><span class="fill-in"></span></div>
+    </div>
+
+    <h2 style="margin-top:14px;">HOW TO START YOUR EXAM</h2>
+    <ul class="steps">
+      <li>
+        <div class="num">1</div>
+        <div class="text">Open a browser and go to the portal address above</div>
+      </li>
+      <li>
+        <div class="num">2</div>
+        <div class="text">Click <strong>"Student Login"</strong> tab. Enter your username and password.</div>
+      </li>
+      <li>
+        <div class="num">3</div>
+        <div class="text">Your available exams will appear. Click <strong>"Start Exam"</strong> next to your exam.</div>
+      </li>
+      <li>
+        <div class="num">4</div>
+        <div class="text">Read the exam briefing carefully, then click <strong>"I Understand — Begin Exam."</strong></div>
+      </li>
+      <li>
+        <div class="num">5</div>
+        <div class="text">Your exam loads in <strong>fullscreen mode.</strong> Answer questions and click <strong>"Submit All"</strong> when done.</div>
+      </li>
+      <li>
+        <div class="num">6</div>
+        <div class="text">Your <strong>result and score</strong> appear immediately. Print your result slip if needed.</div>
+      </li>
+    </ul>
+  </div>
+  <div class="card-footer">
+    <p>Keep this card safe — it is your exam reference</p>
+    <p>Firmvision CBT · FVT/CBT/2026/001</p>
+  </div>
+</div>
+
+<!-- BACK OF CARD -->
+<div class="card card-back">
+  <div class="card-header">
+    <div class="logo">Firmvision Technologies Ltd</div>
+    <h1>CBT Exam — Rules & Tips</h1>
+    <p>Babcock University High School · Read Before Your Exam</p>
+  </div>
+  <div class="card-body">
+    <h2>EXAM RULES</h2>
+    <div class="rules-grid">
+      <div class="rule">
+        <div class="icon">🖥</div>
+        <p><strong>Stay Fullscreen</strong><br>Do not exit fullscreen during the exam. Exiting counts as a violation.</p>
+      </div>
+      <div class="rule">
+        <div class="icon">🚫</div>
+        <p><strong>No Tab Switching</strong><br>Do not open other browser tabs or apps. Every switch is detected and logged.</p>
+      </div>
+      <div class="rule">
+        <div class="icon">⏱</div>
+        <p><strong>Watch the Timer</strong><br>The countdown is at the top. When time runs out, your exam is auto-submitted.</p>
+      </div>
+      <div class="rule">
+        <div class="icon">💾</div>
+        <p><strong>Auto-Saved</strong><br>Every answer saves instantly. You can move between questions freely.</p>
+      </div>
+      <div class="rule">
+        <div class="icon">📵</div>
+        <p><strong>No Phone Use</strong><br>No calls, messages, or searching during the exam. Invigilator can see violations.</p>
+      </div>
+      <div class="rule">
+        <div class="icon">🔄</div>
+        <p><strong>Power Cut?</strong><br>Log back in on the same device. Your answers are saved and timer continues.</p>
+      </div>
+    </div>
+
+    <div class="warn-box">
+      <p>⚠ <strong>Violations:</strong> Exiting fullscreen or switching tabs counts as a violation. After <strong>3 violations</strong> your exam is automatically submitted with whatever you have answered.</p>
+    </div>
+
+    <h2 style="margin-top:14px;">TIPS FOR SUCCESS</h2>
+    <ul style="padding-left:16px;font-size:8.5pt;color:#333;line-height:1.7;">
+      <li>Read every question carefully before selecting an answer</li>
+      <li>Use the <strong>question grid</strong> (sidebar) to track unanswered questions</li>
+      <li>Flag difficult questions and return to them at the end</li>
+      <li>For multi-select: select ALL correct options, not just one</li>
+      <li>For essay: write in full sentences and cover the key points</li>
+      <li>Submit only when you are ready — submission is final</li>
+    </ul>
+
+    <div class="help-box">
+      <p>🙋 Problem during exam? Raise your hand immediately — do NOT attempt to fix technical issues yourself. The invigilator will contact IT support.</p>
+    </div>
+  </div>
+  <div class="card-footer">
+    <p>Good luck! Do your best. 🌟</p>
+    <p>support@firmvision.ng</p>
+  </div>
+</div>
+
+</body>
+</html>

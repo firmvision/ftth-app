@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Email Templates — Firmvision Technologies Ltd</title>
+<style>
+  :root { --navy: #0f2a4a; --blue: #1a5fa8; --gold: #e8a020; --light: #f4f8ff; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: Arial, Helvetica, sans-serif; font-size: 11pt; color: #1a1a2e; background: #f0f4f8; }
+  .page { max-width: 860px; margin: 0 auto; padding: 30px; }
+  .page-header { background: var(--navy); color: #fff; padding: 24px 30px; border-radius: 10px; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center; }
+  .page-header h1 { font-size: 18pt; }
+  .page-header p { opacity: 0.75; font-size: 10pt; }
+  .logo { font-size: 9pt; color: var(--gold); letter-spacing: 2px; margin-bottom: 4px; }
+
+  /* NAV TABS */
+  .tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
+  .tab { padding: 8px 18px; border: 2px solid var(--navy); border-radius: 20px; cursor: pointer; font-size: 10pt; font-weight: bold; color: var(--navy); background: #fff; }
+  .tab.active { background: var(--navy); color: #fff; }
+
+  /* EMAIL CARD */
+  .email-card { background: #fff; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin-bottom: 24px; display: none; }
+  .email-card.active { display: block; }
+  .email-meta { background: var(--light); border-bottom: 1px solid #d0ddf0; padding: 16px 24px; }
+  .email-meta h3 { color: var(--navy); font-size: 13pt; margin-bottom: 10px; }
+  .meta-row { display: grid; grid-template-columns: 80px 1fr; gap: 6px; margin-bottom: 3px; font-size: 10pt; }
+  .meta-label { color: #888; font-weight: bold; }
+  .tag { display: inline-block; background: var(--gold); color: var(--navy); padding: 2px 10px; border-radius: 12px; font-size: 9pt; font-weight: bold; margin-left: 10px; }
+  .email-body { padding: 24px; font-size: 11pt; line-height: 1.8; }
+  .email-body p { margin-bottom: 12px; }
+  .email-body ul { padding-left: 20px; margin-bottom: 12px; }
+  .email-body li { margin-bottom: 4px; }
+  .email-body .placeholder { background: #fff8e6; border: 1px solid var(--gold); border-radius: 3px; padding: 0 4px; font-family: monospace; font-size: 10pt; color: #92400e; }
+  .email-body .signature { border-top: 1px solid #eee; margin-top: 24px; padding-top: 16px; color: #555; }
+  .email-body .signature strong { color: var(--navy); }
+  .copy-btn { background: var(--blue); color: #fff; border: none; padding: 8px 20px; border-radius: 6px; cursor: pointer; font-size: 10pt; margin: 12px 24px 20px; }
+  .copy-btn:hover { background: var(--navy); }
+  .no-print { text-align: center; margin-bottom: 16px; }
+  .btn { background: var(--navy); color: #fff; padding: 10px 24px; border: none; border-radius: 6px; font-size: 11pt; cursor: pointer; }
+  @media print { .no-print { display: none; } .tab { display: none; } .email-card { display: block !important; border: 1px solid #ccc; margin-bottom: 40px; } }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="no-print"><button class="btn" onclick="window.print()">🖨 Print All Templates</button></div>
+
+  <div class="page-header">
+    <div>
+      <div class="logo">FIRMVISION TECHNOLOGIES LTD</div>
+      <h1>Email Templates</h1>
+      <p>Business communication templates for CBT Platform sales, onboarding & support</p>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <div class="tab active" onclick="show('initial-outreach')">Initial Outreach</div>
+    <div class="tab" onclick="show('follow-up')">Follow-Up</div>
+    <div class="tab" onclick="show('proposal-cover')">Proposal Cover</div>
+    <div class="tab" onclick="show('onboarding')">Onboarding</div>
+    <div class="tab" onclick="show('go-live')">Go-Live</div>
+    <div class="tab" onclick="show('support-ack')">Support Ack</div>
+    <div class="tab" onclick="show('renewal')">Support Renewal</div>
+  </div>
+
+  <!-- TEMPLATE 1: INITIAL OUTREACH -->
+  <div class="email-card active" id="initial-outreach">
+    <div class="email-meta">
+      <h3>Initial Outreach <span class="tag">PRE-SALES</span></h3>
+      <div class="meta-row"><span class="meta-label">To:</span><span><span class="placeholder">[Principal Name / School Administrator]</span> &lt;<span class="placeholder">[email]</span>&gt;</span></div>
+      <div class="meta-row"><span class="meta-label">Subject:</span><span>Modernise Your School Examinations with Firmvision CBT Platform</span></div>
+    </div>
+    <div class="email-body">
+      <p>Dear <span class="placeholder">[Title] [Name]</span>,</p>
+      <p>I hope this email meets you well. My name is <span class="placeholder">[Your Name]</span>, Director at Firmvision Technologies Ltd — a Nigerian technology company specialising in educational software for secondary schools.</p>
+      <p>I am writing to introduce our <strong>Computer-Based Testing (CBT) Platform</strong>, purpose-built for schools like <span class="placeholder">[School Name]</span>. The platform enables you to:</p>
+      <ul>
+        <li>Run examinations entirely offline on your school LAN — no internet required during exams</li>
+        <li>Auto-grade MCQ, True/False, and Multi-select questions instantly</li>
+        <li>Prevent cheating with fullscreen lock, tab-switch detection, and randomised question order</li>
+        <li>Produce student result slips immediately after submission</li>
+        <li>Import thousands of students at once via a simple spreadsheet</li>
+      </ul>
+      <p>Schools using CBT see a <strong>60–80% reduction in paper and printing costs</strong>, and teachers recover hours previously spent on manual marking.</p>
+      <p>I would welcome the opportunity to arrange a <strong>free demonstration</strong> — either on-site or via video call — at a time convenient for you. There is no obligation, and the demo typically takes 30–45 minutes.</p>
+      <p>May I kindly ask: is digital examination something your school is currently exploring, or would you be open to learning more?</p>
+      <div class="signature">
+        <strong><span class="placeholder">[Your Name]</span></strong><br>
+        Director, Firmvision Technologies Ltd<br>
+        📞 <span class="placeholder">[Phone]</span> &nbsp;|&nbsp; 📧 info@firmvision.ng<br>
+        🌐 www.firmvision.ng &nbsp;|&nbsp; Ota, Ogun State, Nigeria
+      </div>
+    </div>
+    <button class="copy-btn" onclick="copyEmail('initial-outreach')">📋 Copy Email Text</button>
+  </div>
+
+  <!-- TEMPLATE 2: FOLLOW-UP -->
+  <div class="email-card" id="follow-up">
+    <div class="email-meta">
+      <h3>Follow-Up After No Response <span class="tag">PRE-SALES</span></h3>
+      <div class="meta-row"><span class="meta-label">To:</span><span><span class="placeholder">[Contact Name]</span> &lt;<span class="placeholder">[email]</span>&gt;</span></div>
+      <div class="meta-row"><span class="meta-label">Subject:</span><span>Re: Firmvision CBT — Quick Follow-Up</span></div>
+    </div>
+    <div class="email-body">
+      <p>Dear <span class="placeholder">[Name]</span>,</p>
+      <p>I hope all is well. I wanted to briefly follow up on my earlier email regarding our Computer-Based Testing Platform for <span class="placeholder">[School Name]</span>.</p>
+      <p>I appreciate how busy the academic calendar gets — I won't take much of your time. I just wanted to share one thing that often surprises school leaders:</p>
+      <p>Our platform works <strong>100% offline</strong>. Many schools assume CBT requires a reliable internet connection. Ours does not — it runs on your existing LAN, so even NEPA cannot disrupt an examination in progress.</p>
+      <p>If this sounds relevant, I would be happy to send a one-page summary or arrange a brief call at your convenience. Alternatively, if another contact at <span class="placeholder">[School Name]</span> would be better suited for this conversation, I would appreciate the introduction.</p>
+      <p>Thank you for your time.</p>
+      <div class="signature">
+        <strong><span class="placeholder">[Your Name]</span></strong><br>
+        Director, Firmvision Technologies Ltd<br>
+        📞 <span class="placeholder">[Phone]</span> &nbsp;|&nbsp; 📧 info@firmvision.ng
+      </div>
+    </div>
+    <button class="copy-btn" onclick="copyEmail('follow-up')">📋 Copy Email Text</button>
+  </div>
+
+  <!-- TEMPLATE 3: PROPOSAL COVER LETTER -->
+  <div class="email-card" id="proposal-cover">
+    <div class="email-meta">
+      <h3>Proposal Cover Letter <span class="tag">PROPOSAL</span></h3>
+      <div class="meta-row"><span class="meta-label">To:</span><span><span class="placeholder">[Principal / Finance Officer]</span> &lt;<span class="placeholder">[email]</span>&gt;</span></div>
+      <div class="meta-row"><span class="meta-label">Subject:</span><span>Firmvision CBT Platform — Proposal for [School Name] (Ref: FVT/CBT/2026/001)</span></div>
+      <div class="meta-row"><span class="meta-label">Attach:</span><span>Babcock_CBT_Proposal_Firmvision.pdf</span></div>
+    </div>
+    <div class="email-body">
+      <p>Dear <span class="placeholder">[Title] [Name]</span>,</p>
+      <p>Thank you for your interest in the Firmvision CBT Examination Platform. As discussed, please find attached our formal proposal (Ref: FVT/CBT/2026/001) for the development and deployment of a Computer-Based Testing system for <span class="placeholder">[School Name]</span>.</p>
+      <p><strong>Summary of what is included:</strong></p>
+      <ul>
+        <li>Full CBT platform: question bank, exam management, auto-grading, analytics</li>
+        <li>Anti-cheat: fullscreen lock, tab detection, randomisation, one-time tokens</li>
+        <li>Offline operation on school LAN — no internet required during exams</li>
+        <li>Support for <span class="placeholder">[X]</span> students across <span class="placeholder">[X]</span> classes</li>
+        <li>Staff training, documentation, and <span class="placeholder">[12/24]</span>-month support</li>
+        <li>Three pricing tiers: ₦1,800,000 / ₦2,800,000 / ₦4,500,000</li>
+      </ul>
+      <p>The proposal is printable and contains full technical details, our delivery timeline, payment milestones, and company credentials. Please review at your convenience and don't hesitate to reach out with any questions.</p>
+      <p>We are available for a follow-up call or on-site meeting at any time — just let us know what works for you.</p>
+      <p>We look forward to the opportunity to support <span class="placeholder">[School Name]</span>'s digital transformation.</p>
+      <div class="signature">
+        <strong><span class="placeholder">[Your Name]</span></strong><br>
+        Director, Firmvision Technologies Ltd<br>
+        📞 <span class="placeholder">[Phone]</span> &nbsp;|&nbsp; 📧 info@firmvision.ng
+      </div>
+    </div>
+    <button class="copy-btn" onclick="copyEmail('proposal-cover')">📋 Copy Email Text</button>
+  </div>
+
+  <!-- TEMPLATE 4: ONBOARDING -->
+  <div class="email-card" id="onboarding">
+    <div class="email-meta">
+      <h3>Client Onboarding — Contract Signed <span class="tag">ONBOARDING</span></h3>
+      <div class="meta-row"><span class="meta-label">To:</span><span><span class="placeholder">[School Administrator / IT Contact]</span> &lt;<span class="placeholder">[email]</span>&gt;</span></div>
+      <div class="meta-row"><span class="meta-label">Subject:</span><span>Welcome to Firmvision CBT — Your Project Starts Now</span></div>
+    </div>
+    <div class="email-body">
+      <p>Dear <span class="placeholder">[Name]</span>,</p>
+      <p>Congratulations and welcome aboard! We are delighted to begin our partnership with <span class="placeholder">[School Name]</span>. Your contract (Ref: FVT/CBT/2026/001) has been received and your project is now officially underway.</p>
+      <p><strong>Your Project Team:</strong></p>
+      <ul>
+        <li>Project Lead: <span class="placeholder">[Your Name]</span> — <span class="placeholder">[phone]</span></li>
+        <li>Technical Support: support@firmvision.ng</li>
+        <li>WhatsApp Support Line: <span class="placeholder">[phone]</span></li>
+      </ul>
+      <p><strong>What happens next:</strong></p>
+      <ul>
+        <li>✅ We will send you the IT Setup Guide and minimum server specifications within 24 hours</li>
+        <li>✅ Please designate your System Administrator contact and share their details with us</li>
+        <li>✅ Prepare your student list in CSV format (template attached)</li>
+        <li>✅ Confirm your preferred installation date</li>
+      </ul>
+      <p><strong>Estimated Timeline:</strong></p>
+      <ul>
+        <li>Week 1–2: Development & configuration</li>
+        <li>Week 3: Installation on your server</li>
+        <li>Week 4: Staff training</li>
+        <li>Week 5–6: Pilot exam & go-live</li>
+      </ul>
+      <p>Please do not hesitate to reach out at any time. We are committed to making this a smooth and successful deployment.</p>
+      <div class="signature">
+        <strong><span class="placeholder">[Your Name]</span></strong><br>
+        Director, Firmvision Technologies Ltd<br>
+        📞 <span class="placeholder">[Phone]</span> &nbsp;|&nbsp; 📧 info@firmvision.ng
+      </div>
+    </div>
+    <button class="copy-btn" onclick="copyEmail('onboarding')">📋 Copy Email Text</button>
+  </div>
+
+  <!-- TEMPLATE 5: GO-LIVE -->
+  <div class="email-card" id="go-live">
+    <div class="email-meta">
+      <h3>Go-Live Confirmation <span class="tag">GO-LIVE</span></h3>
+      <div class="meta-row"><span class="meta-label">To:</span><span><span class="placeholder">[Principal / Administrator]</span> &lt;<span class="placeholder">[email]</span>&gt;</span></div>
+      <div class="meta-row"><span class="meta-label">Subject:</span><span>Firmvision CBT Platform — Your System is Live! 🎉</span></div>
+    </div>
+    <div class="email-body">
+      <p>Dear <span class="placeholder">[Name]</span>,</p>
+      <p>We are delighted to inform you that the Firmvision CBT Platform for <span class="placeholder">[School Name]</span> is now <strong>fully live and operational</strong>!</p>
+      <p><strong>System Access Details:</strong></p>
+      <ul>
+        <li>📡 Platform URL: <span class="placeholder">http://[server-ip]</span> (on school LAN) or <span class="placeholder">https://[domain]</span> (cloud)</li>
+        <li>👤 Admin Login: <span class="placeholder">[admin-username]</span></li>
+        <li>🔑 Admin Password: <em>[shared securely via separate channel]</em></li>
+      </ul>
+      <p><strong>What your team can do right now:</strong></p>
+      <ul>
+        <li>Log in as admin and explore the dashboard</li>
+        <li>Import students using the CSV template we provided</li>
+        <li>Create your first subject and question bank</li>
+        <li>Run a test exam with staff to familiarise everyone</li>
+      </ul>
+      <p>All documentation (Admin Handbook, Teacher Guide, Student Quick-Start Card) has been shared with your IT contact. Please acknowledge receipt and let us know if everything is working as expected so we can issue the final milestone invoice.</p>
+      <p>Warmest congratulations on taking this important step forward in digital education. We are proud to be your technology partner.</p>
+      <div class="signature">
+        <strong><span class="placeholder">[Your Name]</span></strong><br>
+        Director, Firmvision Technologies Ltd<br>
+        📞 <span class="placeholder">[Phone]</span> &nbsp;|&nbsp; 📧 support@firmvision.ng
+      </div>
+    </div>
+    <button class="copy-btn" onclick="copyEmail('go-live')">📋 Copy Email Text</button>
+  </div>
+
+  <!-- TEMPLATE 6: SUPPORT ACK -->
+  <div class="email-card" id="support-ack">
+    <div class="email-meta">
+      <h3>Support Ticket Acknowledgement <span class="tag">SUPPORT</span></h3>
+      <div class="meta-row"><span class="meta-label">To:</span><span><span class="placeholder">[Admin Contact]</span> &lt;<span class="placeholder">[email]</span>&gt;</span></div>
+      <div class="meta-row"><span class="meta-label">Subject:</span><span>Re: [Issue Description] — Support Ticket #FVT-<span class="placeholder">[XXXX]</span></span></div>
+    </div>
+    <div class="email-body">
+      <p>Dear <span class="placeholder">[Name]</span>,</p>
+      <p>Thank you for contacting Firmvision Support. We have received your request regarding: <em>"<span class="placeholder">[brief issue description]</span>"</em>.</p>
+      <p><strong>Ticket Reference:</strong> #FVT-<span class="placeholder">[XXXX]</span><br>
+      <strong>Priority:</strong> <span class="placeholder">[P1 Critical / P2 High / P3 Medium / P4 Low]</span><br>
+      <strong>Expected Response:</strong> <span class="placeholder">[timeframe per SLA]</span></p>
+      <p>Our team is looking into this now. We will update you within <span class="placeholder">[X hours]</span> with either a resolution or a progress update.</p>
+      <p>In the meantime, if this is an emergency affecting live examinations, please call us directly on <span class="placeholder">[emergency phone]</span> for immediate assistance.</p>
+      <div class="signature">
+        <strong>Firmvision Support Team</strong><br>
+        Firmvision Technologies Ltd<br>
+        📞 <span class="placeholder">[Phone]</span> &nbsp;|&nbsp; 📧 support@firmvision.ng<br>
+        <em>Support Hours: Mon–Sat, 7 AM – 10 PM</em>
+      </div>
+    </div>
+    <button class="copy-btn" onclick="copyEmail('support-ack')">📋 Copy Email Text</button>
+  </div>
+
+  <!-- TEMPLATE 7: RENEWAL -->
+  <div class="email-card" id="renewal">
+    <div class="email-meta">
+      <h3>Support Renewal Reminder <span class="tag">RENEWAL</span></h3>
+      <div class="meta-row"><span class="meta-label">To:</span><span><span class="placeholder">[Principal / Administrator]</span> &lt;<span class="placeholder">[email]</span>&gt;</span></div>
+      <div class="meta-row"><span class="meta-label">Subject:</span><span>Your Firmvision CBT Support Plan Renews in 60 Days</span></div>
+    </div>
+    <div class="email-body">
+      <p>Dear <span class="placeholder">[Name]</span>,</p>
+      <p>I hope the academic year has been productive for <span class="placeholder">[School Name]</span> and that the CBT Platform has served your examination needs well.</p>
+      <p>I'm writing to let you know that your <strong>12-month support plan</strong> expires on <strong><span class="placeholder">[Expiry Date]</span></strong> — just 60 days away.</p>
+      <p><strong>Renewal Benefits:</strong></p>
+      <ul>
+        <li>Continued priority support (WhatsApp, email, remote desktop)</li>
+        <li>All software updates and security patches</li>
+        <li>Quarterly performance health checks</li>
+        <li>One complimentary remote training session per year</li>
+      </ul>
+      <p><strong>Renewal Pricing (existing clients):</strong></p>
+      <ul>
+        <li>12-month renewal: <strong>₦<span class="placeholder">[amount]</span></strong> (15% loyalty discount applied)</li>
+        <li>24-month renewal: <strong>₦<span class="placeholder">[amount]</span></strong> (25% discount)</li>
+      </ul>
+      <p>Please note: your platform continues to function without renewal — you are never locked out. However, support, updates, and patches will no longer be covered.</p>
+      <p>To renew or discuss options, simply reply to this email or call us. We value your partnership and look forward to supporting <span class="placeholder">[School Name]</span> for another successful academic year.</p>
+      <div class="signature">
+        <strong><span class="placeholder">[Your Name]</span></strong><br>
+        Director, Firmvision Technologies Ltd<br>
+        📞 <span class="placeholder">[Phone]</span> &nbsp;|&nbsp; 📧 info@firmvision.ng
+      </div>
+    </div>
+    <button class="copy-btn" onclick="copyEmail('renewal')">📋 Copy Email Text</button>
+  </div>
+
+</div>
+
+<script>
+function show(id) {
+  document.querySelectorAll('.email-card').forEach(c => c.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  event.target.classList.add('active');
+}
+function copyEmail(id) {
+  const body = document.querySelector('#'+id+' .email-body').innerText;
+  navigator.clipboard.writeText(body).then(() => alert('Email text copied to clipboard!'));
+}
+</script>
+</body>
+</html>

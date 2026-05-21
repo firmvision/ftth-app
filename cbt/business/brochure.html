@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CBT Platform Brochure — Firmvision Technologies Ltd</title>
+<style>
+  :root { --navy: #0f2a4a; --blue: #1a5fa8; --gold: #e8a020; --light: #f4f8ff; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: Arial, Helvetica, sans-serif; color: #1a1a2e; background: #fff; }
+  .page { max-width: 900px; margin: 0 auto; }
+
+  /* HERO */
+  .hero { background: linear-gradient(135deg, var(--navy) 60%, var(--blue) 100%); color: #fff; padding: 60px 50px 50px; position: relative; overflow: hidden; }
+  .hero::before { content: ''; position: absolute; right: -60px; top: -60px; width: 300px; height: 300px; background: rgba(232,160,32,0.15); border-radius: 50%; }
+  .hero::after { content: ''; position: absolute; right: 40px; bottom: -80px; width: 200px; height: 200px; background: rgba(255,255,255,0.05); border-radius: 50%; }
+  .hero-logo { font-size: 11pt; letter-spacing: 3px; color: var(--gold); text-transform: uppercase; margin-bottom: 24px; }
+  .hero h1 { font-size: 32pt; line-height: 1.2; margin-bottom: 16px; }
+  .hero h1 span { color: var(--gold); }
+  .hero p { font-size: 13pt; opacity: 0.9; max-width: 560px; line-height: 1.6; margin-bottom: 30px; }
+  .hero-badges { display: flex; gap: 12px; flex-wrap: wrap; }
+  .hbadge { background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); padding: 6px 16px; border-radius: 20px; font-size: 10pt; }
+
+  /* STATS BAR */
+  .stats-bar { background: var(--gold); padding: 20px 50px; display: grid; grid-template-columns: repeat(4,1fr); text-align: center; }
+  .stat-item strong { font-size: 22pt; color: var(--navy); display: block; }
+  .stat-item span { font-size: 9pt; color: var(--navy); opacity: 0.8; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; }
+
+  /* SECTIONS */
+  .section { padding: 40px 50px; }
+  .section-alt { background: var(--light); }
+  h2 { font-size: 18pt; color: var(--navy); margin-bottom: 6px; }
+  .gold-line { width: 50px; height: 3px; background: var(--gold); margin: 8px 0 22px; border-radius: 2px; }
+  p.lead { font-size: 12pt; color: #444; line-height: 1.7; margin-bottom: 16px; }
+
+  /* FEATURES GRID */
+  .features-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 10px; }
+  .feature-card { border: 1px solid #d0ddf0; border-radius: 10px; padding: 20px; background: #fff; }
+  .feature-icon { font-size: 24pt; margin-bottom: 10px; }
+  .feature-card h4 { color: var(--navy); font-size: 12pt; margin-bottom: 6px; }
+  .feature-card p { font-size: 10pt; color: #555; line-height: 1.6; }
+
+  /* ANTI-CHEAT */
+  .security-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 10px; }
+  .security-item { background: var(--navy); color: #fff; border-radius: 8px; padding: 16px 20px; }
+  .security-item h4 { color: var(--gold); margin-bottom: 6px; font-size: 11pt; }
+  .security-item p { font-size: 10pt; opacity: 0.9; }
+
+  /* PRICING */
+  .pricing-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 20px; }
+  .price-card { border: 2px solid #d0ddf0; border-radius: 12px; padding: 24px 20px; text-align: center; position: relative; }
+  .price-card.featured { border-color: var(--gold); transform: scale(1.04); box-shadow: 0 4px 24px rgba(232,160,32,0.25); }
+  .price-card.featured::before { content: 'MOST POPULAR'; background: var(--gold); color: var(--navy); font-size: 8pt; font-weight: bold; letter-spacing: 1px; padding: 4px 14px; border-radius: 12px; position: absolute; top: -14px; left: 50%; transform: translateX(-50%); white-space: nowrap; }
+  .price-tier { font-size: 10pt; color: var(--blue); font-weight: bold; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+  .price-amount { font-size: 22pt; color: var(--navy); font-weight: bold; }
+  .price-amount span { font-size: 11pt; font-weight: normal; color: #666; }
+  .price-features { text-align: left; margin: 16px 0; list-style: none; }
+  .price-features li { padding: 5px 0; font-size: 10pt; color: #444; }
+  .price-features li::before { content: '✓ '; color: #16a34a; font-weight: bold; }
+
+  /* CTA */
+  .cta { background: var(--navy); color: #fff; padding: 50px; text-align: center; }
+  .cta h2 { color: #fff; margin-bottom: 12px; }
+  .cta p { opacity: 0.85; font-size: 12pt; margin-bottom: 24px; }
+  .cta-details { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 30px; }
+  .cta-item span { font-size: 9pt; color: rgba(255,255,255,0.6); display: block; }
+  .cta-item strong { font-size: 11pt; }
+
+  /* FOOTER */
+  .footer { background: #0a1e36; color: rgba(255,255,255,0.6); text-align: center; padding: 20px; font-size: 9pt; }
+
+  .no-print { text-align: center; padding: 20px; background: #f8f9fa; }
+  .btn { background: var(--navy); color: #fff; padding: 12px 30px; border: none; border-radius: 6px; font-size: 12pt; cursor: pointer; }
+  @media print { .no-print { display: none; } }
+</style>
+</head>
+<body>
+<div class="no-print"><button class="btn" onclick="window.print()">🖨 Print Brochure</button></div>
+<div class="page">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-logo">Firmvision Technologies Ltd</div>
+    <h1>The Smart Way to<br>Run <span>School Exams</span></h1>
+    <p>A secure, offline-ready Computer-Based Testing platform purpose-built for Nigerian secondary schools — no internet required during exams.</p>
+    <div class="hero-badges">
+      <div class="hbadge">✅ Works Offline</div>
+      <div class="hbadge">🔒 Anti-Cheat Built In</div>
+      <div class="hbadge">📱 Mobile Friendly</div>
+      <div class="hbadge">5,000+ Students</div>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats-bar">
+    <div class="stat-item"><strong>5,000+</strong><span>Students Supported</span></div>
+    <div class="stat-item"><strong>4</strong><span>Question Types</span></div>
+    <div class="stat-item"><strong>100%</strong><span>Offline Capable</span></div>
+    <div class="stat-item"><strong>6 Wks</strong><span>Delivery Timeline</span></div>
+  </div>
+
+  <!-- WHY CBT -->
+  <div class="section">
+    <h2>Why Digital Examinations?</h2>
+    <div class="gold-line"></div>
+    <p class="lead">Paper-based exams are costly, slow, and prone to human error. Firmvision CBT Platform gives your school instant results, tamper-proof records, and dramatically reduced printing costs — all while maintaining the highest exam integrity standards.</p>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">⚡</div>
+        <h4>Instant Results</h4>
+        <p>Scores computed automatically at submission. Teachers get analytics reports the same day — no marking overnight.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">💾</div>
+        <h4>Works Offline</h4>
+        <p>Runs entirely on your school LAN. No internet needed during examinations. Power outage resilient with session recovery.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📊</div>
+        <h4>Rich Analytics</h4>
+        <p>Class averages, score distributions, pass/fail rates — all visualised for teachers and administrators instantly.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🖨</div>
+        <h4>Printable Reports</h4>
+        <p>Students get a printable result slip immediately after submission. No waiting, no paperwork, no disputes.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📚</div>
+        <h4>Question Bank</h4>
+        <p>Build a reusable library of MCQ, True/False, Multi-select, and Essay questions — organised by subject and class.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📱</div>
+        <h4>Mobile Ready</h4>
+        <p>Works on phones, tablets, and computers. Students can sit exams from any device on the school network.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECURITY -->
+  <div class="section section-alt">
+    <h2>Exam Security You Can Trust</h2>
+    <div class="gold-line"></div>
+    <p class="lead">Four layers of anti-cheat protection ensure every result is a true reflection of student knowledge.</p>
+    <div class="security-grid">
+      <div class="security-item">
+        <h4>🖥 Fullscreen Lock</h4>
+        <p>Exam runs in mandatory fullscreen mode. Exiting triggers an immediate warning and violation count.</p>
+      </div>
+      <div class="security-item">
+        <h4>🔍 Tab-Switch Detection</h4>
+        <p>Any attempt to switch browser tabs or windows is detected and logged in real time.</p>
+      </div>
+      <div class="security-item">
+        <h4>🔀 Question Randomisation</h4>
+        <p>Questions and answer options shuffled uniquely per student — no two students see the same order.</p>
+      </div>
+      <div class="security-item">
+        <h4>🎫 One-Time Session Tokens</h4>
+        <p>Each exam session uses a cryptographic token — cannot be shared, forwarded, or reused by another student.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- HOW IT WORKS -->
+  <div class="section">
+    <h2>How It Works</h2>
+    <div class="gold-line"></div>
+    <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px;text-align:center;margin-top:10px;">
+      <div>
+        <div style="width:48px;height:48px;background:var(--navy);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16pt;font-weight:bold;margin:0 auto 10px;">1</div>
+        <p style="font-size:10pt;color:#444;"><strong>Admin creates exam</strong> with questions from the question bank</p>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:center;color:#ccc;font-size:20pt;margin-top:14px;">→</div>
+      <div>
+        <div style="width:48px;height:48px;background:var(--navy);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16pt;font-weight:bold;margin:0 auto 10px;">2</div>
+        <p style="font-size:10pt;color:#444;"><strong>Students log in</strong> on any device connected to school network</p>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:center;color:#ccc;font-size:20pt;margin-top:14px;">→</div>
+      <div>
+        <div style="width:48px;height:48px;background:var(--navy);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16pt;font-weight:bold;margin:0 auto 10px;">3</div>
+        <p style="font-size:10pt;color:#444;"><strong>Exam runs</strong> with timer, auto-save, and anti-cheat active</p>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px;text-align:center;margin-top:16px;">
+      <div></div>
+      <div>
+        <div style="width:48px;height:48px;background:var(--gold);color:var(--navy);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16pt;font-weight:bold;margin:0 auto 10px;">4</div>
+        <p style="font-size:10pt;color:#444;"><strong>Auto-scored</strong> immediately on submission; essay manually graded</p>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:center;color:#ccc;font-size:20pt;margin-top:14px;">→</div>
+      <div>
+        <div style="width:48px;height:48px;background:var(--gold);color:var(--navy);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16pt;font-weight:bold;margin:0 auto 10px;">5</div>
+        <p style="font-size:10pt;color:#444;"><strong>Admin views</strong> class analytics; student prints result slip</p>
+      </div>
+      <div></div>
+    </div>
+  </div>
+
+  <!-- PRICING -->
+  <div class="section section-alt">
+    <h2>Simple, Transparent Pricing</h2>
+    <div class="gold-line"></div>
+    <p class="lead">One-time investment. No per-student licence fees. No annual subscription traps.</p>
+    <div class="pricing-grid">
+      <div class="price-card">
+        <div class="price-tier">Standard</div>
+        <div class="price-amount">₦1.8M <span>one-time</span></div>
+        <ul class="price-features">
+          <li>Up to 2,000 students</li>
+          <li>LAN deployment</li>
+          <li>4 question types</li>
+          <li>Basic analytics</li>
+          <li>12 months support</li>
+          <li>2-day staff training</li>
+        </ul>
+      </div>
+      <div class="price-card featured">
+        <div class="price-tier">Professional</div>
+        <div class="price-amount">₦2.8M <span>one-time</span></div>
+        <ul class="price-features">
+          <li>Up to 5,000 students</li>
+          <li>LAN + Cloud hybrid</li>
+          <li>All question types</li>
+          <li>Advanced analytics</li>
+          <li>12 months support</li>
+          <li>Full staff training</li>
+          <li>Result slip printing</li>
+          <li>Mobile device support</li>
+        </ul>
+      </div>
+      <div class="price-card">
+        <div class="price-tier">Enterprise</div>
+        <div class="price-amount">₦4.5M <span>one-time</span></div>
+        <ul class="price-features">
+          <li>Unlimited students</li>
+          <li>Multi-school / campus</li>
+          <li>Custom branding</li>
+          <li>Full API access</li>
+          <li>24 months support</li>
+          <li>On-site training</li>
+          <li>SLA guarantee</li>
+          <li>Custom features</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- CTA -->
+  <div class="cta">
+    <h2>Ready to Transform Your Examinations?</h2>
+    <p>Contact us today for a free demonstration and customised proposal for your school.</p>
+    <div class="cta-details">
+      <div class="cta-item"><span>Call / WhatsApp</span><strong>+234-XXX-XXXX-XXX</strong></div>
+      <div class="cta-item"><span>Email</span><strong>info@firmvision.ng</strong></div>
+      <div class="cta-item"><span>Website</span><strong>www.firmvision.ng</strong></div>
+    </div>
+    <p style="font-size:10pt;opacity:0.7;">Firmvision Technologies Ltd · RC: [Registration Number] · Ota, Ogun State, Nigeria</p>
+  </div>
+
+  <div class="footer">
+    © 2026 Firmvision Technologies Ltd. All rights reserved. · Ref: FVT/CBT/2026/001 · info@firmvision.ng
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Service Agreement — Firmvision Technologies Ltd</title>
+<style>
+  :root {
+    --navy: #0f2a4a; --blue: #1a5fa8; --gold: #e8a020;
+    --light: #f4f8ff; --text: #1a1a2e;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: Georgia, 'Times New Roman', serif; font-size: 13pt; color: var(--text); background: #fff; line-height: 1.7; }
+  .page { max-width: 800px; margin: 0 auto; padding: 40px 60px; }
+  .letterhead { border-bottom: 3px solid var(--navy); padding-bottom: 20px; margin-bottom: 30px; display: flex; justify-content: space-between; align-items: flex-end; }
+  .logo-block h1 { font-size: 22pt; color: var(--navy); letter-spacing: 1px; }
+  .logo-block p { font-size: 9pt; color: #555; }
+  .badge { background: var(--gold); color: var(--navy); padding: 6px 16px; font-size: 9pt; font-weight: bold; border-radius: 4px; }
+  h2 { font-size: 16pt; color: var(--navy); text-align: center; margin: 30px 0 20px; border-bottom: 1px solid var(--gold); padding-bottom: 8px; }
+  h3 { font-size: 12pt; color: var(--blue); margin: 24px 0 8px; }
+  p { margin-bottom: 12px; }
+  .parties-box { background: var(--light); border-left: 4px solid var(--blue); padding: 20px 24px; margin: 20px 0; border-radius: 0 8px 8px 0; }
+  .parties-box table { width: 100%; border-collapse: collapse; }
+  .parties-box td { padding: 6px 12px; vertical-align: top; }
+  .parties-box td:first-child { font-weight: bold; color: var(--navy); width: 140px; }
+  .clause { margin: 20px 0; }
+  .clause-num { color: var(--gold); font-weight: bold; }
+  ol { padding-left: 24px; }
+  ol li { margin-bottom: 8px; }
+  .schedule { border: 1px solid #ccc; border-radius: 6px; padding: 16px 20px; margin: 20px 0; }
+  .schedule h4 { color: var(--navy); margin-bottom: 12px; border-bottom: 1px solid #eee; padding-bottom: 6px; }
+  .fee-table { width: 100%; border-collapse: collapse; margin: 12px 0; }
+  .fee-table th { background: var(--navy); color: #fff; padding: 8px 12px; text-align: left; font-size: 11pt; }
+  .fee-table td { padding: 8px 12px; border-bottom: 1px solid #eee; }
+  .fee-table tr:last-child td { font-weight: bold; border-top: 2px solid var(--navy); }
+  .sig-section { margin-top: 50px; display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
+  .sig-block { border-top: 1px solid #333; padding-top: 12px; }
+  .sig-block .label { font-size: 9pt; color: #666; }
+  .sig-line { height: 50px; border-bottom: 1px solid #999; margin: 20px 0 8px; }
+  .no-print { text-align: center; margin: 30px 0; }
+  .btn { background: var(--navy); color: #fff; padding: 12px 30px; border: none; border-radius: 6px; font-size: 12pt; cursor: pointer; text-decoration: none; display: inline-block; }
+  .btn:hover { background: var(--blue); }
+  @media print { .no-print { display: none; } body { font-size: 11pt; } .page { padding: 20px 40px; } }
+  .ref-bar { background: var(--navy); color: #fff; padding: 8px 16px; font-size: 9pt; display: flex; justify-content: space-between; border-radius: 4px; margin-bottom: 24px; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="no-print">
+    <button class="btn" onclick="window.print()">🖨 Print / Download PDF</button>
+  </div>
+
+  <div class="letterhead">
+    <div class="logo-block">
+      <h1>FIRMVISION TECHNOLOGIES LTD</h1>
+      <p>RC: [Registration Number] · Ota, Ogun State, Nigeria<br>
+         Email: info@firmvision.ng · Tel: +234-XXX-XXXX-XXX</p>
+    </div>
+    <div class="badge">SERVICE AGREEMENT</div>
+  </div>
+
+  <div class="ref-bar">
+    <span>Ref: FVT/CBT/2026/001-SA</span>
+    <span>Date: ________________</span>
+    <span>Version: 1.0</span>
+  </div>
+
+  <h2>SOFTWARE SERVICE AGREEMENT</h2>
+  <p style="text-align:center;color:#555;margin-bottom:24px;">Computer-Based Testing (CBT) Platform — Babcock University High School</p>
+
+  <p>This Software Service Agreement (<strong>"Agreement"</strong>) is entered into as of the date signed below by and between:</p>
+
+  <div class="parties-box">
+    <table>
+      <tr><td>Service Provider:</td><td><strong>Firmvision Technologies Ltd</strong>, a technology company duly incorporated under Nigerian law, with its principal office at [Address], Ota, Ogun State ("Firmvision" or "Provider").</td></tr>
+      <tr><td colspan="2" style="padding:4px 0;"></td></tr>
+      <tr><td>Client:</td><td><strong>Babcock University High School</strong>, an educational institution located within Babcock University, Ilishan-Remo, Ogun State, Nigeria, represented by its authorized officer ("Client" or "School").</td></tr>
+    </table>
+  </div>
+
+  <p>Both parties agree as follows:</p>
+
+  <div class="clause">
+    <h3><span class="clause-num">1.</span> DEFINITIONS</h3>
+    <ol>
+      <li><strong>"Platform"</strong> means the Firmvision CBT Exam Platform software, including backend API, database, web interface, and all associated files delivered under this Agreement.</li>
+      <li><strong>"Deployment Environment"</strong> means the Client's local area network server and/or cloud server on which the Platform is installed.</li>
+      <li><strong>"Go-Live Date"</strong> means the date the Platform is confirmed operational by both parties in writing.</li>
+      <li><strong>"Support Period"</strong> means [12/24] months from the Go-Live Date, as selected in Schedule A.</li>
+    </ol>
+  </div>
+
+  <div class="clause">
+    <h3><span class="clause-num">2.</span> SCOPE OF SERVICES</h3>
+    <p>Firmvision agrees to provide the following services, detailed in Schedule A:</p>
+    <ol>
+      <li>Design, development, and delivery of the CBT Platform per the approved proposal (Ref: FVT/CBT/2026/001).</li>
+      <li>Installation and configuration on the Client's designated server(s).</li>
+      <li>Data migration / initial system population (if applicable).</li>
+      <li>Staff training: administrator, teacher, and IT staff sessions.</li>
+      <li>Post-launch support and maintenance for the Support Period.</li>
+      <li>Documentation: user guides, admin handbook, and IT setup guide.</li>
+    </ol>
+  </div>
+
+  <div class="clause">
+    <h3><span class="clause-num">3.</span> CLIENT OBLIGATIONS</h3>
+    <ol>
+      <li>Provide a suitable server with specifications meeting Firmvision's minimum requirements (detailed in the IT Setup Guide).</li>
+      <li>Designate a System Administrator ("Admin Contact") responsible for day-to-day operation.</li>
+      <li>Ensure reliable power supply and local area network (LAN) connectivity across examination halls.</li>
+      <li>Provide timely feedback and approvals at each project milestone.</li>
+      <li>Not modify, resell, sublicense, or reverse-engineer the Platform software.</li>
+      <li>Maintain confidentiality of administrator credentials and exam content.</li>
+    </ol>
+  </div>
+
+  <div class="clause">
+    <h3><span class="clause-num">4.</span> PAYMENT TERMS</h3>
+    <p>Payment shall be made in Nigerian Naira (₦) per the schedule in Schedule B:</p>
+    <div class="schedule">
+      <table class="fee-table">
+        <thead><tr><th>Milestone</th><th>Percentage</th><th>Amount (₦)</th><th>Due Date</th></tr></thead>
+        <tbody>
+          <tr><td>Milestone 1 — Contract Signing</td><td>50%</td><td>________________</td><td>On signing</td></tr>
+          <tr><td>Milestone 2 — Pilot Go-Live</td><td>30%</td><td>________________</td><td>After pilot acceptance</td></tr>
+          <tr><td>Milestone 3 — Full Go-Live</td><td>20%</td><td>________________</td><td>On final acceptance</td></tr>
+          <tr><td><strong>TOTAL</strong></td><td><strong>100%</strong></td><td><strong>________________</strong></td><td></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>Payment shall be made by bank transfer to Firmvision Technologies Ltd — Account details to be provided on invoice. All payments are non-refundable once the relevant milestone is delivered and accepted.</p>
+  </div>
+
+  <div class="clause">
+    <h3><span class="clause-num">5.</span> INTELLECTUAL PROPERTY</h3>
+    <ol>
+      <li>The Platform software, source code, and documentation remain the intellectual property of Firmvision Technologies Ltd.</li>
+      <li>The Client is granted a perpetual, non-exclusive, non-transferable licence to use the Platform for its internal educational purposes.</li>
+      <li>All exam content (questions, answers, student data) created by the Client within the Platform remains the property of the Client.</li>
+    </ol>
+  </div>
+
+  <div class="clause">
+    <h3><span class="clause-num">6.</span> DATA PROTECTION & NDPR COMPLIANCE</h3>
+    <ol>
+      <li>Both parties agree to comply with Nigeria's National Data Protection Regulation (NDPR) 2019.</li>
+      <li>Student personal data collected via the Platform shall be used solely for examination purposes.</li>
+      <li>Firmvision shall not access Client data except as necessary to provide support services.</li>
+      <li>In the event of a data breach, Firmvision shall notify the Client within 72 hours of discovery.</li>
+    </ol>
+  </div>
+
+  <div class="clause">
+    <h3><span class="clause-num">7.</span> WARRANTIES & LIMITATION OF LIABILITY</h3>
+    <ol>
+      <li>Firmvision warrants that the Platform will substantially conform to the agreed specifications for 90 days post Go-Live.</li>
+      <li>Firmvision's total liability under this Agreement shall not exceed the total contract value paid.</li>
+      <li>Neither party shall be liable for indirect, incidental, or consequential damages.</li>
+      <li>Firmvision is not liable for outages caused by Client infrastructure failure, power cuts, or network issues outside Firmvision's control.</li>
+    </ol>
+  </div>
+
+  <div class="clause">
+    <h3><span class="clause-num">8.</span> TERMINATION</h3>
+    <ol>
+      <li>Either party may terminate this Agreement with 30 days written notice if the other party materially breaches its obligations and fails to remedy within the notice period.</li>
+      <li>On termination, the Client retains the right to export all exam data in standard formats (CSV/JSON).</li>
+    </ol>
+  </div>
+
+  <div class="clause">
+    <h3><span class="clause-num">9.</span> GOVERNING LAW</h3>
+    <p>This Agreement shall be governed by the laws of the Federal Republic of Nigeria. Any dispute shall first be resolved by mediation; if unresolved, by arbitration under the Lagos Court of Arbitration Rules.</p>
+  </div>
+
+  <div class="clause">
+    <h3><span class="clause-num">10.</span> ENTIRE AGREEMENT</h3>
+    <p>This Agreement, together with its Schedules and the Project Proposal (Ref: FVT/CBT/2026/001), constitutes the entire agreement between the parties and supersedes all prior discussions, proposals, or representations.</p>
+  </div>
+
+  <div class="sig-section">
+    <div class="sig-block">
+      <p><strong>FOR AND ON BEHALF OF<br>FIRMVISION TECHNOLOGIES LTD</strong></p>
+      <div class="sig-line"></div>
+      <p>Name: _______________________________</p>
+      <p>Title: Director / Authorised Signatory</p>
+      <p>Date: _______________________________</p>
+      <p>Stamp/Seal:</p>
+    </div>
+    <div class="sig-block">
+      <p><strong>FOR AND ON BEHALF OF<br>BABCOCK UNIVERSITY HIGH SCHOOL</strong></p>
+      <div class="sig-line"></div>
+      <p>Name: _______________________________</p>
+      <p>Title: _______________________________</p>
+      <p>Date: _______________________________</p>
+      <p>Stamp/Seal:</p>
+    </div>
+  </div>
+
+  <p style="text-align:center;margin-top:40px;font-size:9pt;color:#888;">
+    Firmvision Technologies Ltd · Ota, Ogun State, Nigeria · info@firmvision.ng
+  </p>
+
+</div>
+</body>
+</html>

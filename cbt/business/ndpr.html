@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NDPR Compliance Statement — Firmvision Technologies Ltd</title>
+<style>
+  :root { --navy: #0f2a4a; --blue: #1a5fa8; --gold: #e8a020; --green: #166534; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: Arial, Helvetica, sans-serif; font-size: 12pt; color: #1a1a2e; background: #fff; line-height: 1.7; }
+  .page { max-width: 800px; margin: 0 auto; padding: 40px 60px; }
+  .letterhead { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 3px solid var(--navy); padding-bottom: 18px; margin-bottom: 28px; }
+  .logo-block h1 { font-size: 20pt; color: var(--navy); }
+  .logo-block p { font-size: 9pt; color: #555; }
+  .badge { background: var(--green); color: #fff; padding: 6px 16px; border-radius: 4px; font-size: 9pt; font-weight: bold; }
+  h2 { font-size: 16pt; color: var(--navy); text-align: center; margin: 20px 0 8px; }
+  h3 { font-size: 12pt; color: var(--blue); margin: 22px 0 8px; font-weight: bold; }
+  p { margin-bottom: 10px; }
+  .intro { background: #f0f7e6; border-left: 4px solid var(--green); padding: 16px 20px; margin: 18px 0; border-radius: 0 6px 6px 0; }
+  .principle { border: 1px solid #d0ddf0; border-radius: 6px; padding: 16px 20px; margin: 14px 0; }
+  .principle h4 { color: var(--navy); font-size: 11pt; margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
+  .icon { background: var(--gold); color: var(--navy); width: 24px; height: 24px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 9pt; font-weight: bold; flex-shrink: 0; }
+  table { width: 100%; border-collapse: collapse; margin: 14px 0; }
+  th { background: var(--navy); color: #fff; padding: 10px 14px; text-align: left; font-size: 10pt; }
+  td { padding: 9px 14px; border-bottom: 1px solid #e0e8f0; font-size: 10pt; }
+  tr:nth-child(even) td { background: #f8faff; }
+  .check { color: #16a34a; font-weight: bold; font-size: 14pt; }
+  .sig-box { border: 2px solid var(--navy); border-radius: 8px; padding: 24px; margin-top: 40px; }
+  .sig-box h4 { color: var(--navy); margin-bottom: 16px; }
+  .sig-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
+  .sig-line { border-bottom: 1px solid #555; height: 40px; margin: 16px 0 6px; }
+  .no-print { text-align: center; margin: 20px 0; }
+  .btn { background: var(--navy); color: #fff; padding: 10px 28px; border: none; border-radius: 6px; font-size: 12pt; cursor: pointer; }
+  @media print { .no-print { display: none; } .page { padding: 20px 40px; } body { font-size: 10pt; } }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="no-print"><button class="btn" onclick="window.print()">🖨 Print / Download PDF</button></div>
+
+  <div class="letterhead">
+    <div class="logo-block">
+      <h1>FIRMVISION TECHNOLOGIES LTD</h1>
+      <p>RC: [Registration Number] · info@firmvision.ng · Ota, Ogun State</p>
+    </div>
+    <div class="badge">NDPR COMPLIANT</div>
+  </div>
+
+  <h2>DATA PRIVACY & NDPR COMPLIANCE STATEMENT</h2>
+  <p style="text-align:center;color:#666;margin-bottom:16px;">Nigeria Data Protection Regulation (NDPR) 2019 — Compliance Declaration</p>
+
+  <div class="intro">
+    <strong>Firmvision Technologies Ltd</strong> is committed to the responsible handling of personal data in full compliance with Nigeria's National Data Protection Regulation (NDPR) 2019, issued by the National Information Technology Development Agency (NITDA). This statement describes how personal data is handled within the Firmvision CBT Examination Platform deployed at Babcock University High School.
+  </div>
+
+  <h3>1. Data Controller and Processor Roles</h3>
+  <table>
+    <thead><tr><th>Role</th><th>Entity</th><th>Responsibility</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Data Controller</strong></td><td>Babcock University High School</td><td>Determines purposes and means of processing student data; responsible for lawful basis for collection.</td></tr>
+      <tr><td><strong>Data Processor</strong></td><td>Firmvision Technologies Ltd</td><td>Processes data on behalf of the Controller; implements technical and organisational safeguards.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>2. Categories of Personal Data Processed</h3>
+  <table>
+    <thead><tr><th>Data Category</th><th>Data Elements</th><th>Purpose</th><th>Retention</th></tr></thead>
+    <tbody>
+      <tr><td>Student Identity</td><td>Full name, username, class/arm</td><td>Account creation, exam authentication</td><td>Duration of enrolment + 3 years</td></tr>
+      <tr><td>Authentication</td><td>Hashed password (bcrypt), session tokens</td><td>Secure login, session management</td><td>Duration of enrolment</td></tr>
+      <tr><td>Exam Records</td><td>Answers, scores, submission timestamps</td><td>Assessment, grading, academic records</td><td>7 years (academic records retention)</td></tr>
+      <tr><td>Security Logs</td><td>Violation events (tab switches, fullscreen exits)</td><td>Exam integrity monitoring</td><td>1 academic year after exam</td></tr>
+      <tr><td>Staff Data</td><td>Name, username, role (teacher/admin)</td><td>Platform administration</td><td>Duration of employment</td></tr>
+    </tbody>
+  </table>
+
+  <h3>3. NDPR Compliance Principles</h3>
+
+  <div class="principle">
+    <h4><span class="icon">1</span> Lawfulness, Fairness & Transparency</h4>
+    <p>Data is collected with the knowledge of the School (Data Controller) and processed only for legitimate educational assessment purposes. Students are informed of data collection through the school's enrolment process.</p>
+  </div>
+
+  <div class="principle">
+    <h4><span class="icon">2</span> Purpose Limitation</h4>
+    <p>Personal data collected is used solely for examination administration and academic record keeping. It is not used for marketing, profiling, or any purpose incompatible with its collection purpose.</p>
+  </div>
+
+  <div class="principle">
+    <h4><span class="icon">3</span> Data Minimisation</h4>
+    <p>Only data strictly necessary for platform operation is collected. The Platform does not collect biometric data, photographs, device fingerprints, or location data.</p>
+  </div>
+
+  <div class="principle">
+    <h4><span class="icon">4</span> Accuracy</h4>
+    <p>The School's administrators are responsible for maintaining accurate student records. The Platform provides tools for administrators to update, correct, or delete student data at any time.</p>
+  </div>
+
+  <div class="principle">
+    <h4><span class="icon">5</span> Storage Limitation</h4>
+    <p>Data is retained for periods defined in Section 2 above. Automated cleanup processes remove expired data. The School retains the right to export all data before deletion.</p>
+  </div>
+
+  <div class="principle">
+    <h4><span class="icon">6</span> Integrity & Confidentiality (Security)</h4>
+    <p>Technical safeguards implemented in the CBT Platform include:</p>
+    <ul style="padding-left:20px;margin-top:6px;">
+      <li>Passwords hashed using bcrypt (work factor ≥ 12) — never stored in plain text</li>
+      <li>JWT tokens with configurable expiry (default: 8 hours)</li>
+      <li>One-time cryptographic exam session tokens (256-bit entropy)</li>
+      <li>HTTPS enforced in production (SSL/TLS via Let's Encrypt or school certificate)</li>
+      <li>Database access restricted to application service account</li>
+      <li>No student data transmitted to third-party services (fully self-hosted)</li>
+      <li>Automated database backups with encrypted archives</li>
+    </ul>
+  </div>
+
+  <div class="principle">
+    <h4><span class="icon">7</span> Accountability</h4>
+    <p>Firmvision maintains internal records of processing activities. All support access to the system is logged and reported to the School. This Compliance Statement is made available to the School and, upon request, to NITDA.</p>
+  </div>
+
+  <h3>4. Data Subject Rights</h3>
+  <p>Under NDPR, students and staff (data subjects) have the right to:</p>
+  <table>
+    <thead><tr><th>Right</th><th>How to Exercise</th></tr></thead>
+    <tbody>
+      <tr><td>Access their personal data</td><td>Request via School Administrator, who can export data from the admin panel</td></tr>
+      <tr><td>Correct inaccurate data</td><td>Request via School Administrator</td></tr>
+      <tr><td>Delete data ("right to be forgotten")</td><td>Admin panel — student deletion removes all linked exam records after required retention period</td></tr>
+      <tr><td>Object to processing</td><td>Submit request to School Administration, escalated to Firmvision if technical action required</td></tr>
+    </tbody>
+  </table>
+
+  <h3>5. Data Breach Response</h3>
+  <p>In the event of a data breach, Firmvision shall:</p>
+  <ol style="padding-left:20px;margin:10px 0;">
+    <li>Notify the School (Data Controller) within <strong>72 hours</strong> of discovery;</li>
+    <li>Provide a full incident report within 7 days;</li>
+    <li>Cooperate with the School in notifying affected data subjects;</li>
+    <li>Assist in reporting to NITDA if required by NDPR.</li>
+  </ol>
+
+  <h3>6. Third-Party Data Transfers</h3>
+  <p>The CBT Platform is <strong>fully self-hosted</strong> on the School's premises or a dedicated cloud server in Nigeria. No student data is transmitted to external services, analytics platforms, or offshore servers. All processing occurs within the Deployment Environment.</p>
+
+  <div class="sig-box">
+    <h4>Declaration</h4>
+    <p>I, the undersigned authorised representative of Firmvision Technologies Ltd, hereby declare that the CBT Platform and associated services comply with the Nigeria Data Protection Regulation (NDPR) 2019 to the best of our knowledge and practice.</p>
+    <div class="sig-grid">
+      <div>
+        <div class="sig-line"></div>
+        <p><strong>Name:</strong> _________________________</p>
+        <p><strong>Title:</strong> Director / Data Protection Officer</p>
+        <p><strong>Date:</strong> _________________________</p>
+      </div>
+      <div>
+        <p style="margin-bottom:6px;"><strong>Organisation:</strong> Firmvision Technologies Ltd</p>
+        <p><strong>RC:</strong> [Registration Number]</p>
+        <p><strong>Address:</strong> Ota, Ogun State, Nigeria</p>
+        <p><strong>Email:</strong> dpo@firmvision.ng</p>
+      </div>
+    </div>
+  </div>
+
+  <p style="text-align:center;margin-top:30px;font-size:9pt;color:#888;">
+    This document is for disclosure to the Client, NITDA, and regulatory bodies as required. · Version 1.0 · May 2026
+  </p>
+</div>
+</body>
+</html>

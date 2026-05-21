@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Teacher Guide — Firmvision CBT Platform</title>
+<style>
+  :root { --navy: #0f2a4a; --blue: #1a5fa8; --gold: #e8a020; --light: #f4f8ff; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: Arial, Helvetica, sans-serif; font-size: 11pt; color: #1a1a2e; background: #fff; line-height: 1.7; }
+  .page { max-width: 820px; margin: 0 auto; padding: 40px 50px; }
+  .cover { background: var(--navy); color: #fff; padding: 50px; margin: -40px -50px 40px; border-radius: 0 0 12px 12px; }
+  .cover .logo { font-size: 9pt; color: var(--gold); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 12px; }
+  .cover h1 { font-size: 28pt; margin-bottom: 8px; }
+  .cover p { opacity: 0.85; font-size: 12pt; }
+  .cover .meta { margin-top: 20px; font-size: 9pt; opacity: 0.6; }
+
+  .toc { background: var(--light); border-radius: 8px; padding: 20px 24px; margin: 24px 0; }
+  .toc h3 { color: var(--navy); margin-bottom: 12px; font-size: 12pt; }
+  .toc ol { padding-left: 18px; }
+  .toc li { margin-bottom: 4px; }
+  .toc a { color: var(--blue); text-decoration: none; }
+  .toc a:hover { text-decoration: underline; }
+
+  h2 { font-size: 16pt; color: var(--navy); margin: 36px 0 8px; padding-top: 8px; border-top: 2px solid var(--gold); }
+  h3 { font-size: 13pt; color: var(--blue); margin: 22px 0 8px; }
+  p { margin-bottom: 10px; }
+  ol, ul { padding-left: 20px; margin-bottom: 12px; }
+  li { margin-bottom: 5px; }
+
+  .step-box { background: var(--light); border-left: 4px solid var(--blue); padding: 14px 18px; margin: 14px 0; border-radius: 0 8px 8px 0; }
+  .step-box .step-num { color: var(--gold); font-weight: bold; font-size: 11pt; }
+  .tip { background: #fff8e6; border-left: 4px solid var(--gold); padding: 12px 16px; border-radius: 0 6px 6px 0; margin: 14px 0; font-size: 10pt; }
+  .tip strong { color: #92400e; }
+  .warn { background: #fff0f0; border-left: 4px solid #dc2626; padding: 12px 16px; border-radius: 0 6px 6px 0; margin: 14px 0; font-size: 10pt; }
+  .warn strong { color: #dc2626; }
+
+  table { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 10pt; }
+  th { background: var(--navy); color: #fff; padding: 10px 14px; text-align: left; }
+  td { padding: 9px 14px; border-bottom: 1px solid #e0e8f0; }
+  tr:nth-child(even) td { background: var(--light); }
+
+  .screenshot-box { border: 2px dashed #b0c4de; border-radius: 8px; padding: 20px; text-align: center; color: #888; font-size: 10pt; margin: 16px 0; background: #f9fbff; }
+  .kbd { background: #e8eaf0; border: 1px solid #b0b8cc; border-radius: 4px; padding: 2px 8px; font-family: monospace; font-size: 10pt; }
+
+  .no-print { text-align: center; margin: 16px 0; }
+  .btn { background: var(--navy); color: #fff; padding: 10px 24px; border: none; border-radius: 6px; font-size: 11pt; cursor: pointer; }
+  @media print { .no-print { display: none; } .cover { border-radius: 0; } }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="no-print"><button class="btn" onclick="window.print()">🖨 Print Guide</button></div>
+
+  <div class="cover">
+    <div class="logo">Firmvision Technologies Ltd</div>
+    <h1>Teacher User Guide</h1>
+    <p>Firmvision CBT Examination Platform<br>Babcock University High School</p>
+    <div class="meta">Version 1.0 · May 2026 · Ref: FVT/CBT/2026/001</div>
+  </div>
+
+  <div class="toc">
+    <h3>Table of Contents</h3>
+    <ol>
+      <li><a href="#login">Logging In</a></li>
+      <li><a href="#dashboard">Dashboard Overview</a></li>
+      <li><a href="#questions">Creating Questions</a></li>
+      <li><a href="#exams">Creating & Managing Exams</a></li>
+      <li><a href="#results">Viewing Results & Analytics</a></li>
+      <li><a href="#essay">Grading Essay Answers</a></li>
+      <li><a href="#tips">Tips for Good Questions</a></li>
+      <li><a href="#troubleshooting">Troubleshooting</a></li>
+    </ol>
+  </div>
+
+  <h2 id="login">1. Logging In</h2>
+  <p>Open any web browser on a device connected to the school network and navigate to:</p>
+  <div class="step-box"><code style="font-size:12pt;color:var(--navy);">http://[school-server-address]</code><br><span style="font-size:9pt;color:#666;">(Your IT Administrator will provide the exact address — e.g. http://192.168.1.100)</span></div>
+  <ol>
+    <li>You will see the <strong>Login Page</strong>. Click the <strong>"Admin / Teacher"</strong> tab.</li>
+    <li>Enter your <strong>Username</strong> and <strong>Password</strong> as provided by the Administrator.</li>
+    <li>Click <strong>"Login"</strong>. You will be taken to the Admin/Teacher Dashboard.</li>
+  </ol>
+  <div class="tip"><strong>Tip:</strong> Bookmark the login page in your browser for quick access. If you forget your password, contact your System Administrator to reset it.</div>
+
+  <h2 id="dashboard">2. Dashboard Overview</h2>
+  <p>The dashboard shows at a glance:</p>
+  <table>
+    <tr><th>Card</th><th>What it shows</th></tr>
+    <tr><td>Total Students</td><td>All students registered in the system</td></tr>
+    <tr><td>Total Exams</td><td>Exams you have created</td></tr>
+    <tr><td>Question Bank</td><td>Number of questions available</td></tr>
+    <tr><td>Active Sessions</td><td>Students currently sitting an exam</td></tr>
+  </table>
+  <p>The left sidebar contains navigation links to:</p>
+  <ul>
+    <li><strong>Dashboard</strong> — this overview screen</li>
+    <li><strong>Question Bank</strong> — create, edit, and manage questions</li>
+    <li><strong>Exams</strong> — create exams and assign questions</li>
+    <li><strong>Results</strong> — view exam outcomes and grade essays</li>
+  </ul>
+
+  <h2 id="questions">3. Creating Questions</h2>
+  <p>The Question Bank is your library of reusable questions. Build it before creating exams.</p>
+
+  <h3>3.1 Adding a New Question</h3>
+  <div class="step-box"><span class="step-num">Step 1.</span> Click <strong>"Question Bank"</strong> in the sidebar.</div>
+  <div class="step-box"><span class="step-num">Step 2.</span> Click the <strong>"+ Add Question"</strong> button (top right).</div>
+  <div class="step-box"><span class="step-num">Step 3.</span> A form will appear. Fill in the details:</div>
+
+  <table>
+    <tr><th>Field</th><th>Description</th></tr>
+    <tr><td>Subject</td><td>Select the subject this question belongs to (e.g. Mathematics, English)</td></tr>
+    <tr><td>Question Type</td><td>Choose: MCQ, True/False, Multi-select, or Essay (see below)</td></tr>
+    <tr><td>Difficulty</td><td>Easy, Medium, or Hard — for your own organisation</td></tr>
+    <tr><td>Class Level</td><td>e.g. SS1, SS2, JSS3 — filters questions when building exams</td></tr>
+    <tr><td>Question Text</td><td>Type your question clearly. Avoid ambiguity.</td></tr>
+    <tr><td>Marks</td><td>Points awarded for a correct answer (default: 1)</td></tr>
+    <tr><td>Explanation</td><td>Optional explanation shown to students after submission</td></tr>
+  </table>
+
+  <h3>3.2 Question Types Explained</h3>
+
+  <p><strong>Multiple Choice (MCQ):</strong> One correct answer from 2–6 options.</p>
+  <ul>
+    <li>Add 2–6 answer options</li>
+    <li>Select the radio button next to the <em>correct</em> option</li>
+    <li>Students earn full marks for the correct choice, zero for wrong</li>
+  </ul>
+
+  <p><strong>True / False:</strong> Binary choice — automatically set to True and False options.</p>
+  <ul>
+    <li>Select whether "True" or "False" is the correct answer</li>
+    <li>Auto-scored: full marks for correct, zero for wrong</li>
+  </ul>
+
+  <p><strong>Multi-Select:</strong> Multiple correct answers — students must select ALL correct options.</p>
+  <ul>
+    <li>Add 3–6 options; check all options that are correct</li>
+    <li>Scoring: partial credit for partially correct answers; penalties for selecting wrong options</li>
+    <li>Best used for "select all that apply" type questions</li>
+  </ul>
+
+  <p><strong>Essay / Long Answer:</strong> Open text response — manually graded.</p>
+  <ul>
+    <li>Provide a model answer or marking guide in the "Explanation" field</li>
+    <li>After exam submission, you grade essays manually from the Results page</li>
+    <li>Score of 0 is recorded until you enter the actual marks</li>
+  </ul>
+
+  <div class="tip"><strong>Tip:</strong> Write clear, unambiguous questions. Avoid trick questions unless the learning objective specifically requires higher-order thinking. Have a colleague review questions before adding them to an exam.</div>
+
+  <h2 id="exams">4. Creating & Managing Exams</h2>
+
+  <h3>4.1 Creating a New Exam</h3>
+  <div class="step-box"><span class="step-num">Step 1.</span> Click <strong>"Exams"</strong> in the sidebar → click <strong>"+ New Exam"</strong>.</div>
+  <div class="step-box"><span class="step-num">Step 2.</span> Fill in the exam details:</div>
+
+  <table>
+    <tr><th>Field</th><th>Description</th></tr>
+    <tr><td>Title</td><td>e.g. "SS2 Mathematics Mid-Term Exam 2026"</td></tr>
+    <tr><td>Subject</td><td>Select from the dropdown</td></tr>
+    <tr><td>Class</td><td>Which class can access this exam (e.g. SS2)</td></tr>
+    <tr><td>Duration (mins)</td><td>Total time allowed, e.g. 60 or 90</td></tr>
+    <tr><td>Pass Mark (%)</td><td>Minimum percentage to pass, e.g. 50</td></tr>
+    <tr><td>Max Violations</td><td>How many anti-cheat violations before auto-submit (default: 3)</td></tr>
+    <tr><td>Start / End Time</td><td>Schedule when the exam is accessible. Leave blank for manual activation.</td></tr>
+    <tr><td>Instructions</td><td>Special instructions shown to students before starting</td></tr>
+  </table>
+
+  <div class="step-box"><span class="step-num">Step 3.</span> Click <strong>"Save"</strong>. The exam is created in <em>Draft</em> status — students cannot see it yet.</div>
+
+  <h3>4.2 Adding Questions to an Exam</h3>
+  <div class="step-box"><span class="step-num">Step 1.</span> On the Exams page, click the <strong>📋 Manage Questions</strong> button next to the exam.</div>
+  <div class="step-box"><span class="step-num">Step 2.</span> The Question Manager opens with two panels:
+    <ul style="margin-top:8px;">
+      <li><strong>Left panel:</strong> Questions currently in this exam</li>
+      <li><strong>Right panel:</strong> Your question bank (filter by subject, difficulty, class)</li>
+    </ul>
+  </div>
+  <div class="step-box"><span class="step-num">Step 3.</span> Click <strong>"Add"</strong> next to any question to include it. Click <strong>"Remove"</strong> to take it out.</div>
+  <div class="tip"><strong>Tip:</strong> Add more questions than you need, then use the randomisation feature to show a random subset to each student.</div>
+
+  <h3>4.3 Activating an Exam</h3>
+  <p>When you are ready for students to take the exam:</p>
+  <div class="step-box"><span class="step-num">Step 1.</span> On the Exams list, find your exam (status: <em>Draft</em>).</div>
+  <div class="step-box"><span class="step-num">Step 2.</span> Click <strong>"Activate"</strong>. Status changes to <em>Active</em>.</div>
+  <div class="step-box"><span class="step-num">Step 3.</span> Students whose class matches the exam can now see and start it.</div>
+
+  <div class="warn"><strong>Warning:</strong> Once an exam is activated and students have started, do NOT remove questions — this may affect scoring for in-progress sessions.</div>
+
+  <h3>4.4 Ending an Exam</h3>
+  <p>When all students have finished (or the exam period is over):</p>
+  <ul>
+    <li>Click <strong>"End Exam"</strong>. The exam closes and no new sessions can be started.</li>
+    <li>Any student still in progress will be auto-submitted when the timer expires.</li>
+    <li>You can then view full results and grade essays.</li>
+  </ul>
+
+  <h2 id="results">5. Viewing Results & Analytics</h2>
+  <div class="step-box"><span class="step-num">Step 1.</span> Click <strong>"Exams"</strong> → click <strong>📊 View Results</strong> next to a completed exam.</div>
+
+  <p>The Results page shows:</p>
+  <table>
+    <tr><th>Metric</th><th>Description</th></tr>
+    <tr><td>Submissions</td><td>Total number of completed exam attempts</td></tr>
+    <tr><td>Passed / Failed</td><td>Count of students above/below pass mark</td></tr>
+    <tr><td>Class Average</td><td>Mean score percentage across all submissions</td></tr>
+    <tr><td>Score Distribution</td><td>Bar chart showing score bands (0–10%, 10–20%... 90–100%)</td></tr>
+    <tr><td>Results Table</td><td>Each student's name, score, percentage, pass/fail, and date</td></tr>
+  </table>
+
+  <p>Click any student's name to see a <strong>detailed breakdown</strong> — showing every question, the student's answer, and whether it was correct.</p>
+
+  <h2 id="essay">6. Grading Essay Answers</h2>
+  <p>Essay questions require manual grading. To grade:</p>
+  <div class="step-box"><span class="step-num">Step 1.</span> Go to Results → click the student's name to open their session detail.</div>
+  <div class="step-box"><span class="step-num">Step 2.</span> Essay answers appear in <strong>purple</strong> cards labelled "Essay Answer."</div>
+  <div class="step-box"><span class="step-num">Step 3.</span> Read the student's response. Enter the <strong>marks awarded</strong> in the score box (0 to max marks).</div>
+  <div class="step-box"><span class="step-num">Step 4.</span> Click <strong>"Save Grade"</strong>. The student's total score updates immediately.</div>
+  <div class="tip"><strong>Tip:</strong> The question's "Explanation" field (visible to you in the session detail) can contain your marking guide or model answer for reference.</div>
+
+  <h2 id="tips">7. Tips for Writing Good CBT Questions</h2>
+  <h3>MCQ Best Practices</h3>
+  <ul>
+    <li>Write questions that test understanding, not just recall of memorised text</li>
+    <li>All distractors (wrong options) should be plausible — not obviously wrong</li>
+    <li>Avoid "all of the above" and "none of the above" — they can be gamed</li>
+    <li>Keep the question stem complete — a student should understand the question before reading options</li>
+    <li>All options should be grammatically consistent with the stem</li>
+    <li>Avoid negative phrasing ("Which is NOT...") unless clearly highlighted</li>
+  </ul>
+
+  <h3>Essay Best Practices</h3>
+  <ul>
+    <li>State clearly what you are asking: "Describe...", "Explain...", "Discuss..."</li>
+    <li>Specify the expected length or number of points: "List THREE..."</li>
+    <li>Prepare a model answer and marking guide before the exam</li>
+    <li>Be consistent in marking — grade all students on the same question back-to-back</li>
+  </ul>
+
+  <h2 id="troubleshooting">8. Troubleshooting</h2>
+  <table>
+    <tr><th>Problem</th><th>Solution</th></tr>
+    <tr><td>Can't log in — "Invalid credentials"</td><td>Check username/password. Caps Lock? Contact admin to reset password.</td></tr>
+    <tr><td>Question bank is empty</td><td>No questions created yet. Click "Add Question" to begin building your bank.</td></tr>
+    <tr><td>Student says they can't see the exam</td><td>Check: (1) Is the exam Active? (2) Does the student's class match the exam's class?</td></tr>
+    <tr><td>Results show 0 for essay questions</td><td>Normal — essays need manual grading. Go to Results → student session → grade essays.</td></tr>
+    <tr><td>Student's exam was auto-submitted unexpectedly</td><td>Check violation log in session detail. Student likely exceeded the max violations limit.</td></tr>
+    <tr><td>Platform not loading on student device</td><td>Ensure the device is connected to the school LAN (Wi-Fi or cable). Try a different browser.</td></tr>
+    <tr><td>Timer shows incorrect time</td><td>The timer is server-authoritative. Local device clock does not affect it. Contact IT if wildly off.</td></tr>
+  </table>
+
+  <div class="tip" style="margin-top:24px;"><strong>Need help?</strong> Contact Firmvision Support:<br>
+  📞 +234-XXX-XXXX-XXX (WhatsApp available) &nbsp;|&nbsp; 📧 support@firmvision.ng<br>
+  Mon–Sat, 7 AM – 10 PM</div>
+
+  <p style="text-align:center;margin-top:40px;font-size:9pt;color:#888;">
+    Firmvision Technologies Ltd · CBT Teacher Guide v1.0 · May 2026<br>
+    Ref: FVT/CBT/2026/001 · info@firmvision.ng
+  </p>
+</div>
+</body>
+</html>

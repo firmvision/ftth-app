@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Invoice — Firmvision Technologies Ltd</title>
+<style>
+  :root { --navy: #0f2a4a; --blue: #1a5fa8; --gold: #e8a020; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: Arial, Helvetica, sans-serif; font-size: 11pt; color: #1a1a2e; background: #fff; }
+  .page { max-width: 800px; margin: 0 auto; padding: 40px 50px; }
+  .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 30px; }
+  .company h1 { font-size: 22pt; color: var(--navy); letter-spacing: 1px; }
+  .company p { font-size: 9pt; color: #555; line-height: 1.6; }
+  .invoice-badge { background: var(--navy); color: #fff; padding: 8px 20px; font-size: 18pt; font-weight: bold; border-radius: 6px; letter-spacing: 2px; }
+  .meta-row { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin: 24px 0; }
+  .bill-to { background: #f4f8ff; border-radius: 8px; padding: 16px 20px; }
+  .bill-to h4 { color: var(--blue); font-size: 9pt; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+  .invoice-details { text-align: right; }
+  .invoice-details table { margin-left: auto; }
+  .invoice-details td { padding: 4px 0 4px 20px; font-size: 11pt; }
+  .invoice-details td:first-child { color: #666; text-align: left; }
+  .invoice-details td:last-child { font-weight: bold; color: var(--navy); }
+  .divider { border: none; border-top: 2px solid var(--navy); margin: 20px 0; }
+  table.items { width: 100%; border-collapse: collapse; margin: 16px 0; }
+  table.items thead tr { background: var(--navy); color: #fff; }
+  table.items th { padding: 11px 14px; text-align: left; font-size: 10pt; }
+  table.items th:last-child, table.items td:last-child { text-align: right; }
+  table.items th:nth-child(2) { text-align: center; }
+  table.items td:nth-child(2) { text-align: center; }
+  table.items td { padding: 11px 14px; border-bottom: 1px solid #e0e8f0; font-size: 11pt; }
+  table.items tr.milestone-row td { background: #f8faff; font-weight: 500; }
+  table.items tr.subtotal td { border-top: 2px solid var(--navy); font-weight: bold; }
+  table.items tr.total-row td { background: var(--navy); color: #fff; font-size: 13pt; font-weight: bold; }
+  .status-badge { display: inline-block; padding: 2px 10px; border-radius: 12px; font-size: 9pt; font-weight: bold; }
+  .paid { background: #d1fae5; color: #065f46; }
+  .pending { background: #fef3c7; color: #92400e; }
+  .due { background: #fee2e2; color: #991b1b; }
+  .bank-details { border: 1px solid #ccd; border-radius: 8px; padding: 16px 20px; margin: 20px 0; display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .bank-details h4 { color: var(--blue); font-size: 9pt; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; grid-column: 1/-1; }
+  .bank-item { }
+  .bank-item span { font-size: 9pt; color: #666; display: block; }
+  .bank-item strong { font-size: 11pt; color: var(--navy); }
+  .notes { background: #fffbf0; border-left: 4px solid var(--gold); padding: 14px 18px; border-radius: 0 6px 6px 0; margin: 16px 0; font-size: 10pt; }
+  .footer { text-align: center; margin-top: 40px; font-size: 9pt; color: #888; border-top: 1px solid #eee; padding-top: 16px; }
+  .no-print { text-align: center; margin: 20px 0; display: flex; gap: 12px; justify-content: center; }
+  .btn { background: var(--navy); color: #fff; padding: 10px 24px; border: none; border-radius: 6px; font-size: 11pt; cursor: pointer; }
+  .btn-outline { background: #fff; color: var(--navy); border: 2px solid var(--navy); padding: 10px 24px; border-radius: 6px; font-size: 11pt; cursor: pointer; }
+  @media print { .no-print { display: none; } }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="no-print">
+    <button class="btn" onclick="window.print()">🖨 Print / Download PDF</button>
+    <button class="btn-outline" onclick="document.title='FVT-INV-2026-001';window.print()">📄 Save as PDF</button>
+  </div>
+
+  <div class="header">
+    <div class="company">
+      <h1>FIRMVISION</h1>
+      <h1 style="font-size:11pt;color:#e8a020;letter-spacing:2px;">TECHNOLOGIES LTD</h1>
+      <p style="margin-top:8px;">
+        [Address], Ota, Ogun State, Nigeria<br>
+        RC: [Registration Number]<br>
+        Email: billing@firmvision.ng<br>
+        Tel: +234-XXX-XXXX-XXX<br>
+        TIN: [Tax Identification Number]
+      </p>
+    </div>
+    <div class="invoice-badge">INVOICE</div>
+  </div>
+
+  <div class="meta-row">
+    <div class="bill-to">
+      <h4>Bill To</h4>
+      <p><strong>Babcock University High School</strong></p>
+      <p>Babcock University, Ilishan-Remo</p>
+      <p>Ogun State, Nigeria</p>
+      <p>Attn: [Finance Officer Name]</p>
+      <p>Email: [school-finance@babcock.edu.ng]</p>
+    </div>
+    <div class="invoice-details">
+      <table>
+        <tr><td>Invoice No:</td><td>FVT-INV-2026-001</td></tr>
+        <tr><td>Date:</td><td>________________</td></tr>
+        <tr><td>Due Date:</td><td>________________</td></tr>
+        <tr><td>Project Ref:</td><td>FVT/CBT/2026/001</td></tr>
+        <tr><td>Currency:</td><td>Nigerian Naira (₦)</td></tr>
+        <tr><td>VAT Reg:</td><td>[VAT Number]</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <table class="items">
+    <thead>
+      <tr>
+        <th style="width:5%">#</th>
+        <th style="width:45%">Description</th>
+        <th style="width:15%">Qty</th>
+        <th style="width:15%">Unit Price (₦)</th>
+        <th style="width:20%">Amount (₦)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- === MILESTONE 1 === -->
+      <tr>
+        <td colspan="5" style="background:#e8f0fe;font-weight:bold;color:#0f2a4a;padding:10px 14px;">
+          MILESTONE 1 — Contract Signing (50%)
+          <span class="status-badge pending" style="float:right;">PENDING</span>
+        </td>
+      </tr>
+      <tr class="milestone-row">
+        <td>1</td>
+        <td>
+          <strong>CBT Platform Development</strong><br>
+          <span style="font-size:9pt;color:#555;">FastAPI backend, PostgreSQL DB, admin & student portals, 4 question types, anti-cheat system, Docker deployment</span>
+        </td>
+        <td>1</td>
+        <td>________________</td>
+        <td>________________</td>
+      </tr>
+      <tr class="milestone-row">
+        <td>2</td>
+        <td>
+          <strong>Project Initiation & Planning</strong><br>
+          <span style="font-size:9pt;color:#555;">Requirements analysis, architecture design, project plan</span>
+        </td>
+        <td>1</td>
+        <td>________________</td>
+        <td>________________</td>
+      </tr>
+
+      <!-- === MILESTONE 2 === -->
+      <tr>
+        <td colspan="5" style="background:#e8f0fe;font-weight:bold;color:#0f2a4a;padding:10px 14px;">
+          MILESTONE 2 — Pilot Go-Live (30%)
+          <span class="status-badge pending" style="float:right;">PENDING</span>
+        </td>
+      </tr>
+      <tr class="milestone-row">
+        <td>3</td>
+        <td>
+          <strong>Installation & Configuration</strong><br>
+          <span style="font-size:9pt;color:#555;">Server setup, deployment, LAN configuration, security hardening</span>
+        </td>
+        <td>1</td>
+        <td>________________</td>
+        <td>________________</td>
+      </tr>
+      <tr class="milestone-row">
+        <td>4</td>
+        <td>
+          <strong>Training — Administrators & Teachers</strong><br>
+          <span style="font-size:9pt;color:#555;">Full-day training session, training materials, user guides</span>
+        </td>
+        <td>1</td>
+        <td>________________</td>
+        <td>________________</td>
+      </tr>
+
+      <!-- === MILESTONE 3 === -->
+      <tr>
+        <td colspan="5" style="background:#e8f0fe;font-weight:bold;color:#0f2a4a;padding:10px 14px;">
+          MILESTONE 3 — Full Go-Live (20%)
+          <span class="status-badge pending" style="float:right;">PENDING</span>
+        </td>
+      </tr>
+      <tr class="milestone-row">
+        <td>5</td>
+        <td>
+          <strong>12-Month Support & Maintenance</strong><br>
+          <span style="font-size:9pt;color:#555;">Bug fixes, security patches, feature updates, remote support</span>
+        </td>
+        <td>1</td>
+        <td>________________</td>
+        <td>________________</td>
+      </tr>
+      <tr class="milestone-row">
+        <td>6</td>
+        <td>
+          <strong>Documentation Package</strong><br>
+          <span style="font-size:9pt;color:#555;">Admin handbook, teacher guide, student quick-start, IT setup guide</span>
+        </td>
+        <td>1</td>
+        <td>Included</td>
+        <td>—</td>
+      </tr>
+
+      <!-- TOTALS -->
+      <tr class="subtotal">
+        <td colspan="4">Subtotal</td>
+        <td>₦ ________________</td>
+      </tr>
+      <tr>
+        <td colspan="4">VAT (7.5%)</td>
+        <td>₦ ________________</td>
+      </tr>
+      <tr>
+        <td colspan="4">Withholding Tax (WHT 5%) — if applicable</td>
+        <td>(₦ ________________)</td>
+      </tr>
+      <tr class="total-row">
+        <td colspan="4">TOTAL DUE (Milestone 1 — 50%)</td>
+        <td>₦ ________________</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="bank-details">
+    <h4>Payment Details</h4>
+    <div class="bank-item">
+      <span>Account Name</span>
+      <strong>Firmvision Technologies Ltd</strong>
+    </div>
+    <div class="bank-item">
+      <span>Bank Name</span>
+      <strong>[Bank Name]</strong>
+    </div>
+    <div class="bank-item">
+      <span>Account Number</span>
+      <strong>[Account Number]</strong>
+    </div>
+    <div class="bank-item">
+      <span>Sort Code</span>
+      <strong>[Sort Code]</strong>
+    </div>
+  </div>
+
+  <div class="notes">
+    <strong>Terms & Notes:</strong><br>
+    · This invoice covers Milestone 1 (50% deposit) as per Service Agreement Ref: FVT/CBT/2026/001-SA.<br>
+    · Payment is due within 7 business days of invoice date.<br>
+    · Please include invoice number <strong>FVT-INV-2026-001</strong> as payment reference.<br>
+    · VAT charged at 7.5% in accordance with Nigeria Finance Act 2020.<br>
+    · Subsequent milestones will be invoiced separately upon completion.
+  </div>
+
+  <div class="footer">
+    <p>Thank you for choosing Firmvision Technologies Ltd.</p>
+    <p style="margin-top:6px;">Firmvision Technologies Ltd · RC: [Reg No] · TIN: [TIN] · Ota, Ogun State, Nigeria</p>
+    <p>billing@firmvision.ng · +234-XXX-XXXX-XXX · www.firmvision.ng</p>
+  </div>
+</div>
+</body>
+</html>

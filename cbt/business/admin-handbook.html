@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Administrator Handbook — Firmvision CBT Platform</title>
+<style>
+  :root { --navy: #0f2a4a; --blue: #1a5fa8; --gold: #e8a020; --light: #f4f8ff; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: Arial, Helvetica, sans-serif; font-size: 11pt; color: #1a1a2e; background: #fff; line-height: 1.7; }
+  .page { max-width: 820px; margin: 0 auto; padding: 40px 50px; }
+  .cover { background: linear-gradient(135deg, var(--navy), var(--blue)); color: #fff; padding: 50px; margin: -40px -50px 40px; }
+  .cover .logo { font-size: 9pt; color: var(--gold); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 12px; }
+  .cover h1 { font-size: 28pt; }
+  .cover .sub { font-size: 13pt; margin-top: 6px; opacity: 0.85; }
+  .cover .meta { margin-top: 20px; font-size: 9pt; opacity: 0.6; }
+
+  .toc { background: var(--light); border-radius: 8px; padding: 20px 28px; margin: 24px 0; }
+  .toc h3 { color: var(--navy); margin-bottom: 12px; }
+  .toc ol { padding-left: 18px; column-count: 2; column-gap: 30px; }
+  .toc li { margin-bottom: 4px; break-inside: avoid; }
+  .toc a { color: var(--blue); text-decoration: none; }
+
+  h2 { font-size: 16pt; color: var(--navy); margin: 36px 0 8px; border-top: 2px solid var(--gold); padding-top: 8px; }
+  h3 { font-size: 12pt; color: var(--blue); margin: 20px 0 8px; }
+  p { margin-bottom: 10px; }
+  ul, ol { padding-left: 20px; margin-bottom: 12px; }
+  li { margin-bottom: 5px; }
+
+  .step { background: var(--light); border-left: 4px solid var(--blue); padding: 12px 16px; margin: 10px 0; border-radius: 0 6px 6px 0; }
+  .tip { background: #fff8e6; border-left: 4px solid var(--gold); padding: 11px 15px; border-radius: 0 6px 6px 0; margin: 12px 0; font-size: 10pt; }
+  .warn { background: #fff0f0; border-left: 4px solid #dc2626; padding: 11px 15px; border-radius: 0 6px 6px 0; margin: 12px 0; font-size: 10pt; }
+
+  table { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 10pt; }
+  th { background: var(--navy); color: #fff; padding: 10px 14px; text-align: left; }
+  td { padding: 8px 14px; border-bottom: 1px solid #e0e8f0; vertical-align: top; }
+  tr:nth-child(even) td { background: var(--light); }
+
+  code { background: #e8eaf0; padding: 2px 6px; border-radius: 4px; font-size: 10pt; font-family: monospace; color: var(--navy); }
+  .kbd { background: #e8eaf0; border: 1px solid #b0b8cc; border-radius: 4px; padding: 2px 8px; font-family: monospace; font-size: 10pt; }
+
+  .no-print { text-align: center; margin: 16px 0; }
+  .btn { background: var(--navy); color: #fff; padding: 10px 24px; border: none; border-radius: 6px; font-size: 11pt; cursor: pointer; }
+  @media print { .no-print { display: none; } .cover { background: var(--navy); } }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="no-print"><button class="btn" onclick="window.print()">🖨 Print Handbook</button></div>
+
+  <div class="cover">
+    <div class="logo">Firmvision Technologies Ltd</div>
+    <h1>Administrator Handbook</h1>
+    <div class="sub">Firmvision CBT Examination Platform<br>Babcock University High School</div>
+    <div class="meta">Version 1.0 · May 2026 · For Authorised Administrators Only</div>
+  </div>
+
+  <div class="toc">
+    <h3>Contents</h3>
+    <ol>
+      <li><a href="#access">Admin Access & Security</a></li>
+      <li><a href="#users">Managing Users</a></li>
+      <li><a href="#subjects">Subjects & Classes</a></li>
+      <li><a href="#questions">Question Bank Administration</a></li>
+      <li><a href="#exams">Exam Lifecycle</a></li>
+      <li><a href="#results">Results & Analytics</a></li>
+      <li><a href="#backup">Backup & Recovery</a></li>
+      <li><a href="#security">Security Practices</a></li>
+      <li><a href="#roles">User Roles Reference</a></li>
+      <li><a href="#troubleshooting">Troubleshooting Reference</a></li>
+    </ol>
+  </div>
+
+  <h2 id="access">1. Admin Access & Security</h2>
+
+  <h3>1.1 Logging In</h3>
+  <p>Navigate to the platform URL in any modern browser. Click the <strong>"Admin / Teacher"</strong> tab on the login page. Use your administrator credentials.</p>
+  <div class="warn"><strong>Security:</strong> The admin account has unrestricted access to all data. Never share your credentials. Log out (<em>top-right menu → Logout</em>) whenever leaving the computer unattended.</div>
+
+  <h3>1.2 First Login — Change Default Password</h3>
+  <p>The system is seeded with a default admin account. Change the password immediately after first login:</p>
+  <div class="step">Go to <strong>Students page → find "admin" user → Edit → change password</strong> to a strong unique password (12+ characters, mix of letters, numbers, symbols).</div>
+
+  <h3>1.3 Admin Credentials Management</h3>
+  <p>Store admin credentials in a secure, offline location (locked cabinet). Do not store in email, WhatsApp, or unencrypted digital files. Rotate passwords at the start of each academic year.</p>
+
+  <h2 id="users">2. Managing Users</h2>
+
+  <h3>2.1 User Roles</h3>
+  <table>
+    <tr><th>Role</th><th>Can Do</th><th>Cannot Do</th></tr>
+    <tr><td><strong>Admin</strong></td><td>Everything: manage all users, questions, exams, results, system settings</td><td>—</td></tr>
+    <tr><td><strong>Teacher</strong></td><td>Create/edit questions, create/manage exams, view results, grade essays</td><td>Manage students, view other teachers' data, change system settings</td></tr>
+    <tr><td><strong>Student</strong></td><td>View available exams, take exams, view their own results</td><td>Access admin panel, see other students' answers</td></tr>
+  </table>
+
+  <h3>2.2 Adding a Single User</h3>
+  <div class="step">Go to <strong>Students</strong> → click <strong>"+ Add Student"</strong> (or "+ Add Teacher").<br>Fill in: Full Name, Username, Password, Class/Arm, Role.</div>
+  <div class="tip"><strong>Username convention:</strong> Use <code>firstname.lastname</code> format (e.g., <code>adewale.johnson</code>) for easy identification. Avoid spaces or special characters in usernames.</div>
+
+  <h3>2.3 Bulk Student Import (CSV)</h3>
+  <p>For importing large numbers of students at once:</p>
+  <div class="step">
+    <ol style="margin:0;padding-left:18px;">
+      <li>Download the <strong>CSV Template</strong> from the Students page (or use <code>business/student-import-template.csv</code>).</li>
+      <li>Fill in columns: <code>full_name, username, password, class, arm</code></li>
+      <li>Save as <code>.csv</code> (UTF-8 encoding).</li>
+      <li>Go to <strong>Students → Bulk Import</strong> → upload the file.</li>
+      <li>Review the preview table → click <strong>"Confirm Import"</strong>.</li>
+    </ol>
+  </div>
+  <div class="warn"><strong>Password Note:</strong> Students' initial passwords are set from the CSV. For security, require students to change passwords on first login, or issue new passwords each exam period via a new CSV bulk reset.</div>
+
+  <h3>2.4 Editing & Deleting Users</h3>
+  <ul>
+    <li><strong>Edit:</strong> Click the pencil icon next to any user. Change any field and save.</li>
+    <li><strong>Delete:</strong> Click the trash icon. <em>Deletion removes all associated exam records</em> — this is irreversible. Consider deactivating (disabling) students instead of deleting to preserve historical data.</li>
+    <li><strong>Password Reset:</strong> Edit the user and enter a new password.</li>
+  </ul>
+
+  <h3>2.5 Teacher Accounts</h3>
+  <p>Create teacher accounts with Role = "Teacher". Teachers see the same admin panel but with restricted access. Assign teachers to their subjects by ensuring they only create questions for their assigned subjects.</p>
+
+  <h2 id="subjects">3. Subjects & Classes</h2>
+
+  <h3>3.1 Creating Subjects</h3>
+  <div class="step">Go to <strong>Subjects</strong> → click <strong>"+ Add Subject"</strong> → enter the subject name (e.g., "Mathematics", "English Language") → Save.</div>
+  <p>Create all subjects before adding questions. Subjects are shared across all teachers and classes.</p>
+
+  <h3>3.2 Class Organisation</h3>
+  <p>Classes are set at the student level (e.g., SS1, SS2, JSS3) and the exam level. An exam set for "SS2" will only be visible to students whose account has class = "SS2". Use consistent naming across all records.</p>
+
+  <h2 id="questions">4. Question Bank Administration</h2>
+
+  <h3>4.1 Question Review Process</h3>
+  <p>Establish a review workflow before exam season:</p>
+  <ol>
+    <li>Teachers submit questions (they can add to the bank directly)</li>
+    <li>Admin reviews for accuracy, clarity, and appropriate difficulty</li>
+    <li>Approved questions are included in exam assemblies</li>
+  </ol>
+
+  <h3>4.2 Question Organisation</h3>
+  <p>Filter questions by subject, difficulty, or class when building exams. Use the <strong>Difficulty</strong> field (Easy / Medium / Hard) to maintain a balanced distribution across exam papers.</p>
+
+  <h3>4.3 Editing & Deleting Questions</h3>
+  <div class="warn"><strong>Warning:</strong> Do not edit or delete questions that are part of an active or completed exam. Doing so can corrupt scoring for sessions that used that question. Archive completed exams before modifying question bank entries.</div>
+
+  <h2 id="exams">5. Exam Lifecycle</h2>
+
+  <h3>5.1 Status Flow</h3>
+  <table>
+    <tr><th>Status</th><th>What it Means</th><th>Who Can See the Exam</th></tr>
+    <tr><td><strong>Draft</strong></td><td>Being prepared; no students can see it</td><td>Admin and assigned teacher only</td></tr>
+    <tr><td><strong>Scheduled</strong></td><td>Will auto-activate at the set start time</td><td>Only if past start time</td></tr>
+    <tr><td><strong>Active</strong></td><td>Open for students to take</td><td>Students whose class matches</td></tr>
+    <tr><td><strong>Ended</strong></td><td>Closed; no new attempts; results viewable</td><td>Admin and teacher (results only)</td></tr>
+  </table>
+
+  <h3>5.2 Pre-Exam Checklist</h3>
+  <ul>
+    <li>☐ All questions reviewed and verified</li>
+    <li>☐ Correct class assigned to exam</li>
+    <li>☐ Duration set correctly (in minutes)</li>
+    <li>☐ Pass mark confirmed with academic team</li>
+    <li>☐ Max violations configured (recommend: 3)</li>
+    <li>☐ Exam tested by admin with a test student account</li>
+    <li>☐ All students' accounts verified (class/arm correct)</li>
+    <li>☐ Invigilators briefed on procedures</li>
+    <li>☐ Server health confirmed (check <code>/api/health</code> endpoint)</li>
+  </ul>
+
+  <h3>5.3 During the Exam</h3>
+  <p>Monitor active sessions from the Dashboard. The "Active Sessions" count shows how many students are currently in the exam. If a student has a technical problem:</p>
+  <ol>
+    <li>Ask the student to log back in — their session resumes automatically</li>
+    <li>If session is corrupted, you can reset it via: Results → Student Session → Reset (contact Firmvision support if option is not visible)</li>
+  </ol>
+
+  <h3>5.4 Ending an Exam</h3>
+  <div class="step">Click <strong>"End Exam"</strong> on the Exams page. All in-progress sessions are NOT auto-submitted — students currently in the exam can complete it until their timer expires. After the timer expires, sessions auto-submit.</div>
+  <div class="tip"><strong>Best practice:</strong> Announce "Exam ending in 5 minutes" before clicking End Exam, so invigilators can ensure all students save their last answers.</div>
+
+  <h2 id="results">6. Results & Analytics</h2>
+
+  <h3>6.1 Accessing Results</h3>
+  <p>Go to <strong>Exams → View Results</strong> (📊 icon) next to any completed exam.</p>
+
+  <h3>6.2 Understanding the Analytics Dashboard</h3>
+  <table>
+    <tr><th>Metric</th><th>Description & Use</th></tr>
+    <tr><td>Submissions</td><td>Total exam sessions submitted. Compare with enrolled students to identify absentees.</td></tr>
+    <tr><td>Pass Rate</td><td>% of students who met the pass mark. Below 50% pass rate may indicate question difficulty or preparation issues.</td></tr>
+    <tr><td>Class Average</td><td>Mean score %. Compare across classes or exam periods to track improvement.</td></tr>
+    <tr><td>Score Distribution</td><td>Bar chart of score bands. A bell curve indicates good question calibration. Skewed right = too easy; left = too hard.</td></tr>
+  </table>
+
+  <h3>6.3 Session Detail View</h3>
+  <p>Click any student's name to see their full answer breakdown. Useful for:</p>
+  <ul>
+    <li>Investigating a student's score dispute</li>
+    <li>Checking violation log to verify anti-cheat flags</li>
+    <li>Identifying questions many students answered wrongly (possible ambiguity)</li>
+  </ul>
+
+  <h2 id="backup">7. Backup & Recovery</h2>
+
+  <h3>7.1 Running a Manual Backup</h3>
+  <div class="step">On the server, run: <code>bash /path/to/cbt/backup.sh backup</code></div>
+  <p>Backups are saved to <code>cbt/backups/</code> as compressed archives. Each includes the database and application files.</p>
+
+  <h3>7.2 Automated Daily Backups</h3>
+  <div class="step">Set up automatic daily backup at 2 AM: <code>bash /path/to/cbt/backup.sh cron</code></div>
+
+  <h3>7.3 Restoring from Backup</h3>
+  <div class="step"><code>bash /path/to/cbt/backup.sh restore</code> — restores from the most recent backup.</div>
+  <div class="warn"><strong>Warning:</strong> Restore overwrites current data. Only perform after confirming with Firmvision support. Always take a fresh backup before restoring.</div>
+
+  <h3>7.4 Backup Storage Policy</h3>
+  <ul>
+    <li>Backups older than 30 days are automatically deleted</li>
+    <li>Copy at least one backup per month to an external storage (USB or cloud drive)</li>
+    <li>Verify backup integrity quarterly by doing a test restore on a staging server</li>
+  </ul>
+
+  <h2 id="security">8. Security Practices</h2>
+  <ul>
+    <li><strong>Change default passwords</strong> immediately after installation</li>
+    <li><strong>Rotate all staff passwords</strong> at the start of each academic year</li>
+    <li><strong>Limit admin accounts</strong> — only the IT Administrator and Deputy Principal should have admin role</li>
+    <li><strong>Review teacher accounts</strong> — disable teachers who have left the school</li>
+    <li><strong>Keep the server updated</strong> — apply OS and platform security patches when notified by Firmvision</li>
+    <li><strong>Restrict physical server access</strong> — server room should be locked; only IT staff should have access</li>
+    <li><strong>Monitor the violation log</strong> during exams — unusual patterns may indicate organised malpractice</li>
+    <li><strong>Exam content is confidential</strong> — do not share question bank access outside designated staff</li>
+  </ul>
+
+  <h2 id="roles">9. User Roles Quick Reference</h2>
+  <table>
+    <tr><th>Action</th><th>Admin</th><th>Teacher</th><th>Student</th></tr>
+    <tr><td>Manage all users (add/edit/delete)</td><td>✅</td><td>❌</td><td>❌</td></tr>
+    <tr><td>Bulk import students (CSV)</td><td>✅</td><td>❌</td><td>❌</td></tr>
+    <tr><td>Create subjects</td><td>✅</td><td>❌</td><td>❌</td></tr>
+    <tr><td>Add questions to bank</td><td>✅</td><td>✅</td><td>❌</td></tr>
+    <tr><td>Create and manage exams</td><td>✅</td><td>✅</td><td>❌</td></tr>
+    <tr><td>Activate / End exams</td><td>✅</td><td>✅</td><td>❌</td></tr>
+    <tr><td>View all exam results</td><td>✅</td><td>✅ (own exams)</td><td>❌</td></tr>
+    <tr><td>Grade essay answers</td><td>✅</td><td>✅</td><td>❌</td></tr>
+    <tr><td>Take exams</td><td>❌</td><td>❌</td><td>✅</td></tr>
+    <tr><td>View own results</td><td>—</td><td>—</td><td>✅</td></tr>
+  </table>
+
+  <h2 id="troubleshooting">10. Troubleshooting Reference</h2>
+  <table>
+    <tr><th>Issue</th><th>First Steps</th><th>Escalate to Firmvision if...</th></tr>
+    <tr><td>Platform not loading for all users</td><td>Check if the server service is running: <code>systemctl status cbt-exam</code></td><td>Service running but no response</td></tr>
+    <tr><td>Student cannot log in</td><td>Check username/class/password in Users admin panel</td><td>Correct credentials but login fails</td></tr>
+    <tr><td>Exam not visible to students</td><td>Verify exam is "Active" and student's class matches exam's class</td><td>Correct setup but still not visible</td></tr>
+    <tr><td>Results not showing</td><td>Check if exam has been "Ended". In-progress sessions show once submitted.</td><td>Ended exam with no results data</td></tr>
+    <tr><td>Database errors in logs</td><td>Check disk space: <code>df -h</code>. Restart service: <code>systemctl restart cbt-exam</code></td><td>Persistent DB errors after restart</td></tr>
+    <tr><td>CSV import failing</td><td>Check file format: UTF-8 encoding, correct column names, no empty rows</td><td>Correct format but still failing</td></tr>
+  </table>
+
+  <div class="tip" style="margin-top:24px;"><strong>Firmvision Support:</strong><br>
+  📞 +234-XXX-XXXX-XXX (WhatsApp) &nbsp;|&nbsp; 📧 support@firmvision.ng<br>
+  Mon–Sat, 7 AM – 10 PM &nbsp;|&nbsp; Emergency line for P1 (exam down): available 24/7</div>
+
+  <p style="text-align:center;margin-top:40px;font-size:9pt;color:#888;">
+    Firmvision Technologies Ltd · Administrator Handbook v1.0 · May 2026<br>
+    Confidential — For Authorised Personnel Only
+  </p>
+</div>
+</body>
+</html>

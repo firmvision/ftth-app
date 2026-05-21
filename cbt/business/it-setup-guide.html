@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IT Setup Guide — Firmvision CBT Platform</title>
+<style>
+  :root { --navy: #0f2a4a; --blue: #1a5fa8; --gold: #e8a020; --light: #f4f8ff; --green: #166534; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Courier New', monospace; font-size: 11pt; color: #1a1a2e; background: #fff; line-height: 1.7; }
+  .page { max-width: 820px; margin: 0 auto; padding: 40px 50px; }
+  .cover { background: #0d1117; color: #c9d1d9; padding: 50px; margin: -40px -50px 40px; border-bottom: 3px solid var(--gold); }
+  .cover .logo { font-size: 9pt; color: var(--gold); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 12px; }
+  .cover h1 { font-size: 26pt; color: #fff; }
+  .cover p { margin-top: 8px; color: #8b949e; }
+  .cover .meta { margin-top: 16px; font-size: 9pt; color: #484f58; }
+
+  .toc { background: var(--light); border-radius: 8px; padding: 18px 24px; margin: 24px 0; font-family: Arial, sans-serif; }
+  .toc h3 { color: var(--navy); margin-bottom: 10px; font-size: 12pt; }
+  .toc ol { padding-left: 18px; column-count: 2; column-gap: 30px; }
+  .toc li { margin-bottom: 4px; }
+  .toc a { color: var(--blue); text-decoration: none; font-size: 10pt; }
+
+  h2 { font-family: Arial, sans-serif; font-size: 15pt; color: var(--navy); margin: 36px 0 8px; border-top: 2px solid var(--gold); padding-top: 8px; }
+  h3 { font-family: Arial, sans-serif; font-size: 12pt; color: var(--blue); margin: 20px 0 6px; }
+  p { font-family: Arial, sans-serif; margin-bottom: 10px; font-size: 11pt; }
+  ul, ol { font-family: Arial, sans-serif; padding-left: 20px; margin-bottom: 12px; font-size: 11pt; }
+  li { margin-bottom: 4px; }
+
+  /* CODE BLOCKS */
+  .code-block { background: #0d1117; color: #c9d1d9; border-radius: 8px; padding: 16px 20px; margin: 14px 0; overflow-x: auto; }
+  .code-block pre { font-family: 'Courier New', monospace; font-size: 10pt; line-height: 1.6; }
+  .code-block .comment { color: #8b949e; }
+  .code-block .cmd { color: #58a6ff; }
+  .code-block .string { color: #a5d6ff; }
+  .code-block .green { color: #56d364; }
+
+  .step { background: var(--light); border-left: 4px solid var(--blue); padding: 12px 16px; margin: 10px 0; border-radius: 0 6px 6px 0; font-family: Arial, sans-serif; font-size: 10pt; }
+  .tip { background: #fff8e6; border-left: 4px solid var(--gold); padding: 11px 15px; border-radius: 0 6px 6px 0; margin: 12px 0; font-family: Arial, sans-serif; font-size: 10pt; }
+  .warn { background: #fff0f0; border-left: 4px solid #dc2626; padding: 11px 15px; border-radius: 0 6px 6px 0; margin: 12px 0; font-family: Arial, sans-serif; font-size: 10pt; }
+  .success { background: #f0fdf4; border-left: 4px solid var(--green); padding: 11px 15px; border-radius: 0 6px 6px 0; margin: 12px 0; font-family: Arial, sans-serif; font-size: 10pt; }
+
+  table { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 10pt; font-family: Arial, sans-serif; }
+  th { background: var(--navy); color: #fff; padding: 10px 14px; text-align: left; }
+  td { padding: 9px 14px; border-bottom: 1px solid #e0e8f0; vertical-align: top; }
+  tr:nth-child(even) td { background: var(--light); }
+
+  code { background: #e8eaf0; padding: 2px 6px; border-radius: 4px; font-family: 'Courier New', monospace; font-size: 10pt; color: #0f2a4a; }
+  .badge { display: inline-block; padding: 2px 10px; border-radius: 12px; font-size: 9pt; font-weight: bold; font-family: Arial, sans-serif; }
+  .b-req { background: #fee2e2; color: #991b1b; }
+  .b-rec { background: #fef3c7; color: #92400e; }
+  .b-opt { background: #d1fae5; color: #065f46; }
+
+  .no-print { text-align: center; margin: 16px 0; }
+  .btn { background: var(--navy); color: #fff; padding: 10px 24px; border: none; border-radius: 6px; font-size: 11pt; cursor: pointer; font-family: Arial, sans-serif; }
+  @media print { .no-print { display: none; } }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="no-print"><button class="btn" onclick="window.print()">🖨 Print Setup Guide</button></div>
+
+  <div class="cover">
+    <div class="logo">Firmvision Technologies Ltd</div>
+    <h1>IT Setup Guide</h1>
+    <p>Firmvision CBT Platform — Complete Deployment Manual<br>For IT Administrators · Babcock University High School</p>
+    <div class="meta">Version 1.0 · May 2026 · Ref: FVT/CBT/2026/001</div>
+  </div>
+
+  <div class="toc">
+    <h3>Table of Contents</h3>
+    <ol>
+      <li><a href="#prereqs">Prerequisites & Requirements</a></li>
+      <li><a href="#network">Network Architecture</a></li>
+      <li><a href="#server-setup">Server OS Setup</a></li>
+      <li><a href="#automated">Automated Installation (setup.sh)</a></li>
+      <li><a href="#manual">Manual Installation</a></li>
+      <li><a href="#nginx">Nginx Configuration</a></li>
+      <li><a href="#ssl">HTTPS / SSL Setup</a></li>
+      <li><a href="#firewall">Firewall Configuration</a></li>
+      <li><a href="#backup">Backup Configuration</a></li>
+      <li><a href="#monitoring">Monitoring & Logs</a></li>
+      <li><a href="#docker">Docker Deployment (Cloud)</a></li>
+      <li><a href="#checklist">Go-Live Checklist</a></li>
+    </ol>
+  </div>
+
+  <h2 id="prereqs">1. Prerequisites & Requirements</h2>
+
+  <h3>1.1 Server Hardware (Minimum)</h3>
+  <table>
+    <tr><th>Component</th><th>Minimum</th><th>Recommended</th><th>Notes</th></tr>
+    <tr><td>CPU</td><td>4 cores</td><td>8 cores</td><td>x86_64 architecture</td></tr>
+    <tr><td>RAM</td><td>4 GB</td><td>16 GB</td><td>More RAM = more concurrent sessions</td></tr>
+    <tr><td>Storage</td><td>50 GB SSD</td><td>200 GB SSD</td><td>SSD strongly recommended for DB performance</td></tr>
+    <tr><td>Network</td><td>100 Mbps LAN</td><td>1 Gbps LAN</td><td>Gigabit switch for 200+ concurrent users</td></tr>
+    <tr><td>Power</td><td>UPS (30 min)</td><td>UPS (2 hours)</td><td>Critical — power cuts during exams</td></tr>
+  </table>
+
+  <h3>1.2 Software Requirements</h3>
+  <table>
+    <tr><th>Software</th><th>Version</th><th>Status</th></tr>
+    <tr><td>Ubuntu Server</td><td>20.04 / 22.04 / 24.04 LTS</td><td><span class="badge b-req">REQUIRED</span></td></tr>
+    <tr><td>Python</td><td>3.10+ (3.12 recommended)</td><td><span class="badge b-req">REQUIRED</span></td></tr>
+    <tr><td>PostgreSQL</td><td>14+</td><td><span class="badge b-req">REQUIRED (cloud)</span></td></tr>
+    <tr><td>Nginx</td><td>1.18+</td><td><span class="badge b-rec">RECOMMENDED</span></td></tr>
+    <tr><td>Git</td><td>Any</td><td><span class="badge b-rec">RECOMMENDED</span></td></tr>
+    <tr><td>Docker + Compose</td><td>24+</td><td><span class="badge b-opt">OPTIONAL (cloud)</span></td></tr>
+    <tr><td>Certbot (Let's Encrypt)</td><td>Any</td><td><span class="badge b-opt">OPTIONAL (HTTPS)</span></td></tr>
+  </table>
+
+  <h3>1.3 Network Requirements</h3>
+  <ul>
+    <li>Server must have a <strong>static IP address</strong> on the LAN (e.g., 192.168.1.100)</li>
+    <li>All student devices must be on the same network or VLAN as the server</li>
+    <li>No internet required for LAN-only deployment during exams</li>
+    <li>Open port: <strong>80 (HTTP)</strong> or <strong>443 (HTTPS)</strong> on the school network firewall</li>
+  </ul>
+
+  <h2 id="network">2. Network Architecture</h2>
+
+  <div class="code-block"><pre>
+  ┌─────────────────────────────────────────────────────────┐
+  │                   School LAN (192.168.1.0/24)            │
+  │                                                          │
+  │  ┌──────────────┐    ┌──────────────┐    ┌───────────┐  │
+  │  │  CBT Server  │    │  Wi-Fi AP(s) │    │ LAN Switch│  │
+  │  │192.168.1.100 │◄───│              │◄───│           │  │
+  │  │ Port 80/443  │    └──────────────┘    └───────────┘  │
+  │  └──────────────┘            ▲                ▲         │
+  │         ▲                    │                │         │
+  │         │           ┌────────┴──────┐ ┌───────┴──────┐  │
+  │   Admin PC      Mobile Devices   Desktop PCs          │
+  │  (wired/WiFi)  (phones/tablets)  (exam hall)          │
+  └─────────────────────────────────────────────────────────┘</pre></div>
+
+  <h2 id="server-setup">3. Server OS Setup</h2>
+
+  <h3>3.1 Fresh Ubuntu Server Installation</h3>
+  <div class="step">Download Ubuntu Server 22.04 LTS from ubuntu.com and install on your server hardware. During setup:
+    <ul style="margin-top:8px;">
+      <li>Set server name: <code>cbt-server</code></li>
+      <li>Create admin user: <code>cbtadmin</code></li>
+      <li>Enable OpenSSH server</li>
+      <li>Do NOT install additional software (base install only)</li>
+    </ul>
+  </div>
+
+  <h3>3.2 Set Static IP Address</h3>
+  <div class="code-block"><pre>
+<span class="comment"># Edit Netplan configuration</span>
+<span class="cmd">sudo nano /etc/netplan/00-installer-config.yaml</span>
+
+<span class="comment"># Set content like this (adjust interface name with: ip link show):</span>
+<span class="string">network:
+  version: 2
+  ethernets:
+    enp0s3:               # Replace with your interface name
+      dhcp4: no
+      addresses: [192.168.1.100/24]
+      gateway4: 192.168.1.1
+      nameservers:
+        addresses: [8.8.8.8, 8.8.4.4]</span>
+
+<span class="cmd">sudo netplan apply</span>
+<span class="cmd">ip addr show</span>  <span class="comment"># Verify static IP</span></pre></div>
+
+  <h2 id="automated">4. Automated Installation (Recommended)</h2>
+
+  <p>The <code>setup.sh</code> script automates the entire installation:</p>
+
+  <div class="code-block"><pre>
+<span class="comment"># 1. Copy the CBT project to the server (from USB or scp)</span>
+<span class="cmd">scp -r cbt/ cbtadmin@192.168.1.100:/home/cbtadmin/</span>
+
+<span class="comment"># 2. SSH into the server</span>
+<span class="cmd">ssh cbtadmin@192.168.1.100</span>
+
+<span class="comment"># 3. Run the setup script as root</span>
+<span class="cmd">cd /home/cbtadmin/cbt</span>
+<span class="cmd">sudo bash setup.sh</span>
+
+<span class="comment"># For cloud deployment with a domain name:</span>
+<span class="cmd">sudo bash setup.sh cbt.yourschool.edu.ng</span></pre></div>
+
+  <div class="success"><strong>What setup.sh does automatically:</strong>
+    <ul style="margin-top:6px;">
+      <li>Installs Python, PostgreSQL, Nginx, and all system dependencies</li>
+      <li>Creates the database, user, and generates a secure random password</li>
+      <li>Creates a Python virtual environment and installs Python packages</li>
+      <li>Generates a <code>.env</code> file with secure secret keys</li>
+      <li>Creates and enables a systemd service for automatic startup</li>
+      <li>Configures Nginx as a reverse proxy</li>
+      <li>Sets up UFW firewall rules</li>
+      <li>Displays admin credentials at the end</li>
+    </ul>
+  </div>
+
+  <div class="warn"><strong>Save the credentials shown at the end of setup.sh immediately.</strong> They are not stored anywhere else. The admin password is a random generated string.</div>
+
+  <h2 id="manual">5. Manual Installation (If Needed)</h2>
+
+  <div class="code-block"><pre>
+<span class="comment"># Install system packages</span>
+<span class="cmd">sudo apt-get update && sudo apt-get install -y \
+    python3 python3-pip python3-venv python3-dev \
+    nginx postgresql postgresql-contrib libpq-dev</span>
+
+<span class="comment"># Set up PostgreSQL</span>
+<span class="cmd">sudo -u postgres psql -c "CREATE USER cbt WITH PASSWORD 'your_secure_password';"</span>
+<span class="cmd">sudo -u postgres psql -c "CREATE DATABASE cbt_exam OWNER cbt;"</span>
+
+<span class="comment"># Create Python venv and install dependencies</span>
+<span class="cmd">cd /path/to/cbt && python3 -m venv venv</span>
+<span class="cmd">source venv/bin/activate</span>
+<span class="cmd">pip install -r backend/requirements.txt</span>
+
+<span class="comment"># Create .env file</span>
+<span class="cmd">cat > backend/.env << 'EOF'
+DATABASE_URL=postgresql://cbt:your_secure_password@localhost:5432/cbt_exam
+SECRET_KEY=replace_with_long_random_string_at_least_48_chars
+ADMIN_USERNAME=admin
+ADMIN_PASSWORD=your_admin_password
+CORS_ORIGINS=*
+EOF</span>
+
+<span class="comment"># Set up static files</span>
+<span class="cmd">mkdir -p static && cp login.html admin.html student.html static/</span>
+
+<span class="comment"># Test run (Ctrl+C to stop)</span>
+<span class="cmd">cd backend && uvicorn main:app --host 0.0.0.0 --port 8000</span></pre></div>
+
+  <h2 id="nginx">6. Nginx Configuration</h2>
+
+  <div class="code-block"><pre>
+<span class="comment"># /etc/nginx/sites-available/cbt-exam</span>
+<span class="string">server {
+    listen 80;
+    server_name 192.168.1.100;  # Or your domain name
+
+    client_max_body_size 20M;
+
+    add_header X-Frame-Options DENY;
+    add_header X-Content-Type-Options nosniff;
+
+    location / {
+        proxy_pass http://127.0.0.1:8000;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_read_timeout 300s;
+    }
+}</span>
+
+<span class="cmd">sudo ln -s /etc/nginx/sites-available/cbt-exam /etc/nginx/sites-enabled/</span>
+<span class="cmd">sudo nginx -t && sudo systemctl reload nginx</span></pre></div>
+
+  <h2 id="ssl">7. HTTPS / SSL Setup (Optional but Recommended for Cloud)</h2>
+
+  <div class="code-block"><pre>
+<span class="comment"># Install Certbot (requires internet + domain pointing to server)</span>
+<span class="cmd">sudo apt install certbot python3-certbot-nginx -y</span>
+<span class="cmd">sudo certbot --nginx -d cbt.yourschool.edu.ng</span>
+
+<span class="comment"># Auto-renewal is configured automatically by Certbot</span>
+<span class="cmd">sudo certbot renew --dry-run</span>  <span class="comment"># Test renewal</span></pre></div>
+
+  <div class="tip"><strong>LAN-only deployments:</strong> HTTPS is not strictly required when traffic stays within the school LAN. HTTP on port 80 is sufficient for offline LAN deployments. Use HTTPS for cloud/internet-facing deployments.</div>
+
+  <h2 id="firewall">8. Firewall Configuration</h2>
+
+  <div class="code-block"><pre>
+<span class="comment"># UFW setup (done by setup.sh — manual steps shown here)</span>
+<span class="cmd">sudo ufw default deny incoming</span>
+<span class="cmd">sudo ufw default allow outgoing</span>
+<span class="cmd">sudo ufw allow ssh</span>
+<span class="cmd">sudo ufw allow 80/tcp</span>
+<span class="cmd">sudo ufw allow 443/tcp</span>
+<span class="cmd">sudo ufw enable</span>
+<span class="cmd">sudo ufw status verbose</span></pre></div>
+
+  <h2 id="backup">9. Backup Configuration</h2>
+
+  <div class="code-block"><pre>
+<span class="comment"># Run a manual backup now</span>
+<span class="cmd">bash /path/to/cbt/backup.sh backup</span>
+
+<span class="comment"># Set up daily automatic backup at 2 AM</span>
+<span class="cmd">bash /path/to/cbt/backup.sh cron</span>
+
+<span class="comment"># List available backups</span>
+<span class="cmd">bash /path/to/cbt/backup.sh list</span>
+
+<span class="comment"># Restore from a specific backup file</span>
+<span class="cmd">bash /path/to/cbt/backup.sh restore --file backups/cbt_backup_20260520_020000.tar.gz</span></pre></div>
+
+  <div class="tip"><strong>External backup:</strong> Copy backup archives to an external USB drive or network storage weekly. Store at least 3 months of backups off-site (e.g., on a school cloud drive).</div>
+
+  <h2 id="monitoring">10. Monitoring & Logs</h2>
+
+  <div class="code-block"><pre>
+<span class="comment"># Check service status</span>
+<span class="cmd">systemctl status cbt-exam</span>
+
+<span class="comment"># View live application logs</span>
+<span class="cmd">journalctl -u cbt-exam -f</span>
+
+<span class="comment"># View last 100 log lines</span>
+<span class="cmd">journalctl -u cbt-exam -n 100</span>
+
+<span class="comment"># View Nginx access/error logs</span>
+<span class="cmd">tail -f /var/log/nginx/cbt-exam-access.log</span>
+<span class="cmd">tail -f /var/log/nginx/cbt-exam-error.log</span>
+
+<span class="comment"># Check API health endpoint</span>
+<span class="cmd">curl http://localhost:8000/api/health</span>
+<span class="comment"># Expected: {"status": "ok"}</span>
+
+<span class="comment"># Restart the service</span>
+<span class="cmd">systemctl restart cbt-exam</span>
+
+<span class="comment"># Check disk space</span>
+<span class="cmd">df -h</span></pre></div>
+
+  <h2 id="docker">11. Docker Deployment (Cloud)</h2>
+
+  <div class="code-block"><pre>
+<span class="comment"># Prerequisites: Docker + Docker Compose installed</span>
+<span class="cmd">cd /path/to/cbt</span>
+
+<span class="comment"># Set environment variables</span>
+<span class="cmd">export SECRET_KEY="your_very_long_random_secret_key_here"</span>
+<span class="cmd">export ADMIN_PASSWORD="YourStrongAdminPassword"</span>
+
+<span class="comment"># Start all services (app + PostgreSQL)</span>
+<span class="cmd">docker compose up -d</span>
+
+<span class="comment"># Check status</span>
+<span class="cmd">docker compose ps</span>
+<span class="cmd">docker compose logs -f cbt-api</span>
+
+<span class="comment"># Stop services</span>
+<span class="cmd">docker compose down</span>
+
+<span class="comment"># Restart after update</span>
+<span class="cmd">docker compose down && docker compose up -d --build</span></pre></div>
+
+  <h2 id="checklist">12. Go-Live Checklist</h2>
+  <table>
+    <tr><th>Check</th><th>How to Verify</th><th>Done</th></tr>
+    <tr><td>Server accessible from student devices</td><td>Open browser on student device, navigate to server IP</td><td>☐</td></tr>
+    <tr><td>Admin login works</td><td>Log in with admin credentials on admin.html</td><td>☐</td></tr>
+    <tr><td>Student login works</td><td>Create test student, log in on student.html</td><td>☐</td></tr>
+    <tr><td>Test exam end-to-end</td><td>Create exam, start as student, submit, check results</td><td>☐</td></tr>
+    <tr><td>CSV import working</td><td>Import 5-10 test students via CSV</td><td>☐</td></tr>
+    <tr><td>Anti-cheat features active</td><td>Tab-switch test: switch tab during exam, check violation logged</td><td>☐</td></tr>
+    <tr><td>Result slip printing</td><td>Complete test exam, click "Print Result Slip"</td><td>☐</td></tr>
+    <tr><td>Backup configured</td><td>Run <code>bash backup.sh backup</code>, verify file created</td><td>☐</td></tr>
+    <tr><td>Auto-backup cron set</td><td>Run <code>bash backup.sh cron</code></td><td>☐</td></tr>
+    <tr><td>Default admin password changed</td><td>Edit admin user in admin panel</td><td>☐</td></tr>
+    <tr><td>Service auto-starts on reboot</td><td>Reboot server: <code>sudo reboot</code>, verify service starts</td><td>☐</td></tr>
+    <tr><td>Firmvision support contact saved</td><td>Save +234-XXX-XXXX-XXX in school IT contact book</td><td>☐</td></tr>
+  </table>
+
+  <div class="success" style="margin-top:24px;">When all boxes are checked, the system is ready for production use. Contact Firmvision to confirm go-live and trigger the final milestone invoice.</div>
+
+  <div class="tip" style="margin-top:16px;"><strong>Firmvision Support (IT):</strong><br>
+  📞 +234-XXX-XXXX-XXX (WhatsApp) &nbsp;|&nbsp; 📧 support@firmvision.ng<br>
+  Mon–Sat, 7 AM – 10 PM &nbsp;|&nbsp; Emergency P1 (exam down): 24/7</div>
+
+  <p style="text-align:center;margin-top:40px;font-size:9pt;color:#888;font-family:Arial,sans-serif;">
+    Firmvision Technologies Ltd · IT Setup Guide v1.0 · May 2026<br>
+    Ref: FVT/CBT/2026/001 · For IT Administrators Only
+  </p>
+</div>
+</body>
+</html>

@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Service Level Agreement — Firmvision Technologies Ltd</title>
+<style>
+  :root { --navy: #0f2a4a; --blue: #1a5fa8; --gold: #e8a020; --light: #f4f8ff; --text: #1a1a2e; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: Georgia, 'Times New Roman', serif; font-size: 13pt; color: var(--text); background: #fff; line-height: 1.7; }
+  .page { max-width: 800px; margin: 0 auto; padding: 40px 60px; }
+  .letterhead { border-bottom: 3px solid var(--navy); padding-bottom: 20px; margin-bottom: 30px; display: flex; justify-content: space-between; align-items: flex-end; }
+  .logo-block h1 { font-size: 22pt; color: var(--navy); }
+  .logo-block p { font-size: 9pt; color: #555; }
+  .badge { background: var(--blue); color: #fff; padding: 6px 16px; font-size: 9pt; font-weight: bold; border-radius: 4px; }
+  h2 { font-size: 16pt; color: var(--navy); text-align: center; margin: 24px 0 16px; border-bottom: 1px solid var(--gold); padding-bottom: 8px; }
+  h3 { font-size: 12pt; color: var(--blue); margin: 22px 0 8px; }
+  p { margin-bottom: 10px; }
+  table { width: 100%; border-collapse: collapse; margin: 14px 0; }
+  th { background: var(--navy); color: #fff; padding: 10px 14px; text-align: left; font-size: 11pt; }
+  td { padding: 9px 14px; border-bottom: 1px solid #e0e8f0; font-size: 11pt; }
+  tr:nth-child(even) td { background: var(--light); }
+  .green { color: #16a34a; font-weight: bold; }
+  .amber { color: #d97706; font-weight: bold; }
+  .red   { color: #dc2626; font-weight: bold; }
+  .highlight { background: #fff8e6; border-left: 4px solid var(--gold); padding: 14px 18px; margin: 16px 0; border-radius: 0 6px 6px 0; }
+  .sig-section { margin-top: 50px; display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
+  .sig-block { border-top: 1px solid #333; padding-top: 10px; }
+  .sig-line { height: 50px; border-bottom: 1px solid #999; margin: 18px 0 8px; }
+  .no-print { text-align: center; margin: 24px 0; }
+  .btn { background: var(--navy); color: #fff; padding: 10px 28px; border: none; border-radius: 6px; font-size: 12pt; cursor: pointer; }
+  .btn:hover { background: var(--blue); }
+  @media print { .no-print { display: none; } body { font-size: 11pt; } .page { padding: 20px 40px; } }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="no-print"><button class="btn" onclick="window.print()">🖨 Print / Download PDF</button></div>
+
+  <div class="letterhead">
+    <div class="logo-block">
+      <h1>FIRMVISION TECHNOLOGIES LTD</h1>
+      <p>RC: [Registration Number] · Ota, Ogun State, Nigeria<br>Email: info@firmvision.ng</p>
+    </div>
+    <div class="badge">SLA</div>
+  </div>
+
+  <h2>SERVICE LEVEL AGREEMENT (SLA)</h2>
+  <p style="text-align:center;color:#666;margin-bottom:20px;">CBT Platform — Babcock University High School<br>Ref: FVT/CBT/2026/001-SLA · Effective Date: ________________</p>
+
+  <h3>1. Purpose</h3>
+  <p>This Service Level Agreement defines the quality, availability, and support standards that Firmvision Technologies Ltd ("Provider") commits to deliver for the CBT Examination Platform operated by Babcock University High School ("Client").</p>
+
+  <h3>2. Service Availability</h3>
+  <table>
+    <thead><tr><th>Tier</th><th>Target Uptime</th><th>Max Monthly Downtime</th><th>Applicable Period</th></tr></thead>
+    <tbody>
+      <tr><td>Exam Season (active exams)</td><td class="green">99.5%</td><td>~3.6 hours</td><td>As scheduled</td></tr>
+      <tr><td>Normal Academic Term</td><td class="green">99%</td><td>~7.3 hours</td><td>Term dates</td></tr>
+      <tr><td>School Holiday / Break</td><td class="amber">95%</td><td>~36 hours</td><td>Break dates</td></tr>
+    </tbody>
+  </table>
+  <div class="highlight">
+    <strong>Note:</strong> Availability targets apply to the application server. Downtime caused by Client infrastructure (power failure, network outage, hardware failure) is excluded from SLA calculations.
+  </div>
+
+  <h3>3. Incident Response Times</h3>
+  <table>
+    <thead><tr><th>Priority</th><th>Description</th><th>First Response</th><th>Resolution Target</th></tr></thead>
+    <tbody>
+      <tr>
+        <td class="red">P1 — Critical</td>
+        <td>Exam platform completely inaccessible during active examination; data loss risk</td>
+        <td>1 hour</td><td>4 hours</td>
+      </tr>
+      <tr>
+        <td class="amber">P2 — High</td>
+        <td>Major feature broken (login, exam submission); significant user impact</td>
+        <td>4 hours</td><td>Next business day</td>
+      </tr>
+      <tr>
+        <td class="green">P3 — Medium</td>
+        <td>Minor feature impaired; workaround available; admin panel issues</td>
+        <td>1 business day</td><td>5 business days</td>
+      </tr>
+      <tr>
+        <td style="color:#64748b;font-weight:bold;">P4 — Low</td>
+        <td>Cosmetic issues, enhancement requests, documentation queries</td>
+        <td>3 business days</td><td>Next release</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>4. Support Channels</h3>
+  <table>
+    <thead><tr><th>Channel</th><th>Availability</th><th>Priority</th></tr></thead>
+    <tbody>
+      <tr><td>WhatsApp (Dedicated Line)</td><td>Mon–Sat, 7 AM – 10 PM</td><td>P1, P2</td></tr>
+      <tr><td>Email: support@firmvision.ng</td><td>Mon–Fri, 8 AM – 6 PM</td><td>P2, P3, P4</td></tr>
+      <tr><td>Remote Desktop (AnyDesk/TeamViewer)</td><td>By appointment (P1 emergency: immediate)</td><td>P1, P2</td></tr>
+      <tr><td>On-site Visit</td><td>Within 48 hours for P1 (within Ogun State); otherwise by schedule</td><td>P1</td></tr>
+    </tbody>
+  </table>
+
+  <h3>5. Included Maintenance Services</h3>
+  <table>
+    <thead><tr><th>Service</th><th>Frequency</th></tr></thead>
+    <tbody>
+      <tr><td>Security patches and bug fixes</td><td>As released (critical: within 72 hours)</td></tr>
+      <tr><td>Database backup verification</td><td>Monthly</td></tr>
+      <tr><td>Performance health check</td><td>Quarterly</td></tr>
+      <tr><td>Feature updates (minor improvements)</td><td>Per release cycle (~2 months)</td></tr>
+      <tr><td>Staff refresher training (remote)</td><td>Once per academic year</td></tr>
+    </tbody>
+  </table>
+
+  <h3>6. Exclusions</h3>
+  <p>The following are NOT covered by this SLA:</p>
+  <ul style="padding-left:20px;margin:10px 0;">
+    <li>Hardware failures (servers, network switches, UPS)</li>
+    <li>Internet service provider (ISP) outages</li>
+    <li>Power supply interruptions</li>
+    <li>Unauthorised modifications to the software by the Client or third parties</li>
+    <li>Issues arising from Client's failure to apply recommended security updates</li>
+    <li>Force majeure events</li>
+  </ul>
+
+  <h3>7. SLA Credits</h3>
+  <p>If Firmvision fails to meet availability targets due to causes within its control, the Client may claim service credits as follows:</p>
+  <table>
+    <thead><tr><th>Availability Achieved</th><th>Credit (% of Monthly Retainer)</th></tr></thead>
+    <tbody>
+      <tr><td>98.5% – 99%</td><td>5%</td></tr>
+      <tr><td>97% – 98.5%</td><td>10%</td></tr>
+      <tr><td>Below 97%</td><td>15%</td></tr>
+    </tbody>
+  </table>
+  <p>Credits must be claimed within 30 days of the incident. Credits are applied to future invoices only and are not redeemable for cash.</p>
+
+  <h3>8. Review & Amendments</h3>
+  <p>This SLA shall be reviewed annually or upon mutual agreement. Any amendments require written consent from both parties.</p>
+
+  <div class="sig-section">
+    <div class="sig-block">
+      <p><strong>FIRMVISION TECHNOLOGIES LTD</strong></p>
+      <div class="sig-line"></div>
+      <p>Name: ___________________________</p>
+      <p>Title: Director</p>
+      <p>Date: ___________________________</p>
+    </div>
+    <div class="sig-block">
+      <p><strong>BABCOCK UNIVERSITY HIGH SCHOOL</strong></p>
+      <div class="sig-line"></div>
+      <p>Name: ___________________________</p>
+      <p>Title: ___________________________</p>
+      <p>Date: ___________________________</p>
+    </div>
+  </div>
+
+  <p style="text-align:center;margin-top:40px;font-size:9pt;color:#888;">Firmvision Technologies Ltd · Ota, Ogun State, Nigeria</p>
+</div>
+</body>
+</html>
